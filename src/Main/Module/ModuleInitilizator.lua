@@ -9,7 +9,7 @@ local EveryUpdaterModule = loadstring(game:HttpGet(
 
 function ModuleInitilizator.get.new()
     local self = setmetatable({}, ModuleInitilizator)
-    self.updater = EveryUpdaterModule:new()
+    self.updater = EveryUpdaterModule.get.new()
 
     return self
 end
