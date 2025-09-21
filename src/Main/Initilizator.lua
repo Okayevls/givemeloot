@@ -1,5 +1,10 @@
-local UChat = loadstring(game:HttpGet('https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Chat/UChat.lua'))()
-local RenderUtil = loadstring(game:HttpGet('https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua'))()
+local UChat = loadstring(game:HttpGet(
+        'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Chat/UChat.lua'
+))()
+
+local RenderUtil = loadstring(game:HttpGet(
+        'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua'
+))()
 
 if _G.__G_injected then
     UChat.chat.sendMessage("Скрипт уже загружен!")
