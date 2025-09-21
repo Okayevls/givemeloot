@@ -1,17 +1,12 @@
--- Initilizator.lua
-local Util = require(script.Parent.Parent.util.Util)
--- ↑ путь: из init/ идём в родительскую папку (src), затем в util/, затем Util.lua
+local http = require("socket.http")
+local url = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/main/util/Util.lua"
 
-local Initilizator = {}
-Initilizator.__index = Initilizator
-
-function Initilizator.new()
-    local self = setmetatable({}, Initilizator)
-    return self
+local body, code = http.request(url)
+if not body then
+    error("Не удалось загрузить скрипт: " .. tostring(code))
 end
 
-function Initilizator:run()
-    Util.chat.sendMessage("Hello from Initilizator!")
-end
+local chunk = loadstring(body)
+local Util = chunk()
 
-return Initilizator
+Util.chat.sendMessage(1111)
