@@ -9,4 +9,4 @@ end
 local chunk = loadstring(body)
 local Util = chunk()
 
-Util.chat.sendMessage(1111)
+Util.chat.sendMessage("Hello World!!!")

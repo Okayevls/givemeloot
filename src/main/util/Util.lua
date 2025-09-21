@@ -4,7 +4,7 @@ Util.__index = Util
 Util.chat = {}
 
 function Util.chat.sendMessage(msg)
-    print("[CHAT] " .. tostring(msg))
+    print("[Dev] " + msg)
 end
 
 return Util
