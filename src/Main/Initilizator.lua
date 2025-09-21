@@ -12,7 +12,7 @@ if _G.__G_injected then
 end
 _G.__G_injected = true
 
-RenderUtil:drawRoundedRectangle(100, 100, 200, 100, true, Color3.fromRGB(255,0,0))
+RenderUtil:drawRoundedRectangle(100, 100, 300, 150, 20, Color3.fromRGB(255,255,255), 0.25)
 
 local function uninject()
     UChat.chat.sendMessage('Uninjecting...')
