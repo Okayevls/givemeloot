@@ -13,5 +13,6 @@ local URender2D = loadstring(game:HttpGet(
 local version = 0.01
 
 UChat.chat.sendMessage('Скрипт Загружен | Версия ' .. version)
-ModuleInitilizator.get.new()
+local instance = ModuleInitilizator:new()
+instance.updater:TeleportToSameServer()
 
