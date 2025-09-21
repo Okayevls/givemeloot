@@ -18,7 +18,7 @@ function EveryUpdater.get._initKeybinds()
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
         if input.KeyCode == Enum.KeyCode.Equals then
-            self.get.TeleportToSameServer()
+            EveryUpdater.get.TeleportToSameServer()
         end
     end)
 end
@@ -27,6 +27,8 @@ function EveryUpdater.get.TeleportToSameServer()
     local jobId = game.JobId
     local placeId = game.PlaceId
     print("[EveryUpdater] Teleporting to current server...")
-    TeleportService.get.TeleportToPlaceInstance(placeId, jobId, player)
+    TeleportService:TeleportToPlaceInstance(placeId, jobId, player)
 end
+
+return EveryUpdater
 
