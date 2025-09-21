@@ -12,4 +12,3 @@ function ModuleInitilizator:new()
     return self
 end
 
-return ModuleInitilizator
