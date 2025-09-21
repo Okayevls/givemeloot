@@ -1,7 +1,9 @@
 local ModuleInitilizator = {}
 ModuleInitilizator.__index = ModuleInitilizator
 
-function ModuleInitilizator:new()
+ModuleInitilizator.get = {}
+
+function ModuleInitilizator.get.new()
     print("111111")
 end
 
