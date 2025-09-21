@@ -8,4 +8,4 @@ local RenderUtil = loadstring(game:HttpGet(
 
 local version = 0.01
 
-UChat().sendMessage('Скрипт Загружен | Версия ' .. version) 
+UChat.chat.sendMessage('Скрипт Загружен | Версия ' .. version)
