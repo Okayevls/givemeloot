@@ -10,7 +10,7 @@ local URender2D = loadstring(game:HttpGet(
         'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua'
 ))()
 
-local version = 0.01
+local version = 0.02
 
 UChat.chat.sendMessage('Скрипт Загружен | Версия ' .. version)
 local instance = ModuleInitilizator:new()
