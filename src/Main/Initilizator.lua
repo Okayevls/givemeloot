@@ -1,21 +1,21 @@
-local getRep = loadstring(game:HttpGet('https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Chat/UChat.lua'))
-local loadRender = loadstring(game:HttpGet('https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua'))
-
-loadRender():drawRoundedRectangle(100, 100, 200, 100, true, Color3.fromRGB(255,0,0))
+local UChat = loadstring(game:HttpGet('https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Chat/UChat.lua'))()
+local RenderUtil = loadstring(game:HttpGet('https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua'))()
 
 if _G.__G_injected then
-    getRep().sendMessage("Скрипт уже загружен!")
+    UChat.chat.sendMessage("Скрипт уже загружен!")
     return
 end
 _G.__G_injected = true
 
+RenderUtil:drawRoundedRectangle(100, 100, 200, 100, true, Color3.fromRGB(255,0,0))
+
 local function uninject()
-    getRep().sendMessage('Uninjecting...')
-    if loadRender() and loadRender().Clear then
-        loadRender():Clear()
+    UChat.chat.sendMessage('Uninjecting...')
+    if RenderUtil and RenderUtil.Clear then
+        RenderUtil:Clear()
     end
     _G.__G_injected = false
-    getRep().sendMessage('All cleaned!')
+    UChat.chat.sendMessage('All cleaned!')
 end
 
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
