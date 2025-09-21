@@ -8,5 +8,4 @@ local RenderUtil = loadstring(game:HttpGet(
 
 local version = 0.01
 
-UChat().sendMessage('Скрипт Загружен | Версия ' .. version)
-RenderUtil:drawRoundedRectangle(100, 100, 300, 150, 20, Color3.fromRGB(255,255,255), 0.25)
+UChat().sendMessage('Скрипт Загружен | Версия ' .. version) 
