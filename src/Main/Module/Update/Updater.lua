@@ -14,7 +14,8 @@ end
 function Updater:_initKeybind()
     UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if gameProcessed then return end
-        if input.KeyCode == Enum.KeyCode.Equals then
+        print("[Updater] Нажата клавиша:", input.KeyCode)
+        if input.KeyCode == Enum.KeyCode.Equals or input.KeyCode == Enum.KeyCode.KeypadEquals then
             self:TeleportToSameServer()
         end
     end)
