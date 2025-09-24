@@ -14,4 +14,6 @@ local Chat = ModuleLoader:Get("Chat")
 Chat.chat.sendMessage("Скрипт успешно запущен!")
 
 local Updater = ModuleLoader:Get("Updater")
-Updater:TeleportToSameServer()
+local updaterInstance = Updater:new()
+
+Chat.chat.sendMessage("Нажми '=' для перезахода на тот же сервер.")
