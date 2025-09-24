@@ -20,4 +20,4 @@ local Render = ModuleLoader:Get("Render")
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
-Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 20, Color3.fromRGB(100, 200, 255))
+Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 20, Color3.fromRGB(255, 255, 255))
