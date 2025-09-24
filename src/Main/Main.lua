@@ -17,13 +17,7 @@ local Updater = ModuleLoader:Get("Updater")
 local updaterInstance = Updater:new()
 
 local Render = ModuleLoader:Get("Render")
-local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player:WaitForChild("PlayerGui")
-Render:drawRoundedRectangle(
-        screenGui,
-        UDim2.new(0, 200, 0, 100),
-        UDim2.new(0.5, 0, 0.5, 0),
-        Color3.fromRGB(100, 200, 255),
-        20
-)
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 20, Color3.fromRGB(100, 200, 255))

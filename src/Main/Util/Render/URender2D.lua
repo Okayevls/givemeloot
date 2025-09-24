@@ -3,12 +3,12 @@ RenderUtil.__index = RenderUtil
 
 RenderUtil.shapes = {}
 
-function RenderUtil:drawRoundedRectangle(parent, size, position, color, cornerRadius)
+function RenderUtil:drawRoundedRectangle(parent, x, y, width, height, cornerRadius, color)
     local frame = Instance.new("Frame")
-    frame.Size = size or UDim2.new(0, 100, 0, 50)
-    frame.Position = position or UDim2.new(0.5, -50, 0.5, -25)
+    frame.Size = UDim2.new(0, width or 100, 0, height or 50)
+    frame.Position = UDim2.new(0, x or 0, 0, y or 0)
     frame.BackgroundColor3 = color or Color3.fromRGB(255, 255, 255)
-    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.BorderSizePixel = 0
     frame.Parent = parent
 
     local uiCorner = Instance.new("UICorner")
@@ -16,7 +16,6 @@ function RenderUtil:drawRoundedRectangle(parent, size, position, color, cornerRa
     uiCorner.Parent = frame
 
     table.insert(self.shapes, frame)
-
     return frame
 end
 
