@@ -3,12 +3,13 @@ UFontRenderer.__index = UFontRenderer
 
 UFontRenderer.texts = {}
 
-function UFontRenderer:renderText(parent, text, size, x, y, color)
+function UFontRenderer:renderText(parent, text, size, x, y, color, alpha)
     local label = Instance.new("TextLabel")
     label.Text = text or "Text"
     label.Font = Enum.Font.SourceSans
     label.TextSize = size or 18
     label.TextColor3 = color or Color3.fromRGB(255, 255, 255)
+    label.TextTransparency = alpha or 0
     label.BackgroundTransparency = 1
     label.Position = UDim2.new(0, x or 0, 0, y or 0)
     label.Size = UDim2.new(0, 500, 0, size or 18)

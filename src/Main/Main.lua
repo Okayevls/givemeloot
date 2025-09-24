@@ -24,5 +24,5 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
-Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 5, Color3.fromRGB(255, 255, 255))
-FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255))
+Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 9, Color3.fromRGB(25, 25, 25), 0.2)
+FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255), 0.2)
