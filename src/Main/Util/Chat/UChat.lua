@@ -1,10 +1,11 @@
-local Util = {}
-Util.__index = Util
+local Chat = {}
+Chat.__index = Chat
 
-Util.chat = {}
+Chat.chat = {}
 
-function Util.chat.sendMessage(msg)
+function Chat.chat.sendMessage(msg)
     print("[Dev] " .. msg)
 end
 
-return Util
+return Chat
+
