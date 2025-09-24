@@ -2,8 +2,8 @@
 local ModuleLoader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Core/ModuleLoader.lua"))()
 
 local modules = {
-    Chat    = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Chat/Chat.lua",
-    Render  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/Render.lua",
+    Chat    = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Chat/UChat.lua",
+    Render  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua",
 
     Updater = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Update/Updater.lua",
 }
@@ -11,9 +11,7 @@ local modules = {
 ModuleLoader:Init(modules)
 
 local Chat = ModuleLoader:Get("Chat")
-Chat.chat.sendMessage("Скрипт успешно запущен!")
+Chat.chat.sendMessage("Скрипт запущен!")
 
 local Updater = ModuleLoader:Get("Updater")
 local updaterInstance = Updater:new()
-
-Chat.chat.sendMessage("Нажми '=' для перезахода на тот же сервер.")
