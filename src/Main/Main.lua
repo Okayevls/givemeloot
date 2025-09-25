@@ -30,12 +30,15 @@ local GuiSaveManager = EventLoader:Get("SaveManager")
 local updaterReconnect = Updater:new()
 
 local Window = GuiRenderer:CreateWindow({ Title = '                     $ ClosedPvP.lucky | Beta $                     ', AutoShow = true, TabPadding = 15, MenuFadeTime = 0.2 })
-local Tabs = { Main = Window:AddTab('Main'),
-               Character = Window:AddTab('Character'),
-               Visuals = Window:AddTab('Visuals'),
-               Misc = Window:AddTab('Misc'),
-               Players = Window:AddTab('Players'),
-               ['UI Settings'] = Window:AddTab('UI Settings') }
+local Tabs = {
+Main = Window:AddTab('Main'),
+Combat = Window:AddTab('Combat'),
+Character = Window:AddTab('Character'),
+Visuals = Window:AddTab('Visuals'),
+Misc = Window:AddTab('Misc'),
+Players = Window:AddTab('Players'), 
+['UI Settings'] = Window:AddTab('UI Settings')
+}
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
