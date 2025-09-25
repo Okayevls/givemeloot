@@ -1,6 +1,6 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
 
 local RenderUtil = {}
 RenderUtil.__index = RenderUtil
@@ -14,7 +14,7 @@ function RenderUtil:drawRoundedRectangle(x, y, width, height, cornerRadius, colo
     frame.BackgroundColor3 = color or Color3.fromRGB(255, 255, 255)
     frame.BackgroundTransparency = alpha or 0
     frame.BorderSizePixel = 0
-    frame.Parent = PlayerGui
+    frame.Parent = screenGui.Parent
 
     local uiCorner = Instance.new("UICorner")
     uiCorner.CornerRadius = UDim.new(0, cornerRadius or 10)
