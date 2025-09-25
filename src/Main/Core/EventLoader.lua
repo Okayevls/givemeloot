@@ -10,9 +10,9 @@ function EventLoader:Init(modules)
 
         if success and result then
             self.loadedModules[name] = result
-            print("[EventLoader] ✅ Модуль загружен:", name)
+            print("[EventLoader] ✅ Module loaded :", name)
         else
-            warn("[EventLoader] ❌ Ошибка при загрузке модуля:", name, result)
+            warn("[EventLoader] ❌ Error loading module :", name, result)
         end
     end
 end

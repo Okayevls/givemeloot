@@ -23,7 +23,7 @@ end
 function Updater:TeleportToSameServer()
     local player = Players.LocalPlayer
     TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
-    print("[Updater] 🔁 Перезаход на тот же сервер...")
+    print("[Updater] 🔁 Rejoin to the same server...")
 end
 
 return Updater
