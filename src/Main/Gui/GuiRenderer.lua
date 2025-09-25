@@ -10,7 +10,7 @@ function GuiRenderer:drawGui(DrawLoader, ChatLoader)
     local screenGui = Instance.new("ScreenGui")
     screenGui.Parent = player:WaitForChild("PlayerGui")
     Render:drawRoundedRectangle(screenGui, 100, 100, 100, 100, 15, Color3.fromRGB(15, 15, 15), 0.25)
-    Chat:sendMessage("Loading gui...")
+    Chat.chat.sendMessage("Loading gui...")
 end
 
 
