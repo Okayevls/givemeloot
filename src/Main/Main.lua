@@ -30,7 +30,7 @@ local ModuleLoader = EventLoader:Get("ModuleLoader")
 
 local updaterReconnect = Updater:new()
 
-local Window = GuiRenderer:CreateWindow({ Title = '                     $ ClosedPvP.lucky | Beta $                     ', AutoShow = true, TabPadding = 15, MenuFadeTime = 0.2 })
+local Window = GuiRenderer:CreateWindow({ Title = '                      Lucker | Beta                      ', AutoShow = true, TabPadding = 15, MenuFadeTime = 0.2 })
 local Tabs = {
 Main = Window:AddTab('Main'),
 Character = Window:AddTab('Character'),
@@ -43,7 +43,7 @@ Players = Window:AddTab('Players'),
 ModuleLoader:drawAllModule(Tabs)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
-Chat.chat.sendMessage("Build to loading 000000001")
+Chat.chat.sendMessage("Build to loading 000000002")
 
 
 

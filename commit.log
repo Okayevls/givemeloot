@@ -1,6 +1,2 @@
-[main 57f8082] Auto-commit 26.09.2025  0:03:25,24
- 7 files changed, 47 insertions(+), 28 deletions(-)
- create mode 100644 src/Main/Core/ModuleLoader.lua
- delete mode 100644 src/Main/Module/Category.lua
- delete mode 100644 src/Main/Module/ModuleLoader.lua
- create mode 100644 src/Main/Module/ModuleManager.lua
+[main b728c79] Auto-commit 26.09.2025  0:05:06,04
+ 2 files changed, 8 insertions(+), 6 deletions(-)
