@@ -3,11 +3,8 @@ DesyncPosition.__index = DesyncPosition
 
 DesyncPosition.type = {}
 
-
-local TargetingGroup = Tabs.Main:AddLeftGroupbox('Targeting')
-
-function DesyncPosition:drawModule()
-
+function DesyncPosition:drawModule(Tabs)
+    local desyncGroup = Tabs.Character:AddLeftGroupbox('Desync Position')
 end
 
 return DesyncPosition
