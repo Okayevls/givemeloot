@@ -1,5 +1,5 @@
 
-local ClassLoader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Core/ClassLoader.lua"))()
+local EventLoader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Core/EventLoader.lua"))()
 
 local modules = {
     Chat    = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Chat/UChat.lua",
@@ -9,12 +9,12 @@ local modules = {
     Updater = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Update/Updater.lua",
 }
 
-ClassLoader:Init(modules)
+EventLoader:Init(modules)
 
-local Chat = ClassLoader:Get("Chat")
-local Updater = ClassLoader:Get("Updater")
-local Render = ClassLoader:Get("Render")
-local FontRender = ClassLoader:Get("FontRender")
+local Chat = EventLoader:Get("Chat")
+local Updater = EventLoader:Get("Updater")
+local Render = EventLoader:Get("Render")
+local FontRender = EventLoader:Get("FontRender")
 
 local updaterInstance = Updater:new()
 
