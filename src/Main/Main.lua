@@ -45,8 +45,6 @@ Players = Window:AddTab('Players'),
 
 ModuleLoader:drawAllModule(Tabs)
 
---local TargetingGroup = Tabs.Main:AddLeftGroupbox('Targeting')
-
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
 

@@ -16,6 +16,7 @@ function DesyncPosition:drawModule(Tabs)
     --        end
     --    end
     --})
+    return playerGroup
 end
 
 return DesyncPosition
