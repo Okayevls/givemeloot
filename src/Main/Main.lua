@@ -25,7 +25,4 @@ Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
 GuiRenderer:drawGui(Render)
 
---Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 15, Color3.fromRGB(25, 25, 25), 0.2)
---FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255), 0.2)
-
 
