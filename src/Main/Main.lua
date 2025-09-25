@@ -18,6 +18,7 @@ local FontRender = EventLoader:Get("FontRender")
 
 local updaterInstance = Updater:new()
 
+Render.drawRoundedRectangle(100, 100, 100, 100, 15, Color3.fromRGB(255, 255, 255), 0.2)
 Chat.chat.sendMessage("Created By Prokosik x Flyaga other Sucked Dick")
 
 --Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 15, Color3.fromRGB(25, 25, 25), 0.2)
