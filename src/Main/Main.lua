@@ -19,11 +19,11 @@ local Render = EventLoader:Get("Render")
 local FontRender = EventLoader:Get("FontRender")
 local GuiRenderer = EventLoader:Get("GuiRenderer")
 
-local updaterInstance = Updater:new()
+local updaterReconnect = Updater:new()
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
-GuiRenderer:drawGui(Render)
+GuiRenderer:drawGui(Render, Chat)
 
 --Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 15, Color3.fromRGB(25, 25, 25), 0.2)
 --FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255), 0.2)
