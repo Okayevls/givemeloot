@@ -10,9 +10,9 @@ function DesyncPosition:drawModule(Tabs)
         Default = false,
         Callback = function(state)
             if state then
---
+                print("True 1")
             else
---
+                print("False 1")
             end
         end
     })
