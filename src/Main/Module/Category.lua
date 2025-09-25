@@ -3,7 +3,7 @@ Category.__index = Category
 
 Category.type = {}
 
-function Category:drawCategory(window)
+function Category:drawCategory(Window)
     local Tabs = { Main = Window:AddTab('Main'),
                    Character = Window:AddTab('Character'),
                    Visuals = Window:AddTab('Visuals'),
