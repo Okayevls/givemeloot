@@ -6,9 +6,8 @@ local modules = {
     Render  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua",
     FontRender  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/UFontRenderer.lua",
 
-    GuiRenderer  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiRenderer.lua",
-
     Updater = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Update/Updater.lua",
+    GuiRenderer = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/src/Main/Gui/Library.lua'
 }
 
 EventLoader:Init(modules)
@@ -21,8 +20,9 @@ local GuiRenderer = EventLoader:Get("GuiRenderer")
 
 local updaterReconnect = Updater:new()
 
+local Window = GuiRenderer:CreateWindow({ Title = '                     $ ClosedPvP.lucky | Beta $                     ', AutoShow = true, TabPadding = 15, MenuFadeTime = 0.2 })
+
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
-GuiRenderer:drawGui(Render)
 
 
