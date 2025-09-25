@@ -12,7 +12,9 @@ local modules = {
     GuiThemeManager = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/ThemeManager.lua',
     GuiSaveManager = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/SaveManager.lua',
 
-    Category = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Category.lua'
+    Category = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Category.lua',
+
+    ModuleLoader = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleLoader.lua'
 }
 
 EventLoader:Init(modules)
@@ -27,6 +29,8 @@ local Category = EventLoader:Get("Category")
 local GuiThemeManager = EventLoader:Get("ThemeManager")
 local GuiSaveManager = EventLoader:Get("SaveManager")
 
+local ModuleLoader = EventLoader:Get("ModuleLoader")
+
 local updaterReconnect = Updater:new()
 
 local Window = GuiRenderer:CreateWindow({ Title = '                     $ ClosedPvP.lucky | Beta $                     ', AutoShow = true, TabPadding = 15, MenuFadeTime = 0.2 })
@@ -38,6 +42,10 @@ Misc = Window:AddTab('Misc'),
 Players = Window:AddTab('Players'),
 ['UI Settings'] = Window:AddTab('Settings')
 }
+
+ModuleLoader:drawAllModule(Tabs)
+
+--local TargetingGroup = Tabs.Main:AddLeftGroupbox('Targeting')
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
