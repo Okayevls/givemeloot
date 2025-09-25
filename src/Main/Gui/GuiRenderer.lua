@@ -41,7 +41,7 @@ function GuiRenderer:drawGui(DrawLoader)
     screenGui.Name = "DraggableGui"
     screenGui.ResetOnSpawn = false
     screenGui.Parent = player:WaitForChild("PlayerGui")
-    local frame = Render:drawRoundedRectangle(screenGui, 200, 100, 600, 450, 15, Color3.fromRGB(15, 15, 15), 0.13)
+    local frame = Render:drawRoundedRectangle(screenGui, 200, 100, 600, 450, 17, Color3.fromRGB(15, 15, 15), 0.13)
     makeDraggable(frame)
     table.insert(self.shapes, frame)
 end
