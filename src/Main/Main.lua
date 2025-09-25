@@ -23,6 +23,7 @@ local updaterReconnect = Updater:new()
 local Window = GuiRenderer:CreateWindow({ Title = '                     $ ClosedPvP.lucky | Beta $                     ', AutoShow = true, TabPadding = 15, MenuFadeTime = 0.2 })
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
+Chat.chat.sendMessage("Build Test 000000012")
 
 
 
