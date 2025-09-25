@@ -12,11 +12,6 @@ local function makeDraggable(frame)
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
-        elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-            if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.LeftShift)
-                    or game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.RightShift) then
-                frame:Destroy()
-            end
         end
     end)
 
