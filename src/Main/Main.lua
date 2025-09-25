@@ -12,9 +12,7 @@ local modules = {
     GuiThemeManager = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/ThemeManager.lua',
     GuiSaveManager = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/SaveManager.lua',
 
-    Category = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Category.lua',
-
-    ModuleLoader = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleLoader.lua'
+    ModuleLoader = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleManager.lua'
 }
 
 EventLoader:Init(modules)
@@ -25,7 +23,6 @@ local Render = EventLoader:Get("Render")
 local FontRender = EventLoader:Get("FontRender")
 
 local GuiRenderer = EventLoader:Get("GuiRenderer")
-local Category = EventLoader:Get("Category")
 local GuiThemeManager = EventLoader:Get("ThemeManager")
 local GuiSaveManager = EventLoader:Get("SaveManager")
 
@@ -46,6 +43,7 @@ Players = Window:AddTab('Players'),
 ModuleLoader:drawAllModule(Tabs)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
+Chat.chat.sendMessage("Build to loading 000000001")
 
 
 

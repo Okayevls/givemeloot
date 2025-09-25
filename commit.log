@@ -1,2 +1,6 @@
-[main a2db05b] Auto-commit 25.09.2025 23:56:53,92
- 2 files changed, 11 insertions(+), 11 deletions(-)
+[main 57f8082] Auto-commit 26.09.2025  0:03:25,24
+ 7 files changed, 47 insertions(+), 28 deletions(-)
+ create mode 100644 src/Main/Core/ModuleLoader.lua
+ delete mode 100644 src/Main/Module/Category.lua
+ delete mode 100644 src/Main/Module/ModuleLoader.lua
+ create mode 100644 src/Main/Module/ModuleManager.lua
