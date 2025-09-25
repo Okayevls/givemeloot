@@ -18,9 +18,15 @@ local FontRender = EventLoader:Get("FontRender")
 
 local updaterInstance = Updater:new()
 
-Render:drawRoundedRectangle(100, 100, 100, 100, 15, Color3.fromRGB(255, 255, 255), 0.2)
 Chat.chat.sendMessage("Created By Prokosik x Flyaga other Sucked Dick")
-Chat.chat.sendMessage("Build to loader | 0000011")
+
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+Render:drawRoundedRectangle(screenGui, 100, 100, 100, 100, 15, Color3.fromRGB(255, 255, 255), 0.2)
 
 --Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 15, Color3.fromRGB(25, 25, 25), 0.2)
 --FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255), 0.2)
+
+
