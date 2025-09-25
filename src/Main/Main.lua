@@ -24,63 +24,7 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
-local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/source.lua"))()
+Chat.chat.sendMessage("Версия данного билда - 0000011")
 
-local Window = Rayfield:CreateWindow({
-    Name = "Моя GUI Панель",
-    LoadingTitle = "Загрузка...",
-    LoadingSubtitle = "Пожалуйста, подождите",
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = nil,
-        FileName = "MyConfig"
-    },
-    Discord = {
-        Enabled = false,
-        Invite = "discord.gg/example",
-        RememberJoins = true
-    },
-    KeySystem = false
-})
-
-local Tab = Window:CreateTab("Настройки")
-
-Tab:CreateToggle({
-    Name = "GodMode",
-    CurrentValue = false,
-    Flag = "GodMode",
-    Callback = function(value)
-        print("GodMode:", value)
-    end
-})
-
-Tab:CreateSlider({
-    Name = "Скорость",
-    Range = {16, 500},
-    Increment = 1,
-    Suffix = " stud/s",
-    CurrentValue = 50,
-    Flag = "Speed",
-    Callback = function(value)
-        print("Скорость:", value)
-    end
-})
-
-Tab:CreateColorPicker({
-    Name = "Цвет UI",
-    Default = Color3.fromRGB(255, 0, 0),
-    Flag = "UIColor",
-    Callback = function(color)
-        print("Выбран цвет:", color)
-    end
-})
-
-Tab:CreateDropdown({
-    Name = "Режим",
-    Options = {"Easy", "Normal", "Hard"},
-    CurrentOption = "Normal",
-    Flag = "Mode",
-    Callback = function(option)
-        print("Выбран режим:", option)
-    end
-})
+--Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 15, Color3.fromRGB(25, 25, 25), 0.2)
+--FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255), 0.2)
