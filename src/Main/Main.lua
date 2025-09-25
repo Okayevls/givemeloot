@@ -6,6 +6,8 @@ local modules = {
     Render  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/URender2D.lua",
     FontRender  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Util/Render/UFontRenderer.lua",
 
+    GuiRenderer  = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiRenderer.lua",
+
     Updater = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Update/Updater.lua",
 }
 
@@ -15,11 +17,13 @@ local Chat = EventLoader:Get("Chat")
 local Updater = EventLoader:Get("Updater")
 local Render = EventLoader:Get("Render")
 local FontRender = EventLoader:Get("FontRender")
+local GuiRenderer = EventLoader:Get("GuiRenderer")
 
 local updaterInstance = Updater:new()
 
-Chat.chat.sendMessage("Created By Prokosik x Flyaga other Sucked Dick")
-Render:drawRoundedRectangle(100, 100, 100, 100, 15, Color3.fromRGB(15, 15, 15), 0.25)
+Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
+
+GuiRenderer:drawGui()
 
 --Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 15, Color3.fromRGB(25, 25, 25), 0.2)
 --FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255), 0.2)
