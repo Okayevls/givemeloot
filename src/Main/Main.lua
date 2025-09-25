@@ -12,19 +12,13 @@ local modules = {
 ClassLoader:Init(modules)
 
 local Chat = ClassLoader:Get("Chat")
-Chat.chat.sendMessage("Скрипт запущен!")
-
 local Updater = ClassLoader:Get("Updater")
-local updaterInstance = Updater:new()
-
 local Render = ClassLoader:Get("Render")
 local FontRender = ClassLoader:Get("FontRender")
 
-local player = game.Players.LocalPlayer
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = player:WaitForChild("PlayerGui")
+local updaterInstance = Updater:new()
 
-Chat.chat.sendMessage("Версия данного билда - 0000014")
+Chat.chat.sendMessage("Created By Prokosik x Flyaga other Sucked Dick")
 
 --Render:drawRoundedRectangle(screenGui, 100, 50, 200, 100, 15, Color3.fromRGB(25, 25, 25), 0.2)
 --FontRender:renderText(screenGui, "Привет, Roblox!", 24, 100, 50, Color3.fromRGB(255, 255, 255), 0.2)
