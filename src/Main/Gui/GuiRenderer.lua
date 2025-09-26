@@ -383,133 +383,131 @@ local function CreateOptions(Frame)
 
     function Options.Switch(Title, Callback)
         local Properties = {
-            Title = Title or "Switch";
+            Title = Title and tostring(Title) or "Switch";
             Value = false;
             Function = Callback or function(Status) end;
-            Keybind = nil; -- текущий KeyCode
+            Keybind = nil;
         }
 
         local Container = Utility.new("ImageButton", {
-            Name = "Switch",
+            Name = "SwitchContainer",
             Parent = typeof(Frame) == "Instance" and Frame or Frame(),
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 25),
-        }, {
-            -- Keybind слева
-            Utility.new("TextLabel", {
-                Name = "Keybind",
-                AnchorPoint = Vector2.new(0, 0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 0, 0.5, 0),
-                Size = UDim2.new(0, 40, 1, 0),
-                Font = Enum.Font.Gotham,
-                Text = Properties.Keybind and Properties.Keybind.Name or "None",
-                TextColor3 = Color3.fromRGB(200,200,200),
-                TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Left
-            }),
-
-            -- Название Switch
-            Utility.new("TextLabel", {
-                Name = "Title",
-                AnchorPoint = Vector2.new(0, 0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 45, 0.5, 0),
-                Size = UDim2.new(1, -70, 1, 0),
-                Font = Enum.Font.Gotham,
-                Text = Title or "Switch",
-                TextColor3 = Color3.fromRGB(255,255,255),
-                TextSize = 14,
-                TextXAlignment = Enum.TextXAlignment.Left
-            }),
-
-            -- Сам переключатель
-            Utility.new("Frame", {
-                Name = "Switch",
-                AnchorPoint = Vector2.new(1, 0.5),
-                BackgroundColor3 = Color3.fromRGB(100,100,100),
-                Position = UDim2.new(1, 0, 0.5, 0),
-                Size = UDim2.new(0,25,0,15)
-            }, {
-                Utility.new("UICorner", {CornerRadius = UDim.new(1,0)}),
-                Utility.new("Frame", {
-                    Name = "Circle",
-                    AnchorPoint = Vector2.new(0,0.5),
-                    BackgroundColor3 = Color3.fromRGB(255,255,255),
-                    Position = UDim2.new(0,0,0.5,0),
-                    Size = UDim2.new(0,14,0,14)
-                }, {Utility.new("UICorner",{CornerRadius = UDim.new(1,0)})})
-            })
         })
+
+        -- Title Label
+        local TitleLabel = Utility.new("TextLabel", {
+            Name = "Title",
+            AnchorPoint = Vector2.new(0, 0.5),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0.5, 0),
+            Size = UDim2.new(1, -60, 1, 0),
+            Font = Enum.Font.Gotham,
+            Text = Properties.Title,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextSize = 14,
+            TextTransparency = 0.3,
+            TextXAlignment = Enum.TextXAlignment.Left
+        }, nil)
+        TitleLabel.Parent = Container
+
+        -- Keybind Button (слева от слайдера)
+        local KeybindButton = Utility.new("TextButton", {
+            Name = "Keybind",
+            Parent = Container,
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+            Size = UDim2.new(0, 50, 0, 20),
+            Position = UDim2.new(1, -80, 0.5, -10),
+            Text = "None",
+            Font = Enum.Font.Gotham,
+            TextSize = 12,
+            TextColor3 = Color3.fromRGB(255, 255, 255)
+        })
+
+        local CurrentKey = nil
+        KeybindButton.MouseButton1Down:Connect(function()
+            KeybindButton.Text = "..."
+            local connection
+            connection = Services.UserInputService.InputBegan:Connect(function(Input)
+                if Input.UserInputType == Enum.UserInputType.Keyboard then
+                    CurrentKey = Input.KeyCode
+                    Properties.Keybind = CurrentKey
+                    KeybindButton.Text = tostring(CurrentKey):gsub("Enum.KeyCode.", "")
+                    connection:Disconnect()
+                end
+            end)
+        end)
+
+        -- Switch Frame
+        local SwitchFrame = Utility.new("Frame", {
+            Name = "Switch",
+            AnchorPoint = Vector2.new(1, 0.5),
+            BackgroundColor3 = Color3.fromRGB(100, 100, 100),
+            Position = UDim2.new(1, 0, 0.5, 0),
+            Size = UDim2.new(0, 25, 0, 15),
+        }, {
+            Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)}),
+            Utility.new("Frame", {
+                Name = "Circle",
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                Position = UDim2.new(0, 0, 0.5, 0),
+                Size = UDim2.new(0, 14, 0, 14)
+            }, {Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)})})
+        })
+        SwitchFrame.Parent = Container
 
         local Tweens = {
             [true] = {
-                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
-                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1,0.5), Position = UDim2.new(1,0,0.5,0)})
-            },
+                Utility.Tween(SwitchFrame, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
+                Utility.Tween(SwitchFrame.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0)})
+            };
             [false] = {
-                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Color3.fromRGB(100,100,100)}),
-                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(0,0.5), Position = UDim2.new(0,0,0.5,0)})
-            }
+                Utility.Tween(SwitchFrame, TweenInfo.new(0.5), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}),
+                Utility.Tween(SwitchFrame.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 0, 0.5, 0)})
+            };
         }
 
-        -- Клик по switch
-        Container.MouseButton1Down:Connect(function()
+        local function ToggleSwitch()
             Properties.Value = not Properties.Value
             for i,v in ipairs(Tweens[Properties.Value]) do
                 v:Play()
             end
-            local success, err = pcall(Properties.Function, Properties.Value)
-            assert(Luminosity.Settings.Debug == false or success, err)
-        end)
+            local Success, Error = pcall(Properties.Function, Properties.Value)
+            assert(Luminosity.Settings.Debug == false or Success, Error)
+        end
 
-        -- Клик по Keybind для перебинда
-        Container.Keybind.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                Container.Keybind.Text = "..."
-                local conn
-                conn = Services.UserInputService.InputBegan:Connect(function(key)
-                    if key.UserInputType == Enum.UserInputType.Keyboard then
-                        Properties.Keybind = key.KeyCode
-                        Container.Keybind.Text = Properties.Keybind.Name
-                        conn:Disconnect()
-                    end
-                end)
-            end
-        end)
+        Container.MouseButton1Down:Connect(ToggleSwitch)
 
-        -- Метод для вызова по Keybind
-        Services.UserInputService.InputBegan:Connect(function(input, gameProcessed)
-            if not gameProcessed and Properties.Keybind and input.KeyCode == Properties.Keybind then
-                Properties.Value = not Properties.Value
-                for i,v in ipairs(Tweens[Properties.Value]) do
-                    v:Play()
-                end
-                local success, err = pcall(Properties.Function, Properties.Value)
-                assert(Luminosity.Settings.Debug == false or success, err)
+        -- Keybind listener
+        Services.UserInputService.InputBegan:Connect(function(Input, Processed)
+            if not Processed and Input.KeyCode == CurrentKey then
+                ToggleSwitch()
             end
         end)
 
         return setmetatable({}, {
-            __index = function(_, key) return Properties[key] end,
-            __newindex = function(_, key, value)
-                if key == "Title" then
-                    Properties.Title = value
-                    Container.Title.Text = value
-                elseif key == "Value" then
-                    Properties.Value = value
-                    for i,v in ipairs(Tweens[value]) do v:Play() end
-                    local success, err = pcall(Properties.Function, value)
-                    assert(Luminosity.Settings.Debug == false or success, err)
-                elseif key == "Keybind" then
-                    Properties.Keybind = value
-                    Container.Keybind.Text = value.Name
+            __index = function(Self, Index)
+                return Properties[Index]
+            end;
+            __newindex = function(Self, Index, Value)
+                if Index == "Title" then
+                    TitleLabel.Text = Value
+                elseif Index == "Value" then
+                    for i,v in ipairs(Tweens[Value]) do
+                        v:Play()
+                    end
+                    local Success, Error = pcall(Properties.Function, Value)
+                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                elseif Index == "Keybind" then
+                    CurrentKey = Value
+                    KeybindButton.Text = tostring(Value):gsub("Enum.KeyCode.", "")
                 end
-                Properties[key] = value
-            end
+                Properties[Index] = Value
+            end;
         })
     end
-
 
     function Options.Toggle(Title, Callback)
         local Properties = {
