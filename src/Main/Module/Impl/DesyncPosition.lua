@@ -4,7 +4,7 @@ DesyncPosition.__index = DesyncPosition
 DesyncPosition.type = {}
 
 function DesyncPosition:drawModule(MainTab)
-    local Folder = MainTab.Folder("Position Player", "[Info] Controlling player server position")
+    local Folder = MainTab.Folder("Position Player", "[Info1] Controlling player server position")
 
     Folder.SwitchAndBinding("Position Desync", function(Status)
         print("Switch Triggered: " .. tostring(Status))
