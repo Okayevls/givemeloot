@@ -322,16 +322,15 @@ local function CreateOptions(Frame)
 
     function Options.Button(Title, ButtonText, Callback)
         local Properties = {
-            Title = Title or "Button",
-            ButtonText = ButtonText or "Button",
-            Function = Callback or function() end
+            Title = Title and tostring(Title) or "Button";
+            Function = Callback or function(Status) end;
         }
 
         local Container = Utility.new("ImageButton", {
             Name = "Button",
+            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 25),
-            Parent = Frame
         }, {
             Utility.new("TextLabel", {
                 Name = "Title",
@@ -340,7 +339,7 @@ local function CreateOptions(Frame)
                 Position = UDim2.new(0, 0, 0.5, 0),
                 Size = UDim2.new(0.5, 0, 1, 0),
                 Font = Enum.Font.Gotham,
-                Text = Title,
+                Text = Title and tostring(Title) or "Button",
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 14,
                 TextTransparency = 0.3,
@@ -352,7 +351,7 @@ local function CreateOptions(Frame)
                 BackgroundColor3 = Color3.fromRGB(50, 55, 60),
                 Position = UDim2.new(1, 0, 0.5, 0),
                 Size = UDim2.new(0.2, 25, 0, 20),
-                Text = ButtonText,
+                Text = ButtonText and tostring(ButtonText) or "Button",
                 Font = Enum.Font.Gotham,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 12,
@@ -367,33 +366,20 @@ local function CreateOptions(Frame)
             assert(Luminosity.Settings.Debug == false or Success, Error)
         end)
 
-        local Obj = setmetatable({}, {
-            __index = function(self, k) return Properties[k] end,
-            __newindex = function(self, k, v)
-                if k == "Title" then Container.Title.Text = v end
-                if k == "ButtonText" then Container.Button.Text = v end
-                Properties[k] = v
+        return setmetatable({}, {
+            __index = function(Self, Index)
+                return Properties[Index]
+            end;
+            __newindex = function(Self, Index, Value)
+                if Index == "Title" then
+                    Container.Title.Text = Value and tostring(Value) or "Button"
+                elseif Index == "ButtonText" then
+                    Container.Button.Text = Value and tostring(Value) or "Button"
+                end
+                Properties[Index] = Value
             end
         })
-
-        -- Добавляем Keybind метод
-        function Obj:Keybind(Key)
-            if typeof(Key) ~= "EnumItem" then
-                warn("Keybind expects a Enum.KeyCode")
-                return self
-            end
-            Utility.BindKey(Key, function(_, InputState)
-                if InputState == Enum.UserInputState.Begin then
-                    local Success, Error = pcall(Properties.Function)
-                    assert(Luminosity.Settings.Debug == false or Success, Error)
-                end
-            end)
-            return self
-        end
-
-        return Obj
     end
-
 
     function Options.Switch(Title, Callback)
         local Properties = {
