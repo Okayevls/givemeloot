@@ -398,9 +398,8 @@ local function CreateOptions(Frame)
 
         local Binding = false
         local CurrentKey = nil
-        local IgnoreNextInput = false  -- блокировка первого ввода после бинда
+        local IgnoreNextInput = false
 
-        -- Title Label
         local TitleLabel = Utility.new("TextLabel", {
             Name = "Title",
             AnchorPoint = Vector2.new(0, 0.5),
@@ -416,7 +415,6 @@ local function CreateOptions(Frame)
         })
         TitleLabel.Parent = Container
 
-        -- Keybind Button
         local KeybindButton = Utility.new("TextButton", {
             Name = "Keybind",
             Parent = Container,
@@ -434,7 +432,6 @@ local function CreateOptions(Frame)
             Utility.new("UIPadding", {PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2)})
         })
 
-        -- Ввод бинда
         KeybindButton.MouseButton1Down:Connect(function()
             Binding = true
             KeybindButton.Text = "..."
@@ -446,12 +443,11 @@ local function CreateOptions(Frame)
                     KeybindButton.Text = tostring(CurrentKey):gsub("Enum.KeyCode.", "")
                     connection:Disconnect()
                     Binding = false
-                    IgnoreNextInput = true  -- блокируем первый ввод после бинда
+                    IgnoreNextInput = true
                 end
             end)
         end)
 
-        -- Switch Frame
         local SwitchFrame = Utility.new("Frame", {
             Name = "Switch",
             AnchorPoint = Vector2.new(1, 0.5),
@@ -493,11 +489,10 @@ local function CreateOptions(Frame)
 
         Container.MouseButton1Down:Connect(ToggleSwitch)
 
-        -- Слушатель клавиатуры
         Services.UserInputService.InputBegan:Connect(function(Input, Processed)
             if not Processed and Input.KeyCode == CurrentKey then
                 if IgnoreNextInput then
-                    IgnoreNextInput = false  -- игнорируем первый ввод после бинда
+                    IgnoreNextInput = false
                     return
                 end
                 ToggleSwitch()
