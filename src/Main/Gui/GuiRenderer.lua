@@ -402,9 +402,9 @@ local function CreateOptions(Frame)
             AnchorPoint = Vector2.new(0, 0.5),
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 0, 0.5, 0),
-            Size = UDim2.new(0.5, 0, 1, 0),
+            Size = UDim2.new(1, -60, 1, 0),
             Font = Enum.Font.Gotham,
-            Text = Title and tostring(Title) or "Button",
+            Text = Properties.Title,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 14,
             TextTransparency = 0.3,
@@ -414,15 +414,18 @@ local function CreateOptions(Frame)
 
         -- Keybind Button (слева от слайдера)
         local KeybindButton = Utility.new("TextButton", {
-            Name = "Keybind",
-            Parent = Container,
-            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-            Size = UDim2.new(0, 50, 0, 20),
-            Position = UDim2.new(1, -80, 0.5, -10),
-            Text = "None",
+            Name = "Button",
+            AnchorPoint = Vector2.new(1, 0.5),
+            BackgroundColor3 = Color3.fromRGB(50, 55, 60),
+            Position = UDim2.new(1, 0, 0.5, 0),
+            Size = UDim2.new(0.2, 25, 0, 20),
+            Text = "Button",
             Font = Enum.Font.Gotham,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 12,
-            TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextTransparency = 0.3
+        }, {
+            Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
         })
 
         local CurrentKey = nil
