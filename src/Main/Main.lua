@@ -39,7 +39,7 @@ Folder.Toggle("Toggle", function(Status)
     print("Toggle Triggered: " .. tostring(Status))
 end)
 
-Folder.Button("Test Button", "Click Me", function()
+Folder.Button("Test Button", function()
     print("Button Triggered!")
 end):Keybind(Enum.KeyCode.E)
 
