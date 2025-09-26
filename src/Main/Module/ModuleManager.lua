@@ -9,9 +9,12 @@ local modules = {
     DesyncPosition = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Impl/DesyncPosition.lua",
 }
 
-function ModuleLoader:drawAllModule(Tabs)
+function ModuleLoader:loadEvent()
     EventLoader:Init(modules)
-    local desyncLoader = EventLoader:Get("DesyncPosition"):drawModule(Tabs)
+end
+
+function ModuleLoader:drawMainModule(MainTab)
+    local desyncLoader = EventLoader:Get("DesyncPosition"):drawModule(MainTab)
 end
 
 return ModuleLoader

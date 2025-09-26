@@ -9,6 +9,7 @@ local modules = {
     Updater = "https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/Update/Updater.lua",
 
     GuiRenderer = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiRenderer.lua',
+    GuiInstance = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiInstance.lua',
 
     ModuleLoader = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleManager.lua'
 }
@@ -20,32 +21,13 @@ local Updater = EventLoader:Get("Updater")
 local Render = EventLoader:Get("Render")
 local FontRender = EventLoader:Get("FontRender")
 local GuiRenderer = EventLoader:Get("GuiRenderer")
+local GuiInstance = EventLoader:Get("GuiInstance")
 local ModuleLoader = EventLoader:Get("ModuleLoader")
 
 local updaterReconnect = Updater:new()
 
 local Window = GuiRenderer.new("ClosedPvP UI", "v0.0.1", 4370345701)
-
-local Tab1 = Window.Tab("Main", 6026568198)
-
-local Folder = Tab1.Folder("Options", "A bunch of options you can use")
-
-Folder.Button("Button", function()
-    print("Button Clicked")
-end)
-
-Folder.Switch("Switch", function(Status)
-    print("Switch Triggered: " .. tostring(Status))
-end)
-
-Folder.SwitchAndBinding("Switch", function(Status)
-    print("Switch Triggered: " .. tostring(Status))
-end)
-
-Folder.Toggle("Toggle", function(Status)
-    print("Toggle Triggered: " .. tostring(Status))
-end)
-
+GuiInstance:drawGuiCore(Window,ModuleLoader)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
