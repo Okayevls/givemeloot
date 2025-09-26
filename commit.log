@@ -1,2 +1,5 @@
-[main 36b5c88] Auto-commit 26.09.2025 10:52:05,21
- 3 files changed, 48 insertions(+), 6 deletions(-)
+[main 67fbc9a] Auto-commit 26.09.2025 11:07:36,41
+ 7 files changed, 1532 insertions(+), 4127 deletions(-)
+ create mode 100644 src/Main/Gui/ExampleGui.txt
+ delete mode 100644 src/Main/Gui/SaveManager.lua
+ delete mode 100644 src/Main/Gui/ThemeManager.lua

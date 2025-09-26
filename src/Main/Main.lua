@@ -19,11 +19,7 @@ local Chat = EventLoader:Get("Chat")
 local Updater = EventLoader:Get("Updater")
 local Render = EventLoader:Get("Render")
 local FontRender = EventLoader:Get("FontRender")
-
 local GuiRenderer = EventLoader:Get("GuiRenderer")
-local GuiThemeManager = EventLoader:Get("ThemeManager")
-local GuiSaveManager = EventLoader:Get("SaveManager")
-
 local ModuleLoader = EventLoader:Get("ModuleLoader")
 
 local updaterReconnect = Updater:new()
