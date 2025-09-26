@@ -1,2 +1,3 @@
-[main 482c11c] Auto-commit 26.09.2025 12:47:25,60
- 2 files changed, 5 insertions(+), 5 deletions(-)
+[main a125309] Auto-commit 26.09.2025 12:59:27,15
+ 5 files changed, 28 insertions(+), 26 deletions(-)
+ create mode 100644 src/Main/Gui/GuiInstance.lua
