@@ -38,13 +38,10 @@ end)
 Folder.Toggle("Toggle", function(Status)
     print("Toggle Triggered: " .. tostring(Status))
 end)
-Folder.TextBox("Textbox", "Placeholder", function(Text)
-    print("TextBox Triggered: " .. Text)
-end)
 
-Folder.Keybind("Открыть меню", Enum.KeyCode.M, function()
-    print("Меню открыто!")
-end)
+Folder.Button("Test Button", "Click Me", function()
+    print("Button Triggered!")
+end):Keybind(Enum.KeyCode.E)
 
 
 

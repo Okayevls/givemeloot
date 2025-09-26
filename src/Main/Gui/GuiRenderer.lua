@@ -322,15 +322,16 @@ local function CreateOptions(Frame)
 
     function Options.Button(Title, ButtonText, Callback)
         local Properties = {
-            Title = Title and tostring(Title) or "Button";
-            Function = Callback or function(Status) end;
+            Title = Title or "Button",
+            ButtonText = ButtonText or "Button",
+            Function = Callback or function() end
         }
 
         local Container = Utility.new("ImageButton", {
             Name = "Button",
-            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 25),
+            Parent = Frame
         }, {
             Utility.new("TextLabel", {
                 Name = "Title",
@@ -339,7 +340,7 @@ local function CreateOptions(Frame)
                 Position = UDim2.new(0, 0, 0.5, 0),
                 Size = UDim2.new(0.5, 0, 1, 0),
                 Font = Enum.Font.Gotham,
-                Text = Title and tostring(Title) or "Button",
+                Text = Title,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 14,
                 TextTransparency = 0.3,
@@ -351,7 +352,7 @@ local function CreateOptions(Frame)
                 BackgroundColor3 = Color3.fromRGB(50, 55, 60),
                 Position = UDim2.new(1, 0, 0.5, 0),
                 Size = UDim2.new(0.2, 25, 0, 20),
-                Text = "Button",
+                Text = ButtonText,
                 Font = Enum.Font.Gotham,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 12,
@@ -366,101 +367,33 @@ local function CreateOptions(Frame)
             assert(Luminosity.Settings.Debug == false or Success, Error)
         end)
 
-        return setmetatable({}, {
-            __index = function(Self, Index)
-                return Properties[Index]
-            end;
-            __newindex = function(Self, Index, Value)
-                if Index == "Title" then
-                    Container.Title.Text = Value and tostring(Value) or "Button"
-                elseif Index == "ButtonText" then
-                    Container.Button.Text = Value and tostring(Value) or "Button"
-                end
-                Properties[Index] = Value
+        local Obj = setmetatable({}, {
+            __index = function(self, k) return Properties[k] end,
+            __newindex = function(self, k, v)
+                if k == "Title" then Container.Title.Text = v end
+                if k == "ButtonText" then Container.Button.Text = v end
+                Properties[k] = v
             end
         })
+
+        -- Добавляем Keybind метод
+        function Obj:Keybind(Key)
+            if typeof(Key) ~= "EnumItem" then
+                warn("Keybind expects a Enum.KeyCode")
+                return self
+            end
+            Utility.BindKey(Key, function(_, InputState)
+                if InputState == Enum.UserInputState.Begin then
+                    local Success, Error = pcall(Properties.Function)
+                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                end
+            end)
+            return self
+        end
+
+        return Obj
     end
 
-    function Options.Keybind(Title, DefaultKey, Callback)
-        local Properties = {
-            Title = Title or "Keybind",
-            Key = DefaultKey or Enum.KeyCode.F,
-            Function = Callback or function() end
-        }
-
-        local Container = Utility.new("ImageButton", {
-            Name = "Keybind",
-            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 25),
-        }, {
-            Utility.new("TextLabel", {
-                Name = "Title",
-                AnchorPoint = Vector2.new(0, 0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 0, 0.5, 0),
-                Size = UDim2.new(0.5, 0, 1, 0),
-                Font = Enum.Font.Gotham,
-                Text = Properties.Title,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
-                TextSize = 14,
-                TextTransparency = 0.3,
-                TextXAlignment = Enum.TextXAlignment.Left
-            }),
-            Utility.new("TextButton", {
-                Name = "Bind",
-                AnchorPoint = Vector2.new(1, 0.5),
-                BackgroundColor3 = Color3.fromRGB(50, 55, 60),
-                Position = UDim2.new(1, 0, 0.5, 0),
-                Size = UDim2.new(0.2, 25, 0, 20),
-                Text = Properties.Key.Name,
-                Font = Enum.Font.Gotham,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
-                TextSize = 12,
-                TextTransparency = 0.3
-            }, {
-                Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
-            })
-        })
-
-        -- Слушаем нажатия клавиш
-        local listening = false
-        Container.Bind.MouseButton1Down:Connect(function()
-            Container.Bind.Text = "Press..."
-            listening = true
-        end)
-
-        Services.UserInputService.InputBegan:Connect(function(input)
-            if listening and input.UserInputType == Enum.UserInputType.Keyboard then
-                Properties.Key = input.KeyCode
-                Container.Bind.Text = Properties.Key.Name
-                listening = false
-            end
-        end)
-
-        -- Срабатывание функции при нажатии
-        Services.UserInputService.InputBegan:Connect(function(input)
-            if input.KeyCode == Properties.Key then
-                local Success, Error = pcall(Properties.Function)
-                assert(Luminosity.Settings.Debug == false or Success, Error)
-            end
-        end)
-
-        return setmetatable({}, {
-            __index = function(_, Index)
-                return Properties[Index]
-            end,
-            __newindex = function(_, Index, Value)
-                if Index == "Title" then
-                    Container.Title.Text = tostring(Value)
-                elseif Index == "Key" then
-                    Properties.Key = Value
-                    Container.Bind.Text = Value.Name
-                end
-                Properties[Index] = Value
-            end
-        })
-    end
 
     function Options.Switch(Title, Callback)
         local Properties = {
