@@ -39,12 +39,6 @@ Folder.Toggle("Toggle", function(Status)
     print("Toggle Triggered: " .. tostring(Status))
 end)
 
-Folder.Button("Test Button", function()
-    print("Button Triggered!")
-end)
-
-
-
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 Chat.chat.sendMessage("Build to loading 000000002")
 

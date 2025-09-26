@@ -351,7 +351,7 @@ local function CreateOptions(Frame)
                 BackgroundColor3 = Color3.fromRGB(50, 55, 60),
                 Position = UDim2.new(1, 0, 0.5, 0),
                 Size = UDim2.new(0.2, 25, 0, 20),
-                Text = ButtonText and tostring(ButtonText) or "Button",
+                Text = "Button",
                 Font = Enum.Font.Gotham,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 12,
