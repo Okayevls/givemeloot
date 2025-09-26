@@ -322,17 +322,15 @@ local function CreateOptions(Frame)
 
     function Options.Button(Title, ButtonText, Callback)
         local Properties = {
-            Title = Title or "Button";
-            ButtonText = ButtonText or "Click";
-            Function = Callback or function() end;
-            Keybind = nil; -- текущий KeyCode
+            Title = Title and tostring(Title) or "Button";
+            Function = Callback or function(Status) end;
         }
 
         local Container = Utility.new("ImageButton", {
             Name = "Button",
+            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 25),
-            Parent = typeof(Frame) == "Instance" and Frame or Frame()
         }, {
             Utility.new("TextLabel", {
                 Name = "Title",
@@ -341,92 +339,47 @@ local function CreateOptions(Frame)
                 Position = UDim2.new(0, 0, 0.5, 0),
                 Size = UDim2.new(0.5, 0, 1, 0),
                 Font = Enum.Font.Gotham,
-                Text = Properties.Title,
-                TextColor3 = Color3.fromRGB(255,255,255),
+                Text = Title and tostring(Title) or "Button",
+                TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 14,
+                TextTransparency = 0.3,
                 TextXAlignment = Enum.TextXAlignment.Left
             }),
             Utility.new("TextButton", {
                 Name = "Button",
                 AnchorPoint = Vector2.new(1, 0.5),
-                BackgroundColor3 = Color3.fromRGB(50,55,60),
+                BackgroundColor3 = Color3.fromRGB(50, 55, 60),
                 Position = UDim2.new(1, 0, 0.5, 0),
                 Size = UDim2.new(0.2, 25, 0, 20),
-                Text = Properties.ButtonText,
+                Text = "Button",
                 Font = Enum.Font.Gotham,
-                TextColor3 = Color3.fromRGB(255,255,255),
-                TextSize = 12
-            }, { Utility.new("UICorner", {CornerRadius = UDim.new(0,4)}) }),
-            Utility.new("TextLabel", {
-                Name = "Keybind",
-                AnchorPoint = Vector2.new(1, 0.5),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(1, -5, 0.5, 0),
-                Size = UDim2.new(0, 40, 1, 0),
-                Font = Enum.Font.Gotham,
-                Text = Properties.Keybind and Properties.Keybind.Name or "",
-                TextColor3 = Color3.fromRGB(200,200,200),
+                TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Right
+                TextTransparency = 0.3
+            }, {
+                Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
             })
         })
 
-        -- Обработка клика мышью
         Container.Button.MouseButton1Down:Connect(function()
-            local success, err = pcall(Properties.Function)
-            assert(Luminosity.Settings.Debug == false or success, err)
+            local Success, Error = pcall(Properties.Function)
+            assert(Luminosity.Settings.Debug == false or Success, Error)
         end)
 
-        -- Метод для бинда
-        function Container:Keybind(KeyCode)
-            Properties.Keybind = KeyCode
-            Container.Keybind.Text = KeyCode.Name
-
-            local bindId = Services.ContextActionService:BindAction(
-                    "ButtonBind_"..Properties.Title,
-                    function()
-                        local success, err = pcall(Properties.Function)
-                        assert(Luminosity.Settings.Debug == false or success, err)
-                    end,
-                    false,
-                    KeyCode
-            )
-
-            -- Перебинд при клике на текст бинда
-            Container.Keybind.MouseButton1Down:Connect(function()
-                Container.Keybind.Text = "..."
-                local inputConn
-                inputConn = Services.UserInputService.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.Keyboard then
-                        Services.ContextActionService:UnbindAction("ButtonBind_"..Properties.Title)
-                        self:Keybind(input.KeyCode)
-                        inputConn:Disconnect()
-                    end
-                end)
-            end)
-        end
-
-        return setmetatable(Container, {
-            __index = function(self, key)
-                if key == "Title" then return Properties.Title
-                elseif key == "ButtonText" then return Properties.ButtonText
-                elseif key == "Keybind" then return Properties.Keybind
+        return setmetatable({}, {
+            __index = function(Self, Index)
+                return Properties[Index]
+            end;
+            __newindex = function(Self, Index, Value)
+                if Index == "Title" then
+                    Container.Title.Text = Value and tostring(Value) or "Button"
+                elseif Index == "ButtonText" then
+                    Container.Button.Text = Value and tostring(Value) or "Button"
                 end
-            end,
-            __newindex = function(self, key, value)
-                if key == "Title" then
-                    Properties.Title = value
-                    Container.Title.Text = value
-                elseif key == "ButtonText" then
-                    Properties.ButtonText = value
-                    Container.Button.Text = value
-                elseif key == "Keybind" then
-                    Container:Keybind(value)
-                end
+                Properties[Index] = Value
             end
         })
     end
-
 
     function Options.Switch(Title, Callback)
         local Properties = {
@@ -1272,7 +1225,7 @@ function Luminosity.new(Name, Header, Icon)
                         LayoutOrder = -5,
                         Size = UDim2.new(1, 0, 0, 30),
                         Font = Enum.Font.Gotham,
-                        Text = Description and tostring(Description) or "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras justo urna, mattis et neque non.",
+                        Text = Description and tostring(Description) or "",
                         RichText = true,
                         TextColor3 = Color3.fromRGB(255, 255, 255),
                         TextSize = 14,

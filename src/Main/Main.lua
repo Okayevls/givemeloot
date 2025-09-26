@@ -26,29 +26,24 @@ local updaterReconnect = Updater:new()
 
 local Window = GuiRenderer.new("ClosedPvP UI", "v0.0.1", 4370345701)
 
-local Tab1 = Window.Tab("Tab 1", 6026568198)
+local Tab1 = Window.Tab("Main", 6026568198)
 
-local Folder = Tab1.Folder("Options", "A bunch of options you can use")
---Folder.Button("Button", function()
---    print("Button Clicked")
---end)
-local btn = Folder.Button("Button", "Click",
-        function()
-            print("Clicked")
-        end)
-btn:Keybind(Enum.KeyCode.F, function()
-    btn.Function()
+local Folder = Tab1.Folder("Options", "")
+
+Folder.Button("Button", function()
+    print("Button Clicked")
 end)
 
 Folder.Switch("Switch", function(Status)
     print("Switch Triggered: " .. tostring(Status))
 end)
+
 Folder.Toggle("Toggle", function(Status)
     print("Toggle Triggered: " .. tostring(Status))
 end)
 
+
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
-Chat.chat.sendMessage("Build to loading 000000002")
 
 
 
