@@ -27,6 +27,7 @@ local updaterReconnect = Updater:new()
 local Window = GuiRenderer.new("ClosedPvP UI", "v0.0.1", 4370345701)
 
 local Tab1 = Window.Tab("Tab 1", 6026568198)
+
 local Folder = Tab1.Folder("Options", "A bunch of options you can use")
 Folder.Button("Button", function()
     print("Button Clicked")
