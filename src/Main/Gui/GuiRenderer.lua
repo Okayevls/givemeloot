@@ -418,7 +418,7 @@ local function CreateOptions(Frame)
         local KeybindButton = Utility.new("TextButton", {
             Name = "Keybind",
             Parent = Container,
-            BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+            BackgroundColor3 = Color3.fromRGB(50, 55, 60),
             Size = UDim2.new(0, 40, 0, 18),
             Position = UDim2.new(1, -70, 0.5, -9),
             Text = "None",
