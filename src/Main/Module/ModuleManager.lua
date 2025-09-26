@@ -16,7 +16,7 @@ ModuleLoader.__index = ModuleLoader
 
 ModuleLoader.modules = {
     Character = {  -- категория "Combat"
-        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua",
+        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
        -- KillAura       = "src/Main/Module/Impl/KillAura.lua",
     }--,
     --Render = {
