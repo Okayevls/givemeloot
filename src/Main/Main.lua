@@ -28,7 +28,7 @@ local Window = GuiRenderer.new("ClosedPvP UI", "v0.0.1", 4370345701)
 
 local Tab1 = Window.Tab("Main", 6026568198)
 
-local Folder = Tab1.Folder("Options", "")
+local Folder = Tab1.Folder("Options", "A bunch of options you can use")
 
 Folder.Button("Button", function()
     print("Button Clicked")
@@ -36,7 +36,7 @@ end)
 
 Folder.Switch("Switch", function(Status)
     print("Switch Triggered: " .. tostring(Status))
-end)
+end):Keybind()
 
 Folder.Toggle("Toggle", function(Status)
     print("Toggle Triggered: " .. tostring(Status))

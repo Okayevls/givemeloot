@@ -383,9 +383,10 @@ local function CreateOptions(Frame)
 
     function Options.Switch(Title, Callback)
         local Properties = {
-            Title = Title and tostring(Title) or "Switch";
+            Title = Title or "Switch";
             Value = false;
             Function = Callback or function(Status) end;
+            Keybind = nil; -- текущий KeyCode
         }
 
         local Container = Utility.new("ImageButton", {
@@ -394,76 +395,121 @@ local function CreateOptions(Frame)
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 25),
         }, {
+            -- Keybind слева
+            Utility.new("TextLabel", {
+                Name = "Keybind",
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 0, 0.5, 0),
+                Size = UDim2.new(0, 40, 1, 0),
+                Font = Enum.Font.Gotham,
+                Text = Properties.Keybind and Properties.Keybind.Name or "None",
+                TextColor3 = Color3.fromRGB(200,200,200),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left
+            }),
+
+            -- Название Switch
             Utility.new("TextLabel", {
                 Name = "Title",
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 0, 0.5, 0),
-                Size = UDim2.new(1, -30, 1, 0),
+                Position = UDim2.new(0, 45, 0.5, 0),
+                Size = UDim2.new(1, -70, 1, 0),
                 Font = Enum.Font.Gotham,
-                Text = Title and tostring(Title) or "Switch",
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                Text = Title or "Switch",
+                TextColor3 = Color3.fromRGB(255,255,255),
                 TextSize = 14,
-                TextTransparency = 0.3,
                 TextXAlignment = Enum.TextXAlignment.Left
             }),
+
+            -- Сам переключатель
             Utility.new("Frame", {
                 Name = "Switch",
                 AnchorPoint = Vector2.new(1, 0.5),
-                BackgroundColor3 = Color3.fromRGB(100, 100, 100),
+                BackgroundColor3 = Color3.fromRGB(100,100,100),
                 Position = UDim2.new(1, 0, 0.5, 0),
-                Size = UDim2.new(0, 25, 0, 15),
+                Size = UDim2.new(0,25,0,15)
             }, {
-                Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)}),
+                Utility.new("UICorner", {CornerRadius = UDim.new(1,0)}),
                 Utility.new("Frame", {
                     Name = "Circle",
-                    AnchorPoint = Vector2.new(0, 0.5),
-                    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                    Position = UDim2.new(0, 0, 0.5, 0),
-                    Size = UDim2.new(0, 14, 0, 14)
-                }, {Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)})})
+                    AnchorPoint = Vector2.new(0,0.5),
+                    BackgroundColor3 = Color3.fromRGB(255,255,255),
+                    Position = UDim2.new(0,0,0.5,0),
+                    Size = UDim2.new(0,14,0,14)
+                }, {Utility.new("UICorner",{CornerRadius = UDim.new(1,0)})})
             })
         })
 
         local Tweens = {
             [true] = {
                 Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
-                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0)})
-            };
-
+                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1,0.5), Position = UDim2.new(1,0,0.5,0)})
+            },
             [false] = {
-                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}),
-                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 0, 0.5, 0)})
-            };
+                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Color3.fromRGB(100,100,100)}),
+                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(0,0.5), Position = UDim2.new(0,0,0.5,0)})
+            }
         }
 
+        -- Клик по switch
         Container.MouseButton1Down:Connect(function()
-            Properties.Value = not  Properties.Value
+            Properties.Value = not Properties.Value
             for i,v in ipairs(Tweens[Properties.Value]) do
                 v:Play()
             end
-            local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(Luminosity.Settings.Debug == false or Success, Error)
+            local success, err = pcall(Properties.Function, Properties.Value)
+            assert(Luminosity.Settings.Debug == false or success, err)
+        end)
+
+        -- Клик по Keybind для перебинда
+        Container.Keybind.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                Container.Keybind.Text = "..."
+                local conn
+                conn = Services.UserInputService.InputBegan:Connect(function(key)
+                    if key.UserInputType == Enum.UserInputType.Keyboard then
+                        Properties.Keybind = key.KeyCode
+                        Container.Keybind.Text = Properties.Keybind.Name
+                        conn:Disconnect()
+                    end
+                end)
+            end
+        end)
+
+        -- Метод для вызова по Keybind
+        Services.UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if not gameProcessed and Properties.Keybind and input.KeyCode == Properties.Keybind then
+                Properties.Value = not Properties.Value
+                for i,v in ipairs(Tweens[Properties.Value]) do
+                    v:Play()
+                end
+                local success, err = pcall(Properties.Function, Properties.Value)
+                assert(Luminosity.Settings.Debug == false or success, err)
+            end
         end)
 
         return setmetatable({}, {
-            __index = function(Self, Index)
-                return Properties[Index]
-            end;
-            __newindex = function(Self, Index, Value)
-                if Index == "Title" then
-                    Container.Title.Text = Value and tostring(Value) or "Switch"
-                elseif Index == "Value" then
-                    for i,v in ipairs(Tweens[Value]) do
-                        v:Play()
-                    end
-                    local Success, Error = pcall(Properties.Function, Value)
-                    assert(Luminosity.Settings.Debug == false or Success, Error)
+            __index = function(_, key) return Properties[key] end,
+            __newindex = function(_, key, value)
+                if key == "Title" then
+                    Properties.Title = value
+                    Container.Title.Text = value
+                elseif key == "Value" then
+                    Properties.Value = value
+                    for i,v in ipairs(Tweens[value]) do v:Play() end
+                    local success, err = pcall(Properties.Function, value)
+                    assert(Luminosity.Settings.Debug == false or success, err)
+                elseif key == "Keybind" then
+                    Properties.Keybind = value
+                    Container.Keybind.Text = value.Name
                 end
-                Properties[Index] = Value
-            end;
+                Properties[key] = value
+            end
         })
     end
+
 
     function Options.Toggle(Title, Callback)
         local Properties = {
@@ -1225,7 +1271,7 @@ function Luminosity.new(Name, Header, Icon)
                         LayoutOrder = -5,
                         Size = UDim2.new(1, 0, 0, 30),
                         Font = Enum.Font.Gotham,
-                        Text = Description and tostring(Description) or "",
+                        Text = Description and tostring(Description) or "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras justo urna, mattis et neque non.",
                         RichText = true,
                         TextColor3 = Color3.fromRGB(255, 255, 255),
                         TextSize = 14,
