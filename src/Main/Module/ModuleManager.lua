@@ -22,18 +22,22 @@ ModuleLoader.modules = {
 function ModuleLoader:loadEvent()
     self.loadedModules = {}
 
-    for category, modules in pairs(self.modules) do
-        self.loadedModules[category] = {}
-        for name, path in pairs(modules) do
-            local success, result = pcall(function()
-                local code = LoadGitHubScript("Okayevls", "givemeloot", path)
-                return loadstring(code)()
-            end)
+    for categoryName, modules in pairs(self.modules) do
+        self.loadedModules[categoryName] = {}
 
-            if success then
-                self.loadedModules[category][name] = result
+        for moduleName, path in pairs(modules) do
+            if type(path) ~= "string" then
+                warn(("[ModuleLoader] Invalid path for module '%s' in category '%s'"):format(moduleName, categoryName))
             else
-                warn(("[ModuleLoader] X Error loading module '%s' in category '%s': %s"):format(name, category, result))
+                local success, result = pcall(function()
+                    local code = LoadGitHubScript("Okayevls", "givemeloot", path)
+                    return loadstring(code)()
+                end)
+                if success then
+                    self.loadedModules[categoryName][moduleName] = result
+                else
+                    warn(("[ModuleLoader] X Error loading module '%s' in category '%s': %s"):format(moduleName, categoryName, result))
+                end
             end
         end
     end
