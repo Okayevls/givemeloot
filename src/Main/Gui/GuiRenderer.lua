@@ -405,11 +405,11 @@ local function CreateOptions(Frame)
             AnchorPoint = Vector2.new(0, 0.5),
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 0, 0.5, 0),
-            Size = UDim2.new(1, -90, 1, 0),
+            Size = UDim2.new(1, -30, 1, 0),
             Font = Enum.Font.Gotham,
-            Text = Properties.Title,
+            Text = Title and tostring(Title) or "Switch",
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextSize = 12,
+            TextSize = 14,
             TextTransparency = 0.3,
             TextXAlignment = Enum.TextXAlignment.Left
         })
