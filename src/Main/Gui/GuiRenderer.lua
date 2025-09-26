@@ -381,7 +381,7 @@ local function CreateOptions(Frame)
         })
     end
 
-    function Options.Switch(Title, Callback)
+    function Options.SwitchAndBinding(Title, Callback)
         local Properties = {
             Title = Title and tostring(Title) or "Switch";
             Value = false;
@@ -396,9 +396,9 @@ local function CreateOptions(Frame)
             Size = UDim2.new(1, 0, 0, 25),
         })
 
-        -- Флаг бинда
         local Binding = false
         local CurrentKey = nil
+        local IgnoreNextInput = false  -- блокировка первого ввода после бинда
 
         -- Title Label
         local TitleLabel = Utility.new("TextLabel", {
@@ -416,7 +416,7 @@ local function CreateOptions(Frame)
         })
         TitleLabel.Parent = Container
 
-        -- Keybind Button (слева от переключателя)
+        -- Keybind Button
         local KeybindButton = Utility.new("TextButton", {
             Name = "Keybind",
             Parent = Container,
@@ -446,6 +446,7 @@ local function CreateOptions(Frame)
                     KeybindButton.Text = tostring(CurrentKey):gsub("Enum.KeyCode.", "")
                     connection:Disconnect()
                     Binding = false
+                    IgnoreNextInput = true  -- блокируем первый ввод после бинда
                 end
             end)
         end)
@@ -469,7 +470,6 @@ local function CreateOptions(Frame)
         })
         SwitchFrame.Parent = Container
 
-        -- Tweens для анимации
         local Tweens = {
             [true] = {
                 Utility.Tween(SwitchFrame, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
@@ -481,7 +481,6 @@ local function CreateOptions(Frame)
             };
         }
 
-        -- Функция переключения
         local function ToggleSwitch()
             if Binding then return end
             Properties.Value = not Properties.Value
@@ -496,7 +495,11 @@ local function CreateOptions(Frame)
 
         -- Слушатель клавиатуры
         Services.UserInputService.InputBegan:Connect(function(Input, Processed)
-            if not Processed and Input.KeyCode == CurrentKey and not Binding then
+            if not Processed and Input.KeyCode == CurrentKey then
+                if IgnoreNextInput then
+                    IgnoreNextInput = false  -- игнорируем первый ввод после бинда
+                    return
+                end
                 ToggleSwitch()
             end
         end)
@@ -523,6 +526,174 @@ local function CreateOptions(Frame)
         })
     end
 
+    function Options.Switch(Title, Callback)
+        local Properties = {
+            Title = Title and tostring(Title) or "Switch";
+            Value = false;
+            Function = Callback or function(Status) end;
+        }
+
+        local Container = Utility.new("ImageButton", {
+            Name = "Switch",
+            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 25),
+        }, {
+            Utility.new("TextLabel", {
+                Name = "Title",
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 0, 0.5, 0),
+                Size = UDim2.new(1, -30, 1, 0),
+                Font = Enum.Font.Gotham,
+                Text = Title and tostring(Title) or "Switch",
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 14,
+                TextTransparency = 0.3,
+                TextXAlignment = Enum.TextXAlignment.Left
+            }),
+            Utility.new("Frame", {
+                Name = "Switch",
+                AnchorPoint = Vector2.new(1, 0.5),
+                BackgroundColor3 = Color3.fromRGB(100, 100, 100),
+                Position = UDim2.new(1, 0, 0.5, 0),
+                Size = UDim2.new(0, 25, 0, 15),
+            }, {
+                Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)}),
+                Utility.new("Frame", {
+                    Name = "Circle",
+                    AnchorPoint = Vector2.new(0, 0.5),
+                    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                    Position = UDim2.new(0, 0, 0.5, 0),
+                    Size = UDim2.new(0, 14, 0, 14)
+                }, {Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)})})
+            })
+        })
+
+        local Tweens = {
+            [true] = {
+                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
+                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0)})
+            };
+
+            [false] = {
+                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}),
+                Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 0, 0.5, 0)})
+            };
+        }
+
+        Container.MouseButton1Down:Connect(function()
+            Properties.Value = not  Properties.Value
+            for i,v in ipairs(Tweens[Properties.Value]) do
+                v:Play()
+            end
+            local Success, Error = pcall(Properties.Function, Properties.Value)
+            assert(Luminosity.Settings.Debug == false or Success, Error)
+        end)
+
+        return setmetatable({}, {
+            __index = function(Self, Index)
+                return Properties[Index]
+            end;
+            __newindex = function(Self, Index, Value)
+                if Index == "Title" then
+                    Container.Title.Text = Value and tostring(Value) or "Switch"
+                elseif Index == "Value" then
+                    for i,v in ipairs(Tweens[Value]) do
+                        v:Play()
+                    end
+                    local Success, Error = pcall(Properties.Function, Value)
+                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                end
+                Properties[Index] = Value
+            end;
+        })
+    end
+
+    function Options.Toggle(Title, Callback)
+        local Properties = {
+            Title = Title and tostring(Title) or "Switch";
+            Value = false;
+            Function = Callback or function(Status) end;
+        }
+
+        local Container = Utility.new("ImageButton", {
+            Name = "Toggle",
+            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 25)
+        }, {
+            Utility.new("TextLabel", {
+                Name = "Title",
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 0, 0.5, 0),
+                Size = UDim2.new(1, -30, 1, 0),
+                Font = Enum.Font.Gotham,
+                Text = Title and tostring(Title) or "Switch",
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 14,
+                TextTransparency = 0.3,
+                TextXAlignment = Enum.TextXAlignment.Left
+            }),
+
+            Utility.new("ImageLabel", {
+                Name = "Toggle",
+                AnchorPoint = Vector2.new(1, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(1, 0, 0.5, 0),
+                Size = UDim2.new(0, 20, 0, 20),
+                ZIndex = 2,
+                Image = "rbxassetid://6031068420"
+            }, {
+                Utility.new("ImageLabel", {
+                    Name = "Fill",
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 1, 0),
+                    Image = "rbxassetid://6031068421",
+                    ImageTransparency = 1
+                })
+            })
+        })
+
+        local Tweens = {
+            [true] = {
+                Utility.Tween(Container.Toggle.Fill, TweenInfo.new(0.2), {ImageTransparency = 0}),
+                Utility.Tween(Container.Toggle, TweenInfo.new(0.5), {ImageColor3 = Color3.fromRGB(240, 240, 240)})
+            };
+            [false] = {
+                Utility.Tween(Container.Toggle.Fill, TweenInfo.new(0.2), {ImageTransparency = 1}),
+                Utility.Tween(Container.Toggle, TweenInfo.new(0.5), {ImageColor3 = Color3.fromRGB(255, 255, 255)})
+            };
+        }
+
+        Container.MouseButton1Down:Connect(function()
+            Properties.Value = not Properties.Value
+            for i,v in ipairs(Tweens[Properties.Value]) do
+                v:Play()
+            end
+            local Success, Error = pcall(Properties.Function, Properties.Value)
+            assert(Luminosity.Settings.Debug == false or Success, Error)
+        end)
+
+        return setmetatable({}, {
+            __index = function(Self, Index)
+                return Properties[Index]
+            end;
+            __newindex = function(Self, Index, Value)
+                if Index == "Title" then
+                    Container.Title.Text = Value and tostring(Value) or "Switch"
+                elseif Index == "Value" then
+                    for i,v in ipairs(Tweens[Value]) do
+                        v:Play()
+                    end
+                    local Success, Error = pcall(Properties.Function, Value)
+                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                end
+                Properties[Index] = Value
+            end
+        })
+    end
 
     function Options.TextBox(Title, PlaceHolder, Callback)
         local Properties = {

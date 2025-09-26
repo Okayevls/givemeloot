@@ -36,6 +36,10 @@ end)
 
 Folder.Switch("Switch", function(Status)
     print("Switch Triggered: " .. tostring(Status))
+end)
+
+Folder.SwitchAndBinding("Switch", function(Status)
+    print("Switch Triggered: " .. tostring(Status))
 end):Keybind()
 
 Folder.Toggle("Toggle", function(Status)
