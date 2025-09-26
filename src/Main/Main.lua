@@ -26,8 +26,8 @@ local ModuleLoader = EventLoader:Get("ModuleLoader")
 
 local updaterReconnect = Updater:new()
 
-local Window = GuiRenderer.new("ClosedPvP UI", "v0.0.1", 4370345701)
-GuiInstance:drawGuiCore(Window,ModuleLoader)
+local Window = GuiRenderer.new("Morphis", "vBeta I", 4370345701)
+GuiInstance:drawGuiCore(Window, ModuleLoader)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
