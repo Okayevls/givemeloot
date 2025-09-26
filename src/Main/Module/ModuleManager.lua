@@ -34,12 +34,19 @@ function ModuleLoader:loadEvent()
 end
 
 function ModuleLoader:drawMainModule(MainTab)
-    local module = self.loadedModules.DesyncPosition
-    if module and module.drawModule then
-        module:drawModule(MainTab)
-    else
-        warn("[ModuleLoader] Module 'DesyncPosition' not loaded or missing drawModule function")
+    for name, module in pairs(self.loadedModules) do
+        if module and type(module.drawModule) == "function" then
+            local success, err = pcall(function()
+                module:drawModule(MainTab)
+            end)
+            if not success then
+                warn(("[ModuleLoader] Failed to draw module '%s': %s"):format(name, err))
+            end
+        else
+            warn(("[ModuleLoader] Module '%s' missing drawModule function"):format(name))
+        end
     end
 end
+
 
 return ModuleLoader
