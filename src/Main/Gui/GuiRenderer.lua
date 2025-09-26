@@ -407,7 +407,7 @@ local function CreateOptions(Frame)
             Position = UDim2.new(0, 0, 0.5, 0),
             Size = UDim2.new(1, -30, 1, 0),
             Font = Enum.Font.Gotham,
-            Text = Title and tostring(Title) or "Switch",
+            Text = Properties.Title,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 14,
             TextTransparency = 0.3,
@@ -415,6 +415,7 @@ local function CreateOptions(Frame)
         })
         TitleLabel.Parent = Container
 
+        -- Keybind Button
         local KeybindButton = Utility.new("TextButton", {
             Name = "Keybind",
             Parent = Container,
@@ -433,21 +434,19 @@ local function CreateOptions(Frame)
         })
 
         KeybindButton.MouseButton1Down:Connect(function()
-            Binding = true
-            KeybindButton.Text = "..."
-            local connection
-            connection = Services.UserInputService.InputBegan:Connect(function(Input)
-                if Input.UserInputType == Enum.UserInputType.Keyboard then
-                    CurrentKey = Input.KeyCode
-                    Properties.Keybind = CurrentKey
-                    KeybindButton.Text = tostring(CurrentKey):gsub("Enum.KeyCode.", "")
-                    connection:Disconnect()
-                    Binding = false
-                    IgnoreNextInput = true
-                end
-            end)
+            if Binding then
+                -- если уже в биндинге, снять
+                Binding = false
+                CurrentKey = nil
+                Properties.Keybind = nil
+                KeybindButton.Text = "None"
+            else
+                Binding = true
+                KeybindButton.Text = "..."
+            end
         end)
 
+        -- Switch Frame
         local SwitchFrame = Utility.new("Frame", {
             Name = "Switch",
             AnchorPoint = Vector2.new(1, 0.5),
@@ -490,12 +489,26 @@ local function CreateOptions(Frame)
         Container.MouseButton1Down:Connect(ToggleSwitch)
 
         Services.UserInputService.InputBegan:Connect(function(Input, Processed)
-            if not Processed and Input.KeyCode == CurrentKey then
-                if IgnoreNextInput then
-                    IgnoreNextInput = false
+            if not Processed then
+                if Binding then
+                    if Input.UserInputType == Enum.UserInputType.Keyboard then
+                        if Input.KeyCode == Enum.KeyCode.Delete then
+                            CurrentKey = nil
+                            Properties.Keybind = nil
+                            KeybindButton.Text = "None"
+                        else
+                            CurrentKey = Input.KeyCode
+                            Properties.Keybind = CurrentKey
+                            KeybindButton.Text = tostring(CurrentKey):gsub("Enum.KeyCode.", "")
+                        end
+                        Binding = false
+                    end
                     return
                 end
-                ToggleSwitch()
+
+                if CurrentKey and Input.KeyCode == CurrentKey then
+                    ToggleSwitch()
+                end
             end
         end)
 
@@ -514,7 +527,7 @@ local function CreateOptions(Frame)
                     assert(Luminosity.Settings.Debug == false or Success, Error)
                 elseif Index == "Keybind" then
                     CurrentKey = Value
-                    KeybindButton.Text = tostring(Value):gsub("Enum.KeyCode.", "")
+                    KeybindButton.Text = Value and tostring(Value):gsub("Enum.KeyCode.", "") or "None"
                 end
                 Properties[Index] = Value
             end;
