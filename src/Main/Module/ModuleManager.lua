@@ -15,7 +15,17 @@ local ModuleLoader = {}
 ModuleLoader.__index = ModuleLoader
 
 ModuleLoader.modules = {
-    DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
+    Character = {  -- категория "Combat"
+        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua",
+       -- KillAura       = "src/Main/Module/Impl/KillAura.lua",
+    }--,
+    --Render = {
+    --    ESP        = "src/Main/Module/Impl/ESP.lua",
+    --    Chams      = "src/Main/Module/Impl/Chams.lua",
+    --},
+    --Misc = {
+    --    AutoFarm   = "src/Main/Module/Impl/AutoFarm.lua"
+    --}
 }
 
 function ModuleLoader:loadEvent()
@@ -33,20 +43,27 @@ function ModuleLoader:loadEvent()
     end
 end
 
-function ModuleLoader:drawMainModule(MainTab)
-    for name, module in pairs(self.loadedModules) do
+function ModuleLoader:drawModule(category, MainTab)
+    local modules = self.loadedModules[category]
+    if not modules then
+        warn(("[ModuleLoader] Category '%s' not found"):format(category))
+        return
+    end
+
+    for name, module in pairs(modules) do
         if module and type(module.drawModule) == "function" then
             local success, err = pcall(function()
                 module:drawModule(MainTab)
             end)
             if not success then
-                warn(("[ModuleLoader] Failed to draw module '%s': %s"):format(name, err))
+                warn(("[ModuleLoader] Failed to draw module '%s' in category '%s': %s"):format(name, category, err))
             end
         else
-            warn(("[ModuleLoader] Module '%s' missing drawModule function"):format(name))
+            warn(("[ModuleLoader] Module '%s' in category '%s' missing drawModule function"):format(name, category))
         end
     end
 end
+
 
 
 return ModuleLoader
