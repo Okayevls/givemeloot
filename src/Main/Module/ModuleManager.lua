@@ -10,35 +10,31 @@ local function LoadGitHubScript(user, repo, path, branch)
     return game:HttpGet(rawUrl, true)
 end
 
-
 local ModuleLoader = {}
 ModuleLoader.__index = ModuleLoader
 
 ModuleLoader.modules = {
-    Character = {  -- категория "Combat"
+    Character = {
         DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
-       -- KillAura       = "src/Main/Module/Impl/KillAura.lua",
-    }--,
-    --Render = {
-    --    ESP        = "src/Main/Module/Impl/ESP.lua",
-    --    Chams      = "src/Main/Module/Impl/Chams.lua",
-    --},
-    --Misc = {
-    --    AutoFarm   = "src/Main/Module/Impl/AutoFarm.lua"
-    --}
+    }
 }
 
 function ModuleLoader:loadEvent()
     self.loadedModules = {}
-    for name, path in pairs(self.modules) do
-        local success, result = pcall(function()
-            local code = LoadGitHubScript("Okayevls", "givemeloot", path)
-            return loadstring(code)()
-        end)
-        if success then
-            self.loadedModules[name] = result
-        else
-            warn("[ModuleLoader] X Error loading module:", name, result)
+
+    for category, modules in pairs(self.modules) do
+        self.loadedModules[category] = {}
+        for name, path in pairs(modules) do
+            local success, result = pcall(function()
+                local code = LoadGitHubScript("Okayevls", "givemeloot", path)
+                return loadstring(code)()
+            end)
+
+            if success then
+                self.loadedModules[category][name] = result
+            else
+                warn(("[ModuleLoader] X Error loading module '%s' in category '%s': %s"):format(name, category, result))
+            end
         end
     end
 end
@@ -63,7 +59,5 @@ function ModuleLoader:drawModule(category, MainTab)
         end
     end
 end
-
-
 
 return ModuleLoader
