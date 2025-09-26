@@ -412,25 +412,23 @@ local function CreateOptions(Frame)
         })
         TitleLabel.Parent = Container
 
-        -- Keybind Button (слева от слайдера)
         -- Keybind Button (слева от переключателя)
         local KeybindButton = Utility.new("TextButton", {
             Name = "Keybind",
             Parent = Container,
-            BackgroundColor3 = Color3.fromRGB(60, 60, 60),  -- немного светлее/темнее для дизайна
-            Size = UDim2.new(0, 40, 0, 20),  -- компактная кнопка
-            Position = UDim2.new(1, -70, 0.5, -10),  -- подгоняем позицию
+            BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+            Size = UDim2.new(0, 40, 0, 18), -- чуть меньше кнопка
+            Position = UDim2.new(1, -70, 0.5, -9), -- позиция подгоняем
             Text = "None",
             Font = Enum.Font.Gotham,
-            TextSize = 10,  -- меньше шрифт
+            TextSize = 9, -- компактный шрифт
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextWrapped = true
+            TextWrapped = false,
+            ClipsDescendants = true
         }, {
             Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)}),
-            Utility.new("UIPadding", {PaddingLeft = UDim.new(0, 3), PaddingRight = UDim.new(0, 3)})
+            Utility.new("UIPadding", {PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2)})
         })
-
-
 
         local CurrentKey = nil
         KeybindButton.MouseButton1Down:Connect(function()
