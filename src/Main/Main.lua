@@ -41,7 +41,7 @@ end)
 
 Folder.Button("Test Button", function()
     print("Button Triggered!")
-end):Keybind(Enum.KeyCode.E)
+end)
 
 
 
