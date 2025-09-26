@@ -421,13 +421,14 @@ local function CreateOptions(Frame)
             Position = UDim2.new(1, -90, 0.5, -10),
             Text = "None",
             Font = Enum.Font.Gotham,
-            TextSize = 14,
+            TextSize = 12,
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextScaled = true
+            TextWrapped = true
         }, {
             Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)}),
             Utility.new("UIPadding", {PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5)})
         })
+
 
         local CurrentKey = nil
         KeybindButton.MouseButton1Down:Connect(function()
