@@ -381,6 +381,87 @@ local function CreateOptions(Frame)
         })
     end
 
+    function Options.Keybind(Title, DefaultKey, Callback)
+        local Properties = {
+            Title = Title or "Keybind",
+            Key = DefaultKey or Enum.KeyCode.F,
+            Function = Callback or function() end
+        }
+
+        local Container = Utility.new("ImageButton", {
+            Name = "Keybind",
+            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 25),
+        }, {
+            Utility.new("TextLabel", {
+                Name = "Title",
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 0, 0.5, 0),
+                Size = UDim2.new(0.5, 0, 1, 0),
+                Font = Enum.Font.Gotham,
+                Text = Properties.Title,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 14,
+                TextTransparency = 0.3,
+                TextXAlignment = Enum.TextXAlignment.Left
+            }),
+            Utility.new("TextButton", {
+                Name = "Bind",
+                AnchorPoint = Vector2.new(1, 0.5),
+                BackgroundColor3 = Color3.fromRGB(50, 55, 60),
+                Position = UDim2.new(1, 0, 0.5, 0),
+                Size = UDim2.new(0.2, 25, 0, 20),
+                Text = Properties.Key.Name,
+                Font = Enum.Font.Gotham,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 12,
+                TextTransparency = 0.3
+            }, {
+                Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
+            })
+        })
+
+        -- Слушаем нажатия клавиш
+        local listening = false
+        Container.Bind.MouseButton1Down:Connect(function()
+            Container.Bind.Text = "Press..."
+            listening = true
+        end)
+
+        Services.UserInputService.InputBegan:Connect(function(input)
+            if listening and input.UserInputType == Enum.UserInputType.Keyboard then
+                Properties.Key = input.KeyCode
+                Container.Bind.Text = Properties.Key.Name
+                listening = false
+            end
+        end)
+
+        -- Срабатывание функции при нажатии
+        Services.UserInputService.InputBegan:Connect(function(input)
+            if input.KeyCode == Properties.Key then
+                local Success, Error = pcall(Properties.Function)
+                assert(Luminosity.Settings.Debug == false or Success, Error)
+            end
+        end)
+
+        return setmetatable({}, {
+            __index = function(_, Index)
+                return Properties[Index]
+            end,
+            __newindex = function(_, Index, Value)
+                if Index == "Title" then
+                    Container.Title.Text = tostring(Value)
+                elseif Index == "Key" then
+                    Properties.Key = Value
+                    Container.Bind.Text = Value.Name
+                end
+                Properties[Index] = Value
+            end
+        })
+    end
+
     function Options.Switch(Title, Callback)
         local Properties = {
             Title = Title and tostring(Title) or "Switch";
