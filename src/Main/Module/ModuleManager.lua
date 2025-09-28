@@ -10,7 +10,6 @@ local function LoadGitHubScript(user, repo, path, branch)
     return game:HttpGet(rawUrl, true)
 end
 
-
 local ModuleLoader = {}
 ModuleLoader.__index = ModuleLoader
 
