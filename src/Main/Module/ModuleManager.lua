@@ -1,32 +1,17 @@
-local function LoadGitHubScript(user, repo, path, branch)
-    branch = branch or "main"
-    local httpService = game:GetService("HttpService")
+local function LoadGitHubScript(path)
+    local branch = "main"
+    local repoUser = "Okayevls"
+    local repoName = "givemeloot"
 
-    -- Попытка получить последний коммит
-    local success, data = pcall(function()
-        local apiUrl = "https://api.github.com/repos/"..user.."/"..repo.."/commits/"..branch
-        return httpService:JSONDecode(game:HttpGet(apiUrl, true))
-    end)
+    local apiUrl = "https://api.github.com/repos/"..repoUser.."/"..repoName.."/commits/"..branch
+    local data = game:GetService("HttpService"):JSONDecode(game:HttpGet(apiUrl))
+    local latestSHA = data["sha"]
 
-    if not success or not data or #data == 0 then
-        error("[LoadGitHubScript] Failed to fetch commits for "..repo)
-    end
-
-    local latestSHA = data[1].sha -- первый элемент массива коммитов
-
-    local rawUrl = "https://raw.githubusercontent.com/"..user.."/"..repo.."/"..latestSHA.."/"..path
-    local codeSuccess, code = pcall(function()
-        return game:HttpGet(rawUrl, true)
-    end)
-
-    if not codeSuccess then
-        error("[LoadGitHubScript] Failed to fetch raw script: "..path)
-    end
-
-    return code
+    local rawUrl = "https://raw.githubusercontent.com/"..repoUser.."/"..repoName.."/"..latestSHA.."/"..path
+    return game:HttpGet(rawUrl, true)
 end
 
--- ModuleLoader остался без изменений
+
 local ModuleLoader = {}
 ModuleLoader.__index = ModuleLoader
 
@@ -38,13 +23,13 @@ function ModuleLoader:loadEvent()
     self.loadedModules = {}
     for name, path in pairs(self.modules) do
         local success, result = pcall(function()
-            local code = LoadGitHubScript("Okayevls", "givemeloot", path)
+            local code = LoadGitHubScript(path)
             return loadstring(code)()
         end)
         if success then
             self.loadedModules[name] = result
         else
-            warn("[ModuleLoader] Error loading module:", name, result)
+            warn("[ModuleLoader] X Error loading module:", name, result)
         end
     end
 end
@@ -63,5 +48,6 @@ function ModuleLoader:drawModule(MainTab)
         end
     end
 end
+
 
 return ModuleLoader
