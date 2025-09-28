@@ -26,8 +26,7 @@ local ModuleManager = EventLoader:Get("ModuleManager")
 
 local updaterReconnect = Updater:new()
 
-local Window = GuiRenderer.new("Morphis", "vBeta I", 4370345701)
-GuiInstance:drawGuiCore(Window, ModuleManager)
+Gu  iInstance:drawGuiCore(GuiRenderer, ModuleManager)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
