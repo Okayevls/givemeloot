@@ -35,10 +35,10 @@ function ModuleLoader:loadEvent()
 end
 
 function ModuleLoader:drawModule(MainTab)
-    for name, module in pairs(self.loadedModules) do
-        if module and type(module.drawModule) == "function" then
+    for name, modules in pairs(self.loadedModules) do
+        if modules and type(modules.drawModule) == "function" then
             local success, err = pcall(function()
-                module:drawModule(MainTab)
+                modules:drawModule(MainTab)
             end)
             if not success then
                 warn(("[ModuleLoader] Failed to draw module '%s': %s"):format(name, err))
