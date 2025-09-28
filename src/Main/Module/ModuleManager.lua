@@ -12,14 +12,14 @@ local function LoadGitHubScript(path)
 end
 
 
-local ModuleLoader = {}
-ModuleLoader.__index = ModuleLoader
+local ModuleManager = {}
+ModuleManager.__index = ModuleManager
 
-ModuleLoader.modules = {
+ModuleManager.modules = {
     DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
 }
 
-function ModuleLoader:loadEvent()
+function ModuleManager:loadEvent()
     self.loadedModules = {}
     for name, path in pairs(self.modules) do
         local success, result = pcall(function()
@@ -50,4 +50,4 @@ function ModuleLoader:drawModule(MainTab)
 end
 
 
-return ModuleLoader
+return ModuleManager

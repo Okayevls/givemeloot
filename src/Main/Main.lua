@@ -11,7 +11,7 @@ local modules = {
     GuiRenderer = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiRenderer.lua',
     GuiInstance = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiInstance.lua',
 
-    ModuleLoader = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleManager.lua'
+    ModuleManager = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleManager.lua'
 }
 
 EventLoader:Init(modules)
@@ -22,12 +22,12 @@ local Render = EventLoader:Get("Render")
 local FontRender = EventLoader:Get("FontRender")
 local GuiRenderer = EventLoader:Get("GuiRenderer")
 local GuiInstance = EventLoader:Get("GuiInstance")
-local ModuleLoader = EventLoader:Get("ModuleLoader")
+local ModuleManager = EventLoader:Get("ModuleManager")
 
 local updaterReconnect = Updater:new()
 
 local Window = GuiRenderer.new("Morphis", "vBeta I", 4370345701)
-GuiInstance:drawGuiCore(Window, ModuleLoader)
+GuiInstance:drawGuiCore(Window, ModuleManager)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
