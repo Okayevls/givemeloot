@@ -26,7 +26,7 @@ local ModuleManager = EventLoader:Get("ModuleManager")
 
 local updaterReconnect = Updater:new()
 
-Gu  iInstance:drawGuiCore(GuiRenderer, ModuleManager)
+GuiInstance:drawGuiCore(GuiRenderer, ModuleManager)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
