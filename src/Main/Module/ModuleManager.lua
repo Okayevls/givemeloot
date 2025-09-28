@@ -1,13 +1,32 @@
+local HttpService = game:GetService("HttpService")
+
 local function LoadGitHubScript(user, repo, path, branch)
     branch = branch or "main"
-    local httpService = game:GetService("HttpService")
 
-    local apiUrl = "https://api.github.com/repos/"..user.."/"..repo.."/commits/"..branch
-    local data = httpService:JSONDecode(game:HttpGet(apiUrl, true))
-    local latestSHA = data["sha"]
+    -- Получаем SHA последнего коммита
+    local apiUrl = ("https://api.github.com/repos/%s/%s/commits/%s"):format(user, repo, branch)
+    local success, data = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(apiUrl, true))
+    end)
 
-    local rawUrl = "https://raw.githubusercontent.com/"..user.."/"..repo.."/"..latestSHA.."/"..path
-    return game:HttpGet(rawUrl, true)
+    if not success or not data or #data == 0 then
+        error("[LoadGitHubScript] Failed to fetch commits for "..repo)
+    end
+
+    local latestSHA = data[1].sha
+
+    -- Формируем URL для raw файла
+    local rawUrl = ("https://raw.githubusercontent.com/%s/%s/%s/%s"):format(user, repo, latestSHA, path)
+
+    local codeSuccess, code = pcall(function()
+        return game:HttpGet(rawUrl, true)
+    end)
+
+    if not codeSuccess then
+        error("[LoadGitHubScript] Failed to fetch raw script: "..path)
+    end
+
+    return code
 end
 
 local ModuleLoader = {}
@@ -22,12 +41,13 @@ function ModuleLoader:loadEvent()
     for name, path in pairs(self.modules) do
         local success, result = pcall(function()
             local code = LoadGitHubScript("Okayevls", "givemeloot", path)
-            return loadstring(code)()
+            local func = assert(loadstring(code), "[ModuleLoader] loadstring failed for "..name)
+            return func()
         end)
         if success then
             self.loadedModules[name] = result
         else
-            warn("[ModuleLoader] X Error loading module:", name, result)
+            warn("[ModuleLoader] Error loading module:", name, result)
         end
     end
 end
@@ -46,6 +66,5 @@ function ModuleLoader:drawModule(MainTab)
         end
     end
 end
-
 
 return ModuleLoader
