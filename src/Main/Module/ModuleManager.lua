@@ -28,8 +28,6 @@ function ModuleManager:loadEvent()
         end)
         if success then
             self.loadedModules[name] = result
-        else
-            warn("[ModuleLoader] X Error loading module:", name, result)
         end
     end
 end
@@ -43,8 +41,6 @@ function ModuleManager:drawModule(MainTab)
             if not success then
                 warn(("[ModuleLoader] Failed to draw module '%s': %s"):format(name, err))
             end
-        else
-            warn(("[ModuleLoader] Module '%s' missing drawModule function"):format(name))
         end
     end
 end
