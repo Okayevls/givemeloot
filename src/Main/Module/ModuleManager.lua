@@ -11,39 +11,61 @@ local function LoadGitHubScript(path)
     return game:HttpGet(rawUrl, true)
 end
 
-
 local ModuleManager = {}
 ModuleManager.__index = ModuleManager
 
 ModuleManager.modules = {
-    DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
+    Combat = {
+        Aimbot = "src/Main/Module/Impl/Aimbot.lua",
+    },
+    Character = {
+        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua",
+    }--,
+    --Visual = {
+    --    ESP = "src/Main/Module/Impl/ESP.lua",
+    --}
 }
 
 function ModuleManager:loadEvent()
     self.loadedModules = {}
-    for name, path in pairs(self.modules) do
-        local success, result = pcall(function()
-            local code = LoadGitHubScript(path)
-            return loadstring(code)()
-        end)
-        if success then
-            self.loadedModules[name] = result
-        end
-    end
-end
 
-function ModuleManager:drawModule(MainTab)
-    for name, modules in pairs(self.loadedModules) do
-        if modules and type(modules.drawModule) == "function" then
-            local success, err = pcall(function()
-                modules:drawModule(MainTab)
+    for category, mods in pairs(self.modules) do
+        self.loadedModules[category] = {}
+        for name, path in pairs(mods) do
+            local success, result = pcall(function()
+                local code = LoadGitHubScript(path)
+                return loadstring(code)()
             end)
-            if not success then
-                warn(("[ModuleLoader] Failed to draw module '%s': %s"):format(name, err))
+
+            if success then
+                self.loadedModules[category][name] = result
+                print("[ModuleManager] ✅ Loaded:", category, "/", name)
+            else
+                warn("[ModuleManager] ❌ Error loading:", category, "/", name, "->", result)
             end
         end
     end
 end
 
+function ModuleManager:drawCategory(category, MainTab)
+    local categoryModules = self.loadedModules[category]
+    if not categoryModules then
+        warn(("[ModuleManager] ⚠️ Category '%s' not found or no modules loaded."):format(category))
+        return
+    end
+
+    for name, module in pairs(categoryModules) do
+        if module and type(module.drawModule) == "function" then
+            local success, err = pcall(function()
+                module:drawModule(MainTab)
+            end)
+            if not success then
+                warn(("[ModuleManager] ❌ Failed to draw module '%s' in '%s': %s"):format(name, category, err))
+            end
+        else
+            warn(("[ModuleManager] ⚠️ Module '%s' in '%s' missing drawModule()"):format(name, category))
+        end
+    end
+end
 
 return ModuleManager
