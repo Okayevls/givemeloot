@@ -1,23 +1,20 @@
-local HttpService = game:GetService("HttpService")
-
 local function LoadGitHubScript(user, repo, path, branch)
     branch = branch or "main"
+    local httpService = game:GetService("HttpService")
 
-    -- Получаем SHA последнего коммита
-    local apiUrl = ("https://api.github.com/repos/%s/%s/commits/%s"):format(user, repo, branch)
+    -- Попытка получить последний коммит
     local success, data = pcall(function()
-        return HttpService:JSONDecode(game:HttpGet(apiUrl, true))
+        local apiUrl = "https://api.github.com/repos/"..user.."/"..repo.."/commits/"..branch
+        return httpService:JSONDecode(game:HttpGet(apiUrl, true))
     end)
 
     if not success or not data or #data == 0 then
         error("[LoadGitHubScript] Failed to fetch commits for "..repo)
     end
 
-    local latestSHA = data[1].sha
+    local latestSHA = data[1].sha -- первый элемент массива коммитов
 
-    -- Формируем URL для raw файла
-    local rawUrl = ("https://raw.githubusercontent.com/%s/%s/%s/%s"):format(user, repo, latestSHA, path)
-
+    local rawUrl = "https://raw.githubusercontent.com/"..user.."/"..repo.."/"..latestSHA.."/"..path
     local codeSuccess, code = pcall(function()
         return game:HttpGet(rawUrl, true)
     end)
@@ -29,6 +26,7 @@ local function LoadGitHubScript(user, repo, path, branch)
     return code
 end
 
+-- ModuleLoader остался без изменений
 local ModuleLoader = {}
 ModuleLoader.__index = ModuleLoader
 
@@ -41,8 +39,7 @@ function ModuleLoader:loadEvent()
     for name, path in pairs(self.modules) do
         local success, result = pcall(function()
             local code = LoadGitHubScript("Okayevls", "givemeloot", path)
-            local func = assert(loadstring(code), "[ModuleLoader] loadstring failed for "..name)
-            return func()
+            return loadstring(code)()
         end)
         if success then
             self.loadedModules[name] = result
