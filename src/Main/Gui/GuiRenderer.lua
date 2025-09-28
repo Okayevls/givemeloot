@@ -645,7 +645,7 @@ local function CreateOptions(Frame)
         })
     end
 
-    
+
 
     function Options.Dropdown(Title, List, Callback, Placeholder)
 
