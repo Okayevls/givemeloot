@@ -34,7 +34,7 @@ function ModuleManager:loadEvent()
     end
 end
 
-function ModuleLoader:drawModule(MainTab)
+function ModuleManager:drawModule(MainTab)
     for name, modules in pairs(self.loadedModules) do
         if modules and type(modules.drawModule) == "function" then
             local success, err = pcall(function()
