@@ -12,9 +12,20 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local CombatTab = Window.Tab("Combat", 7485051733)
     local CharacterTab = Window.Tab("Character", 16149111790)
 
-    local Aimbot = loader:Get("Aimbot"):drawModule(CombatTab)
-    local DesyncPosition = loader:Get("DesyncPosition"):drawModule(CharacterTab)
+    local Aimbot = loader:Get("Aimbot")
+    if Aimbot then
+        Aimbot:drawModule(CombatTab)
+    else
+        warn("[ModuleManager] ❌ Aimbot module is nil!")
+    end
 
+    local DesyncPosition = loader:Get("DesyncPosition")
+    if DesyncPosition then
+        DesyncPosition:drawModule(CharacterTab)
+    else
+        warn("[ModuleManager] ❌ DesyncPosition module is nil!")
+    end
 end
+
 
 return ModuleManager
