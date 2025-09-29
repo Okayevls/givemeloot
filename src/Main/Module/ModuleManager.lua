@@ -32,6 +32,7 @@ function ModuleManager:loadEvent()
     for category, mods in pairs(self.modules) do
         self.loadedModules[category] = {}
         for name, path in pairs(mods) do
+            print("[DEBUG] Загружаем модуль:", name, "из категории:", category)
             local success, result = pcall(function()
                 local code = LoadGitHubScript(path)
                 return loadstring(code)()
