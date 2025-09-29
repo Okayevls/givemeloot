@@ -20,10 +20,7 @@ ModuleManager.modules = {
     },
     Character = {
         DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua",
-    }--,
-    --Visual = {
-    --    ESP = "src/Main/Module/Impl/ESP.lua",
-    --}
+    }
 }
 
 function ModuleManager:loadEvent()
@@ -35,7 +32,8 @@ function ModuleManager:loadEvent()
             print("[DEBUG] Загружаем модуль:", name, "из категории:", category)
             local success, result = pcall(function()
                 local code = LoadGitHubScript(path)
-                return loadstring(code)()
+                print("[DEBUG] Загруженный код модуля "..name..":\n", code)
+                local result = loadstring(code)()
             end)
 
             if success then
