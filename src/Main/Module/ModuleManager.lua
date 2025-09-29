@@ -1,7 +1,7 @@
 local ModuleManager = {}
 ModuleManager.__index = ModuleManager
 
-function ModuleManager:drawCategory(ModuleLoader, Category, MainTab)
+function ModuleManager:drawCategory(Window, ModuleLoader)
     local loader = ModuleLoader
 
     loader:Init({
@@ -9,15 +9,12 @@ function ModuleManager:drawCategory(ModuleLoader, Category, MainTab)
         DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
     })
 
-    if Category == "Combat" then
-        local Aimbot = loader:Get("Aimbot")
-        Aimbot:drawModule(MainTab)
-    end
+    local CombatTab = Window.Tab("Combat", 7485051733)
+    local Aimbot = loader:Get("Aimbot"):drawModule(CombatTab)
 
-    if Category == "Character" then
-        local Desync = loader:Get("DesyncPosition")
-        Desync:drawModule(MainTab)
-    end
+    local CharacterTab = Window.Tab("Character", 16149111790)
+    local DesyncPosition = loader:Get("DesyncPosition"):drawModule(CharacterTab)
+
 end
 
 return ModuleManager
