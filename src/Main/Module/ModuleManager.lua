@@ -1,15 +1,17 @@
--- ModuleManager.lua
 local ModuleManager = {}
 ModuleManager.__index = ModuleManager
 
 function ModuleManager.new()
-    return setmetatable({}, ModuleManager)
+    return setmetatable({ loadedCategories = {} }, ModuleManager)
 end
 
-function ModuleManager:drawCategory(ModuleLoader, category, MainTab)
+-- Загружает и отрисовывает все модули категории на вкладке
+function ModuleManager:LoadAndDrawCategory(ModuleLoader, category, MainTab)
     assert(ModuleLoader, "[ModuleManager] ModuleLoader required")
     assert(category and type(category)=="string", "[ModuleManager] category required")
+    assert(MainTab, "[ModuleManager] MainTab required")
 
+    -- Таблица модулей для каждой категории
     local modules = {
         Combat = { Aimbot = "src/Main/Module/Impl/Aimbot.lua" },
         Character = { DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua" }
@@ -21,8 +23,13 @@ function ModuleManager:drawCategory(ModuleLoader, category, MainTab)
         return
     end
 
-    ModuleLoader:Init({ [category] = categoryModules })
+    -- Загружаем модули категории только если ещё не загружены
+    if not self.loadedCategories[category] then
+        ModuleLoader:Init({ [category] = categoryModules })
+        self.loadedCategories[category] = true
+    end
 
+    -- Отрисовываем каждый модуль
     for name, _ in pairs(categoryModules) do
         local mod = ModuleLoader:Get(category, name)
         if mod and type(mod.drawModule) == "function" then
