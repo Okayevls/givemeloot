@@ -5,12 +5,8 @@ function ModuleManager:drawCategory(ModuleLoader, Category, MainTab)
     local loader = ModuleLoader
 
     loader:Init({
-        Combat = {
-            Aimbot = "src/Main/Module/Impl/Aimbot.lua"
-        },
-        Character = {
-            DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
-        }
+        Aimbot = "src/Main/Module/Impl/Aimbot.lua",
+        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
     })
 
     if Category == "Combat" then
