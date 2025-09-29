@@ -9,7 +9,7 @@ function GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
     local CombatTab = Window.Tab("Combat", 7485051733)
     local CharacterTab = Window.Tab("Character", 16149111790)
 
-    print("111111111")
+    print("0000")
 
     local drawCategoryCombat = ModuleManager:drawCategory(ModuleLoader,"Combat", CombatTab)
     local drawCategoryCharacter = ModuleManager:drawCategory(ModuleLoader,"Character", CharacterTab)
