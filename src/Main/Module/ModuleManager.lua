@@ -10,9 +10,9 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     })
 
     local CombatTab = Window.Tab("Combat", 7485051733)
-    local Aimbot = loader:Get("Aimbot"):drawModule(CombatTab)
-
     local CharacterTab = Window.Tab("Character", 16149111790)
+
+    local Aimbot = loader:Get("Aimbot"):drawModule(CombatTab)
     local DesyncPosition = loader:Get("DesyncPosition"):drawModule(CharacterTab)
 
 end
