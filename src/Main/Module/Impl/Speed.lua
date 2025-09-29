@@ -56,7 +56,7 @@ function Speed:drawModule(MainTab)
         end
     end)
 
-    Folder.Slider("Speed Multiplier", self.SpeedMultiplier, 1, 5, function(value)
+    Folder.Slider("Speed Multiplier", {Default = self.SpeedMultiplier, Min = 1, Max = 5, Precise = true}, function(value)
         self.SpeedMultiplier = value
     end)
 

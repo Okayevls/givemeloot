@@ -6,7 +6,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
 
     loader:Init({
         AimBot = "src/Main/Module/Impl/AimBot.lua",
-        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua"
+        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua",
         DesyncPosition = "src/Main/Module/Impl/Speed.lua"
     })
 
