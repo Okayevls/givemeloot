@@ -1,22 +1,19 @@
---local function LoadGitHubScript(path)
---    local branch = "main"
---    local repoUser = "Okayevls"
---    local repoName = "givemeloot"
---
---    local apiUrl = "https://api.github.com/repos/"..repoUser.."/"..repoName.."/commits/"..branch
---    local data = game:GetService("HttpService"):JSONDecode(game:HttpGet(apiUrl))
---    local latestSHA = data["sha"]
---
---    local rawUrl = "https://raw.githubusercontent.com/"..repoUser.."/"..repoName.."/"..latestSHA.."/"..path
---    return game:HttpGet(rawUrl, true)
---end
 local function LoadGitHubScript(path)
     local repoUser = "Okayevls"
     local repoName = "givemeloot"
     local branch = "main"
 
     local rawUrl = "https://raw.githubusercontent.com/"..repoUser.."/"..repoName.."/"..branch.."/"..path
-    return game:HttpGet(rawUrl, true)
+    local success, result = pcall(function()
+        return game:HttpGet(rawUrl, true)
+    end)
+
+    if success then
+        return result
+    else
+        warn("[LoadGitHubScript] ❌ Failed to fetch:", path)
+        return nil
+    end
 end
 
 local ModuleManager = {}
@@ -31,24 +28,28 @@ ModuleManager.modules = {
     }
 }
 
-function ModuleManager:loadEvent()
+function ModuleManager:loadModules()
     self.loadedModules = {}
 
     for category, mods in pairs(self.modules) do
         self.loadedModules[category] = {}
         for name, path in pairs(mods) do
-            print("[DEBUG] Загружаем модуль:", name, "из категории:", category)
-            local success, result = pcall(function()
-                local code = LoadGitHubScript(path)
-                print("[DEBUG] Загруженный код модуля "..name..":\n", code)
-                local result = loadstring(code)()
-            end)
+            print("[ModuleManager] 🔄 Loading module:", name, "from category:", category)
+            local code = LoadGitHubScript(path)
 
-            if success then
-                self.loadedModules[category][name] = result
-                print("[ModuleManager] ✅ Loaded:", category, "/", name)
+            if code then
+                local success, result = pcall(function()
+                    return loadstring(code)()
+                end)
+
+                if success then
+                    self.loadedModules[category][name] = result
+                    print("[ModuleManager] ✅ Loaded:", category, "/", name)
+                else
+                    warn("[ModuleManager] ❌ Failed to load:", category, "/", name, "->", result)
+                end
             else
-                warn("[ModuleManager] ❌ Error loading:", category, "/", name, "->", result)
+                warn("[ModuleManager] ❌ Could not fetch module code:", name)
             end
         end
     end
