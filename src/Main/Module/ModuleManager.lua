@@ -10,11 +10,13 @@ function ModuleManager:drawCategory(ModuleLoader, Category, MainTab)
     })
 
     if Category == "Combat" then
-        local Aimbot = loader:Get("Aimbot"):drawModule(MainTab)
+        local Aimbot = loader:Get("Aimbot")
+        Aimbot:drawModule(MainTab)
     end
 
     if Category == "Character" then
-        local Desync = loader:Get("DesyncPosition"):drawModule(MainTab)
+        local Desync = loader:Get("DesyncPosition")
+        Desync:drawModule(MainTab)
     end
 end
 
