@@ -1,7 +1,7 @@
 local ModuleManager = {}
 ModuleManager.__index = ModuleManager
 
-function ModuleManager:drawCategory(ModuleLoader, Category, MainTab)
+function ModuleManager:drawCategory(ModuleLoader, MainTab)
     local loader = ModuleLoader
 
     loader:Init({
