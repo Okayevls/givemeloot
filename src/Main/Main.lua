@@ -11,7 +11,8 @@ local modules = {
     GuiRenderer = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiRenderer.lua',
     GuiInstance = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Gui/GuiInstance.lua',
 
-    ModuleManager = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleManager.lua'
+    ModuleManager = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleManager.lua',
+    ModuleLoader = 'https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Module/ModuleLoader.lua'
 }
 
 EventLoader:Init(modules)
@@ -23,10 +24,11 @@ local FontRender = EventLoader:Get("FontRender")
 local GuiRenderer = EventLoader:Get("GuiRenderer")
 local GuiInstance = EventLoader:Get("GuiInstance")
 local ModuleManager = EventLoader:Get("ModuleManager")
+local ModuleLoader = EventLoader:Get("ModuleLoader")
 
 local updaterReconnect = Updater:new()
 
-GuiInstance:drawGuiCore(GuiRenderer, ModuleManager)
+GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
 
 Chat.chat.sendMessage("Created by Prokosik x Flyaga other sucked dick")
 
