@@ -20,7 +20,6 @@ function ModuleManager:drawCategory(ModuleLoader, MainTab)
     if MainTab == "Character" then
         local Desync = loader:Get("DesyncPosition"):drawModule(MainTab)
     end
-
 end
 
 return ModuleManager
