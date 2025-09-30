@@ -101,17 +101,13 @@ function Speed:SetMultiplier(value)
     end
 end
 
--- Метод, который вызывается GUI для отрисовки и привязки событий
 function Speed:drawModule(MainTab)
     local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
-    -- Инициализируем внутренние значения (если нужно)
     if not self.SpeedMultiplier then self.SpeedMultiplier = 1 end
     if self.Enabled == nil then self.Enabled = false end
 
-    -- SwitchAndBinding: первый аргумент - label, второй - текущее значение, третий - callback
-    Folder.SwitchAndBinding("Toggle", self.Enabled, function(Status)
-        -- Status может быть true/false или таблица с булом+bind, адаптируй под реализацию GUI
+    Folder.SwitchAndBinding("Toggle", function(Status)
         local enabled = false
         if type(Status) == "boolean" then
             enabled = Status
