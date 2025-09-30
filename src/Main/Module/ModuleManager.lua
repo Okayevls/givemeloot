@@ -13,8 +13,9 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local CharacterTab = Window.Tab("Character", 16149111790)
 
     local Aimbot = loader:Get("AimBot"):drawModule(CombatTab)
-
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
+
+    print("Base ModuleManager Build | 0x00000000001")
 
 end
 
