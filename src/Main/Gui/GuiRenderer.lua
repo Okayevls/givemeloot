@@ -1206,21 +1206,25 @@ function Luminosity.new(Name, Header, Icon)
 
     function Window:Toggle(Value)
         Window.Toggled = Value or not Window.Toggled
-
-        local AbsolutePosition = Main.AbsolutePosition
-        local AbsoulteSize = Main.AbsoluteSize
-        if Window.Toggled == true then
+        local currentPos = Main.Position
+        local currentSize = Main.Size
+        if Window.Toggled then
             Main.Visible = true
+            Main.AnchorPoint = Vector2.new(0, 0)
+            Main.Position = currentPos
             Utility.Tween(Main, TweenInfo.new(0.25), {Size = WindowInfo.SizeSave}):Yield()
-            Main.UISizeConstraint.MinSize = Vector2.new(300, 200)
-            Main.Position = UDim2.new(0, AbsolutePosition.X, 0, AbsolutePosition.Y)
         else
             WindowInfo.SizeSave = Main.Size
-            Main.Position = UDim2.new(0, AbsolutePosition.X + (AbsoulteSize.X * 0.5), 0, AbsolutePosition.Y + (AbsoulteSize.Y * 0.5))
             Main.AnchorPoint = Vector2.new(0.5, 0.5)
-            Main.UISizeConstraint.MinSize = Vector2.new(0, 0)
+            local centerPos = UDim2.new(
+                    0, currentPos.X.Offset + currentSize.X.Offset/2,
+                    0, currentPos.Y.Offset + currentSize.Y.Offset/2
+            )
+            Main.Position = centerPos
             Utility.Tween(Main, TweenInfo.new(0.5), {Size = UDim2.new(0, 0, 0, 0)}):Yield()
             Main.Visible = false
+            Main.AnchorPoint = Vector2.new(0, 0)
+            Main.Position = currentPos
         end
     end
 
