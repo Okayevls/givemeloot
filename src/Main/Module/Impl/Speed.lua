@@ -1,43 +1,61 @@
 local Speed = {}
 Speed.__index = Speed
 
-Speed.type = {}
-
 Speed.Enabled = false
 Speed.SpeedMultiplier = 2
-Speed._origWalkSpeed = nil
 
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-function Speed:_getHumanoid()
+local BV
+local conn
+
+function Speed:Enable()
+    if self.Enabled then return end
+    self.Enabled = true
+
     local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    return character:FindFirstChildOfClass("Humanoid")
-end
+    local root = character:WaitForChild("HumanoidRootPart")
+    local humanoid = character:WaitForChild("Humanoid")
 
-function Speed:SetEnabled(state)
-    self.Enabled = state and true or false
-    local humanoid = self:_getHumanoid()
-    if not humanoid then return end
-
-    if self.Enabled then
-        if not self._origWalkSpeed then
-            self._origWalkSpeed = humanoid.WalkSpeed
-        end
-        humanoid.WalkSpeed = self._origWalkSpeed * self.SpeedMultiplier
-    else
-        if self._origWalkSpeed then
-            humanoid.WalkSpeed = self._origWalkSpeed
-        end
+    if not BV then
+        BV = Instance.new("BodyVelocity")
+        BV.MaxForce = Vector3.new(1e5, 0, 1e5)
+        BV.Velocity = Vector3.new(0,0,0)
+        BV.Parent = root
     end
+
+    humanoid.PlatformStand = false
+
+    conn = RunService.RenderStepped:Connect(function()
+        if self.Enabled and humanoid then
+            local moveDir = humanoid.MoveDirection
+            BV.Velocity = moveDir * 16 * self.SpeedMultiplier
+        end
+    end)
 end
 
-function Speed:SetMultiplier(value)
-    self.SpeedMultiplier = tonumber(value) or 1
-    if self.Enabled then
-        local humanoid = self:_getHumanoid()
-        if humanoid and self._origWalkSpeed then
-            humanoid.WalkSpeed = self._origWalkSpeed * self.SpeedMultiplier
+function Speed:Disable()
+    self.Enabled = false
+
+    if conn then
+        conn:Disconnect()
+        conn = nil
+    end
+
+    if BV then
+        BV.Velocity = Vector3.new(0,0,0)
+        BV.MaxForce = Vector3.new(0,0,0)
+        BV:Destroy()
+        BV = nil
+    end
+
+    local character = LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = false
         end
     end
 end
@@ -46,11 +64,15 @@ function Speed:drawModule(MainTab)
     local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
     Folder.SwitchAndBinding("Toggle", function(Status)
-        self:SetEnabled(Status)
+        if Status then
+            self:Enable()
+        else
+            self:Disable()
+        end
     end)
 
     Folder.Slider("Speed Multiplier", {Default = self.SpeedMultiplier, Min = 1, Max = 10, Precise = true}, function(value)
-        self:SetMultiplier(value)
+        self.SpeedMultiplier = value
     end)
 
     return self
