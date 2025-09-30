@@ -6,8 +6,8 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
 
     loader:Init({
         AimBot = "src/Main/Module/Impl/AimBot.lua",
-        DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua",
-        Speed = "src/Main/Module/Impl/Speed.lua"
+        Speed = "src/Main/Module/Impl/Speed.lua",
+        Penis = "src/Main/Module/Impl/Penis.lua"
     })
 
     local CombatTab = Window.Tab("Combat", 7485051733)
@@ -15,8 +15,8 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
 
     local Aimbot = loader:Get("AimBot"):drawModule(CombatTab)
 
-    local DesyncPosition = loader:Get("DesyncPosition"):drawModule(CharacterTab)
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
+    local Penis = loader:Get("Penis"):drawModule(CharacterTab)
 
 end
 
