@@ -8,6 +8,7 @@ Speed.SpeedMultiplier = 2
 
 local RunService = game:GetService("RunService")
 local BV
+
 function Speed:Enable()
     if self.Enabled then return end
     self.Enabled = true
@@ -42,6 +43,9 @@ function Speed:Disable()
     end
     if BV then
         BV.Velocity = Vector3.new(0,0,0)
+        BV.MaxForce = Vector3.new(0,0,0)
+        BV:Destroy()
+        BV = nil
     end
 end
 
