@@ -7,7 +7,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     loader:Init({
         AimBot = "src/Main/Module/Impl/AimBot.lua",
         DesyncPosition = "src/Main/Module/Impl/DesyncPosition.lua",
-        DesyncPosition = "src/Main/Module/Impl/Speed.lua"
+        Speed = "src/Main/Module/Impl/Speed.lua"
     })
 
     local CombatTab = Window.Tab("Combat", 7485051733)
