@@ -1206,27 +1206,22 @@ function Luminosity.new(Name, Header, Icon)
 
     function Window:Toggle(Value)
         Window.Toggled = Value or not Window.Toggled
-        local currentPos = Main.Position
-        local currentSize = Main.Size
+
+        local originalSize = WindowInfo.SizeSave or Main.Size
+
         if Window.Toggled then
             Main.Visible = true
             Main.AnchorPoint = Vector2.new(0, 0)
-            Main.Position = currentPos
-            Utility.Tween(Main, TweenInfo.new(0.25), {Size = WindowInfo.SizeSave}):Yield()
+            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = originalSize}):Yield()
         else
             WindowInfo.SizeSave = Main.Size
-            Main.AnchorPoint = Vector2.new(0.5, 0.5)
-            local centerPos = UDim2.new(
-                    0, currentPos.X.Offset + currentSize.X.Offset/2,
-                    0, currentPos.Y.Offset + currentSize.Y.Offset/2
-            )
-            Main.Position = centerPos
-            Utility.Tween(Main, TweenInfo.new(0.5), {Size = UDim2.new(0, 0, 0, 0)}):Yield()
+
+            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Yield()
+
             Main.Visible = false
-            Main.AnchorPoint = Vector2.new(0, 0)
-            Main.Position = currentPos
         end
     end
+
 
     function Window.Tab(Title, Icon)
         local TabFrame = Utility.new("ScrollingFrame", {
