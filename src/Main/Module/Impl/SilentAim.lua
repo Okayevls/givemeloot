@@ -169,7 +169,7 @@ end
 con1 = UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if SilentAim.Enabled then
-        if input.KeyCode == SilentAim.TargetBind then
+        if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
             if selectedTarget then
                 selectedTarget = nil
                 if line then line:Remove() line = nil end
