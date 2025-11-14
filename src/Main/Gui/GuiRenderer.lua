@@ -812,24 +812,38 @@ local function CreateOptions(Frame)
 
     function Options.Slider(Title, Settings, Callback)
         Settings = Settings or {}
+
         local Properties = {
-            Title = Title and tostring(Title) or "Slider";
-            Value = nil;
-            Settings = Settings;
-            Function = Callback or function(Status) end;
+            Title = Title or "Slider",
+            Value = nil,
+            Settings = Settings,
+            Function = Callback or function() end,
         }
-        for i,v in pairs({Precise = false, Default = 1, Min = 1, Max = 10}) do
+
+        -- Default settings, including Step
+        for i, v in pairs({
+            Precise = false,
+            Default = 1,
+            Min = 1,
+            Max = 10,
+            Step = 0.1,     -- ✔ добавлен шаг по умолчанию
+        }) do
             if Properties.Settings[i] == nil then
                 Properties.Settings[i] = v
             end
         end
-        Properties.Value = math.clamp(Properties.Settings.Default or Properties.Settings.Min, Properties.Settings.Min, Properties.Settings.Max)
+
+        local Min = Properties.Settings.Min
+        local Max = Properties.Settings.Max
+        local Step = Properties.Settings.Step
+
+        Properties.Value = math.clamp(Properties.Settings.Default, Min, Max)
 
         local Container = Utility.new("ImageButton", {
             Name = "Slider",
-            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
+            Parent = Frame,
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 35)
+            Size = UDim2.new(1, 0, 0, 35),
         }, {
             Utility.new("TextLabel", {
                 Name = "Title",
@@ -837,13 +851,13 @@ local function CreateOptions(Frame)
                 Position = UDim2.new(0, 0, 0, 2),
                 Size = UDim2.new(1, -75, 0, 20),
                 Font = Enum.Font.Gotham,
-                Text = Title and tostring(Title) or "Slider",
+                Text = Title,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 14,
                 TextTransparency = 0.3,
-                TextXAlignment = Enum.TextXAlignment.Left
+                TextXAlignment = Enum.TextXAlignment.Left,
             }),
-        
+
             Utility.new("TextBox", {
                 Name = "Value",
                 Active = true,
@@ -856,9 +870,9 @@ local function CreateOptions(Frame)
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 TextSize = 14,
                 TextTransparency = 0.3,
-                TextXAlignment = Enum.TextXAlignment.Right
+                TextXAlignment = Enum.TextXAlignment.Right,
             }),
-        
+
             Utility.new("ImageLabel", {
                 Name = "Bar",
                 AnchorPoint = Vector2.new(0.5, 0),
@@ -868,7 +882,7 @@ local function CreateOptions(Frame)
                 Image = "rbxassetid://5028857472",
                 ImageColor3 = Color3.fromRGB(20, 20, 20),
                 ScaleType = Enum.ScaleType.Slice,
-                SliceCenter = Rect.new(2, 2, 298, 298)
+                SliceCenter = Rect.new(2, 2, 298, 298),
             }, {
                 Utility.new("ImageLabel", {
                     Name = "Fill",
@@ -877,132 +891,112 @@ local function CreateOptions(Frame)
                     Image = "rbxassetid://5028857472",
                     ImageColor3 = MyGui.ColorScheme.Primary,
                     ScaleType = Enum.ScaleType.Slice,
-                    SliceCenter = Rect.new(2, 2, 298, 298)
+                    SliceCenter = Rect.new(2, 2, 298, 298),
                 }, {
                     Utility.new("Frame", {
                         Name = "Circle",
                         AnchorPoint = Vector2.new(0.5, 0.5),
-                        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                         BackgroundTransparency = 1,
                         ZIndex = 2,
                         Position = UDim2.new(1, 0, 0.5, 0),
-                        Size = UDim2.new(0, 10, 0, 10)
+                        Size = UDim2.new(0, 10, 0, 10),
                     }, {
-                        Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)}),
+                        Utility.new("UICorner", { CornerRadius = UDim.new(1, 0) }),
                         Utility.new("Frame", {
                             Name = "Ripple",
                             AnchorPoint = Vector2.new(0.5, 0.5),
                             BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                             BackgroundTransparency = 0.75,
-                            Position = UDim2.new(0.5, 0, 0.5, 0),
-                            Size = UDim2.new(0, 0, 0, 0)
-                        }, {Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)})})
-                    })
-                })
-            })
+                            Size = UDim2.new(0, 0, 0, 0),
+                        }, {
+                            Utility.new("UICorner", { CornerRadius = UDim.new(1, 0) }),
+                        }),
+                    }),
+                }),
+            }),
         })
 
         local Info = {
-            Sliding = false;
-            LastSelected = 0;
-            LastUpdated = 0;
-            Idled = false;
+            Sliding = false,
+            LastUpdated = 0,
         }
 
+        -- UpdateSlider (основная логика)
         local function UpdateSlider(Value)
             if time() - Info.LastUpdated < 0.01 then
                 return
             end
             Info.LastUpdated = time()
 
-            Value = math.clamp(Value, Properties.Settings.Min, Properties.Settings.Max)
-            if Properties.Settings.Precise then
-                Value = math.floor(Value + 0.5)
-            end
+            Value = math.clamp(Value, Min, Max)
+
+            -- ✔ округление по шагу
+            Value = math.floor(Value / Step + 0.5) * Step
+
             Container.Value.Text = tostring(Value)
             Properties.Value = Value
-            local Percentage = math.clamp((Value - Properties.Settings.Min) / (Properties.Settings.Max - Properties.Settings.Min), 0, 1)
-            Utility.Tween(Container.Bar.Fill, TweenInfo.new(0.1), {Size = UDim2.new(Percentage, 0, 1, 0)}):Play()
+
+            -- процент
+            local percent = (Value - Min) / (Max - Min)
+            Utility.Tween(Container.Bar.Fill, TweenInfo.new(0.1), {
+                Size = UDim2.new(percent, 0, 1, 0),
+            }):Play()
         end
 
+        -- Слайд через движение мыши
         Services.UserInputService.InputChanged:Connect(function(Input)
-            if Info.Sliding == true and Input.UserInputType == Enum.UserInputType.MouseMovement then
-                UpdateSlider(((Input.Position.X - Container.Bar.AbsolutePosition.X) / Container.Bar.AbsoluteSize.X) * Properties.Settings.Max)
-                Info.LastSelected = time()
-                local Success, Error = pcall(Properties.Function, Properties.Value)
-                assert(MyGui.Settings.Debug == false or Success, Error)
+            if Info.Sliding and Input.UserInputType == Enum.UserInputType.MouseMovement then
+                local px = Input.Position.X
+                local bar = Container.Bar
+
+                local percent = (px - bar.AbsolutePosition.X) / bar.AbsoluteSize.X
+                UpdateSlider(Min + percent * (Max - Min))
+
+                pcall(Properties.Function, Properties.Value)
             end
         end)
 
-        local CircleTweens = {
-            Visible = Utility.Tween(Container.Bar.Fill.Circle, TweenInfo.new(0.25), {BackgroundTransparency = 0});
-            Hidden = Utility.Tween(Container.Bar.Fill.Circle, TweenInfo.new(0.5), {BackgroundTransparency = 1});
-        }
-        local RippleTweens = {
-            Visible = Utility.Tween(Container.Bar.Fill.Circle.Ripple, TweenInfo.new(0.25), {Size = UDim2.new(0, 26, 0, 26)});
-            Hidden = Utility.Tween(Container.Bar.Fill.Circle.Ripple, TweenInfo.new(0.25), {Size = UDim2.new(0, 0, 0, 0)});
-        }
+        -- Нажатие мыши
         Container.MouseButton1Down:Connect(function()
             Info.Sliding = true
-            UpdateSlider(((Services.UserInputService:GetMouseLocation().X - Container.Bar.AbsolutePosition.X) / Container.Bar.AbsoluteSize.X) * Properties.Settings.Max)
-            Info.LastSelected = time()
-            CircleTweens.Visible:Play()
-            RippleTweens.Visible:Play()
-            local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(MyGui.Settings.Debug == false or Success, Error)
+
+            local mx = Services.UserInputService:GetMouseLocation().X
+            local bar = Container.Bar
+            local percent = (mx - bar.AbsolutePosition.X) / bar.AbsoluteSize.X
+
+            UpdateSlider(Min + percent * (Max - Min))
+            pcall(Properties.Function, Properties.Value)
         end)
+
+        -- Отпускание
         Container.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                 Info.Sliding = false
-                Info.LastSelected = time()
-                
-                RippleTweens.Hidden:Play()
-                Info.Idled = true
-                repeat
-                    Utility.Wait(0.1)
-                    if Info.Idled == false then
-                        return
-                    end
-                until time() - Info.LastSelected > 2.5
-                CircleTweens.Hidden:Play()
-                Info.Idled = false
             end
         end)
 
+        -- Ввод текста вручную
         Container.Value.FocusLost:Connect(function()
-            local Text = Container.Value.Text
-            if Text == "" then
-                Container.Value.Text = tostring(Properties.Settings.Min)
-            elseif tonumber(Text) == nil then
-                Container.Value.Text = tostring(Properties.Settings.Min)
+            local n = tonumber(Container.Value.Text)
+            if not n then
+                n = Min
             end
-            UpdateSlider(tonumber(Container.TextBox.Text) or Options.Min)
-            local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(MyGui.Settings.Debug == false or Success, Error)
-        end)
-
-        Container.Value:GetPropertyChangedSignal("Text"):Connect(function()
-            local Text = Container.Value.Text
-            if not table.find({"", "-"}, Text) and not tonumber(Text) then
-                Container.Value.Text = Text:sub(1, #Text - 1)
-            elseif not table.find({"", "-"}, Text) then
-                UpdateSlider(tonumber(Text))
-            end
+            UpdateSlider(n)
+            pcall(Properties.Function, Properties.Value)
         end)
 
         UpdateSlider(Properties.Value)
+
         return setmetatable({}, {
-            __index = function(Self, Index)
+            __index = function(_, Index)
                 return Properties[Index]
-            end;
-            __newindex = function(Self, Index, Value)
-                if Index == "Title" then
-                    Container.Title.Text = Value and tostring(Value) or "TextBox"
-                elseif Index == "Value" then
-                    UpdateSlider(tonumber(Value))
+            end,
+            __newindex = function(_, Index, Value)
+                if Index == "Value" then
+                    UpdateSlider(Value)
                 end
                 Properties[Index] = Value
-            end
+            end,
         })
     end
 
