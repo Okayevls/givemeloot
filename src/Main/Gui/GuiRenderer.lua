@@ -820,13 +820,12 @@ local function CreateOptions(Frame)
             Function = Callback or function() end,
         }
 
-        -- Default settings, including Step
         for i, v in pairs({
             Precise = false,
             Default = 1,
             Min = 1,
             Max = 10,
-            Step = 0.1,     -- ✔ добавлен шаг по умолчанию
+            Step = 0.1,
         }) do
             if Properties.Settings[i] == nil then
                 Properties.Settings[i] = v
@@ -933,7 +932,13 @@ local function CreateOptions(Frame)
             -- ✔ округление по шагу
             Value = math.floor(Value / Step + 0.5) * Step
 
-            Container.Value.Text = tostring(Value)
+            -- ✔ определяем, сколько знаков после запятой у Step
+            local decimals = tostring(Step):match("%.(%d+)")
+            decimals = decimals and #decimals or 0
+
+            -- ✔ форматируем число, чтобы не было 10.0000000001
+            Container.Value.Text = string.format("%." .. decimals .. "f", Value)
+
             Properties.Value = Value
 
             -- процент
