@@ -18,7 +18,7 @@ local selectedTarget = nil
 local line = nil
 local isShooting = false
 
-local con, con1, con2, con3, con4, con5
+local con, con1, con2, con3, con4, con5, con6
 
 local SupportedWeapons = {
     ["AW1"] = true,
@@ -146,14 +146,23 @@ local function stomp(targetPlayer)
 end
 
 local function blockShoot(actionName, inputState, inputObject)
-    if inputState == Enum.UserInputState.Begin then
-        if getEquippedWeapon() and selectedTarget then
-            isShooting = true
-            return Enum.ContextActionResult.Sink
+    if SilentAim.Enabled then
+        if inputState == Enum.UserInputState.Begin then
+            if getEquippedWeapon() and selectedTarget then
+                isShooting = true
+                return Enum.ContextActionResult.Sink
+            end
         end
     end
     return Enum.ContextActionResult.Pass
 end
+
+con6 = RunService.RenderStepped:Connect(function()
+    if SilentAim.EnabledAutoStomp then
+        if not selectedTarget then return end
+        stomp(selectedTarget)
+    end
+end)
 
 if SilentAim.Enabled then
     con = ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
@@ -174,18 +183,15 @@ con1 = UserInputService.InputBegan:Connect(function(input, processed)
                     print("[Legacy.win] Target nil")
                 end
             end
-        elseif input.KeyCode == SilentAim.StompBind.KeyBind then
-            if SilentAim.EnabledAutoStomp and SilentAim.EnabledAutoStomp ~= nil then
-                if not selectedTarget then return end
-                stomp(selectedTarget)
-            end
         end
     end
 end)
 
 con2 = UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        isShooting = false
+    if SilentAim.Enabled then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isShooting = false
+        end
     end
 end)
 
@@ -220,12 +226,12 @@ function SilentAim:Enable()
 end
 
 function SilentAim:Disable()
+    isShooting = false
     selectedTarget = nil
     line:Remove()
     line = nil
     self.Enabled = false
 end
-
 
 function SilentAim:drawModule(MainTab)
     local Folder = MainTab.Folder("Silent Aim", "[Info] Automatically finds the target and destroys it")
