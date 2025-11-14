@@ -5,7 +5,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local loader = ModuleLoader
 
     loader:Init({
-        AimBot = "src/Main/Module/Impl/AimBot.lua",
+        AimBot = "src/Main/Module/Impl/SilentAim.lua",
         Fly = "src/Main/Module/Impl/Fly.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
@@ -13,11 +13,11 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local CombatTab = Window.Tab("Combat", 7485051733)
     local CharacterTab = Window.Tab("Character", 16149111790)
 
-    local Aimbot = loader:Get("SilentAim"):drawModule(CombatTab)
+    local SilentAim = loader:Get("SilentAim"):drawModule(CombatTab)
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
     local Fly = loader:Get("Fly"):drawModule(CharacterTab)
 
-    print("Base ModuleManager Build | 0x000000000104")
+    print("Base ModuleManager Build | 0x000000000105")
 
 end
 
