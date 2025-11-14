@@ -700,19 +700,16 @@ local function CreateOptions(Frame)
 
         KeybindButton.MouseButton1Down:Connect(function()
             if Binding then
-                -- если уже биндим — сбрасываем
                 Binding = false
                 CurrentKey = nil
                 Properties.Keybind = nil
                 KeybindButton.Text = "None"
             else
-                -- начинаем выбор бинда
                 Binding = true
                 KeybindButton.Text = "..."
             end
         end)
 
-        -- Сам переключатель
         local SwitchFrame = Utility.new("Frame", {
             Name = "Switch",
             AnchorPoint = Vector2.new(1, 0.5),
@@ -743,7 +740,165 @@ local function CreateOptions(Frame)
         }
 
         local function ToggleSwitch()
-            if Binding then return end -- не трогаем переключатель во время бинда
+            if Binding then return end
+            Properties.Value = not Properties.Value
+            for _, tween in ipairs(Tweens[Properties.Value]) do
+                tween:Play()
+            end
+            local Success, Error = pcall(Properties.Function, Properties.Value)
+            assert(MyGui.Settings.Debug == false or Success, Error)
+        end
+
+        Container.MouseButton1Down:Connect(ToggleSwitch)
+
+        Services.UserInputService.InputBegan:Connect(function(Input, Processed)
+            if Processed then return end
+
+            if Binding then
+                if Input.UserInputType == Enum.UserInputType.Keyboard then
+                    if Input.KeyCode == Enum.KeyCode.Delete then
+                        CurrentKey = nil
+                        Properties.Keybind = nil
+                        KeybindButton.Text = "None"
+                    else
+                        CurrentKey = Input.KeyCode
+                        Properties.Keybind = CurrentKey
+                        KeybindButton.Text = tostring(CurrentKey):gsub("Enum.KeyCode.", "")
+                    end
+                    Binding = false
+                    IgnoreNextInput = true
+                end
+                return
+            end
+
+            if IgnoreNextInput then
+                IgnoreNextInput = false
+                return
+            end
+
+            if CurrentKey and Input.KeyCode == CurrentKey then
+                ToggleSwitch()
+            end
+        end)
+
+        return setmetatable({}, {
+            __index = function(_, Index)
+                return Properties[Index]
+            end,
+            __newindex = function(_, Index, Value)
+                if Index == "Title" then
+                    TitleLabel.Text = Value
+                elseif Index == "Value" then
+                    for _, tween in ipairs(Tweens[Value]) do
+                        tween:Play()
+                    end
+                    local Success, Error = pcall(Properties.Function, Value)
+                    assert(MyGui.Settings.Debug == false or Success, Error)
+                elseif Index == "Keybind" then
+                    CurrentKey = Value
+                    KeybindButton.Text = Value and tostring(Value):gsub("Enum.KeyCode.", "") or "None"
+                end
+                Properties[Index] = Value
+            end
+        })
+    end
+
+    function Options.SwitchAndBinding(Title, Callback)
+        local Properties = {
+            Title = Title and tostring(Title) or "Switch",
+            Value = false,
+            Function = Callback or function(Status) end,
+            Keybind = nil
+        }
+
+        local Container = Utility.new("ImageButton", {
+            Name = "SwitchContainer",
+            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 25),
+        })
+
+        local Binding = false
+        local CurrentKey = nil
+        local IgnoreNextInput = false
+
+        -- Заголовок
+        local TitleLabel = Utility.new("TextLabel", {
+            Name = "Title",
+            AnchorPoint = Vector2.new(0, 0.5),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0.5, 0),
+            Size = UDim2.new(1, -30, 1, 0),
+            Font = Enum.Font.Gotham,
+            Text = Properties.Title,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextSize = 14,
+            TextTransparency = 0.3,
+            TextXAlignment = Enum.TextXAlignment.Left
+        })
+        TitleLabel.Parent = Container
+
+        -- Кнопка бинда
+        local KeybindButton = Utility.new("TextButton", {
+            Name = "Keybind",
+            Parent = Container,
+            BackgroundColor3 = Color3.fromRGB(50, 55, 60),
+            Size = UDim2.new(0, 40, 0, 18),
+            Position = UDim2.new(1, -70, 0.5, -9),
+            Text = "None",
+            Font = Enum.Font.Gotham,
+            TextSize = 9,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextWrapped = false,
+            ClipsDescendants = true
+        }, {
+            Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)}),
+            Utility.new("UIPadding", {PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2)})
+        })
+
+        KeybindButton.MouseButton1Down:Connect(function()
+            if Binding then
+                Binding = false
+                CurrentKey = nil
+                Properties.Keybind = nil
+                KeybindButton.Text = "None"
+            else
+                Binding = true
+                KeybindButton.Text = "..."
+            end
+        end)
+
+        local SwitchFrame = Utility.new("Frame", {
+            Name = "Switch",
+            AnchorPoint = Vector2.new(1, 0.5),
+            BackgroundColor3 = Color3.fromRGB(100, 100, 100),
+            Position = UDim2.new(1, 0, 0.5, 0),
+            Size = UDim2.new(0, 25, 0, 15),
+        }, {
+            Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)}),
+            Utility.new("Frame", {
+                Name = "Circle",
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                Position = UDim2.new(0, 0, 0.5, 0),
+                Size = UDim2.new(0, 14, 0, 14)
+            }, {Utility.new("UICorner", {CornerRadius = UDim.new(1, 0)})})
+        })
+        SwitchFrame.Parent = Container
+
+        local Tweens = {
+            [true] = {
+                Utility.Tween(SwitchFrame, TweenInfo.new(0.5), {BackgroundColor3 = MyGui.ColorScheme.Primary}),
+                Utility.Tween(SwitchFrame.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0)})
+            },
+            [false] = {
+                Utility.Tween(SwitchFrame, TweenInfo.new(0.5), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)}),
+                Utility.Tween(SwitchFrame.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 0, 0.5, 0)})
+            }
+        }
+
+        local function ToggleSwitch()
+            if Binding then return end
             Properties.Value = not Properties.Value
             for _, tween in ipairs(Tweens[Properties.Value]) do
                 tween:Play()
@@ -920,35 +1075,23 @@ local function CreateOptions(Frame)
             LastUpdated = 0,
         }
 
-        -- UpdateSlider (основная логика)
         local function UpdateSlider(Value)
             if time() - Info.LastUpdated < 0.01 then
                 return
             end
             Info.LastUpdated = time()
-
             Value = math.clamp(Value, Min, Max)
-
-            -- ✔ округление по шагу
             Value = math.floor(Value / Step + 0.5) * Step
-
-            -- ✔ определяем, сколько знаков после запятой у Step
             local decimals = tostring(Step):match("%.(%d+)")
             decimals = decimals and #decimals or 0
-
-            -- ✔ форматируем число, чтобы не было 10.0000000001
             Container.Value.Text = string.format("%." .. decimals .. "f", Value)
-
             Properties.Value = Value
-
-            -- процент
             local percent = (Value - Min) / (Max - Min)
             Utility.Tween(Container.Bar.Fill, TweenInfo.new(0.1), {
                 Size = UDim2.new(percent, 0, 1, 0),
             }):Play()
         end
 
-        -- Слайд через движение мыши
         Services.UserInputService.InputChanged:Connect(function(Input)
             if Info.Sliding and Input.UserInputType == Enum.UserInputType.MouseMovement then
                 local px = Input.Position.X
@@ -961,7 +1104,6 @@ local function CreateOptions(Frame)
             end
         end)
 
-        -- Нажатие мыши
         Container.MouseButton1Down:Connect(function()
             Info.Sliding = true
 
@@ -973,14 +1115,12 @@ local function CreateOptions(Frame)
             pcall(Properties.Function, Properties.Value)
         end)
 
-        -- Отпускание
         Container.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                 Info.Sliding = false
             end
         end)
 
-        -- Ввод текста вручную
         Container.Value.FocusLost:Connect(function()
             local n = tonumber(Container.Value.Text)
             if not n then

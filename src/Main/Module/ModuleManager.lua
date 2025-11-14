@@ -13,11 +13,11 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local CombatTab = Window.Tab("Combat", 7485051733)
     local CharacterTab = Window.Tab("Character", 16149111790)
 
-    local Aimbot = loader:Get("AimBot"):drawModule(CombatTab)
+    local Aimbot = loader:Get("SilentAim"):drawModule(CombatTab)
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
     local Fly = loader:Get("Fly"):drawModule(CharacterTab)
 
-    print("Base ModuleManager Build | 0x000000000095")
+    print("Base ModuleManager Build | 0x000000000097")
 
 end
 
