@@ -92,9 +92,10 @@ function Fly:drawModule(MainTab)
                 end
         end)
 
-        Folder.Slider("Fly Multiplier", {Default = self.FlyMultiplier, Min = 1, Max = 15, Precise = true}, function(value)
-                self.FlyMultiplier = value
+        Folder.Slider("Fly Speed", { Min = 0, Max = 5, Default = 1, Step = 0.01 }, function(value)
+                Fly.FlyMultiplier = value
         end)
+
 
         return self
 end
