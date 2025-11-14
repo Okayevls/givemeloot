@@ -48,7 +48,7 @@ connection = RunService.RenderStepped:Connect(function()
         if keys.Space then dir += Vector3.new(0,1,0) end
         if keys.LeftControl then dir -= Vector3.new(0,1,0) end
         if dir.Magnitude > 0 then dir = dir.Unit end
-        hrp.CFrame = CFrame.new(hrp.Position + dir * Fly.flySpeed, hrp.Position + dir * Fly.flySpeed + cam.CFrame.LookVector)
+        hrp.CFrame = CFrame.new(hrp.Position + dir * Fly.FlyMultiplier, hrp.Position + dir * Fly.FlyMultiplier + cam.CFrame.LookVector)
         hrp.Velocity = Vector3.zero
     end
 end)
