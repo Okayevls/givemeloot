@@ -79,26 +79,25 @@ function Fly:Destroy()
     if connection then
        connection:Disconnect()
     end
+
     self:Disable()
 end
 
 function Fly:drawModule(MainTab)
-        local Folder = MainTab.Folder("Fly", "[Info] Allows the player to fly")
+   local Folder = MainTab.Folder("Fly", "[Info] Allows the player to fly")
+   Folder.SwitchAndBinding("Toggle", function(Status)
+       if Status then
+           self:Enable()
+       else
+           self:Disable()
+       end
+   end)
 
-        Folder.SwitchAndBinding("Toggle", function(Status)
-                if Status then
-                        self:Enable()
-                else
-                        self:Disable()
-                end
-        end)
+   Folder.Slider("Fly Speed", { Min = 0, Max = 5, Default = 1, Step = 0.01 }, function(value)
+       Fly.FlyMultiplier = value
+   end)
 
-        Folder.Slider("Fly Speed", { Min = 0, Max = 5, Default = 1, Step = 0.01 }, function(value)
-                Fly.FlyMultiplier = value
-        end)
-
-
-        return self
+   return self
 end
 
 return Fly
