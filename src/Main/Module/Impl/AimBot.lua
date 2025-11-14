@@ -4,7 +4,7 @@ AimBot.__index = AimBot
 AimBot.type = {}
 
 function AimBot:drawModule(MainTab)
-    local Folder = MainTab.Folder("AimBot", "[Info] Automatically finds the target and destroys it")
+    local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
     Folder.SwitchAndBinding("Silent Aim", function(Status)
 
