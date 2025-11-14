@@ -13,9 +13,9 @@ local keys = {W=false, A=false, S=false, D=false, Space=false, LeftControl=false
 local connection
 
 local function setupCharacter()
-        character = player.Character or player.CharacterAdded:Wait()
-        hum = character:WaitForChild("Humanoid")
-        hrp = character:WaitForChild("HumanoidRootPart")
+    character = player.Character or player.CharacterAdded:Wait()
+    hum = character:WaitForChild("Humanoid")
+    hrp = character:WaitForChild("HumanoidRootPart")
 end
 setupCharacter()
 
