@@ -56,12 +56,13 @@ end)
 local UserInputService = game:GetService("UserInputService")
 UserInputService.InputBegan:Connect(function(input, processed)
     local kc = input.KeyCode
-    if kc == Enum.KeyCode.W then keys.W = true
-    elseif kc == Enum.KeyCode.A then keys.A = true
-    elseif kc == Enum.KeyCode.S then keys.S = true
-    elseif kc == Enum.KeyCode.D then keys.D = true
-    elseif kc == Enum.KeyCode.LeftControl then keys.LeftControl = true
-    end
+        if kc == Enum.KeyCode.W then keys.W = true
+        elseif kc == Enum.KeyCode.A then keys.A = true
+        elseif kc == Enum.KeyCode.S then keys.S = true
+        elseif kc == Enum.KeyCode.D then keys.D = true
+        elseif kc == Enum.KeyCode.Space then keys.Space = true
+        elseif kc == Enum.KeyCode.LeftControl then keys.LeftControl = true
+        end
 end)
 
 UserInputService.InputEnded:Connect(function(input)
