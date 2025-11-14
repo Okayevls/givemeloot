@@ -6,8 +6,6 @@ SilentAim.EnabledAutoStomp = false
 SilentAim.TargetBind = nil
 SilentAim.StompBind = nil
 
-SilentAim.type = {}
-
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -18,42 +16,27 @@ local selectedTarget = nil
 local line = nil
 local isShooting = false
 
-local con, con1, con2, con3, con4, con5, con6
-
 local SupportedWeapons = {
-    ["AW1"] = true,
-    ["Ak"] = true,
-    ["Barrett"] = true,
-    ["Deagle"] = true,
-    ["Double Barrel"] = true,
-    ["Draco"] = true,
-    ["Glock"] = true,
-    ["Heli"] = true,
-    ["M249"] = true,
-    ["M37"] = true,
-    ["M4"] = true,
-    ["Micro Uzi"] = true,
-    ["Rpg"] = true,
-    ["Silencer"] = true,
-    ["Spas"] = true,
-    ["Taser"] = true,
-    ["Tec"] = true,
-    ["Ump"] = true
+    ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true,
+    ["Double Barrel"] = true, ["Draco"] = true, ["Glock"] = true, ["Heli"] = true,
+    ["M249"] = true, ["M37"] = true, ["M4"] = true, ["Micro Uzi"] = true,
+    ["Rpg"] = true, ["Silencer"] = true, ["Spas"] = true, ["Taser"] = true,
+    ["Tec"] = true, ["Ump"] = true
 }
 
+-- Получение оружия
 local function getEquippedWeapon()
     local char = LocalPlayer.Character
     if not char then return nil end
-
     for name, _ in pairs(SupportedWeapons) do
         if char:FindFirstChild(name) and char[name]:FindFirstChild("Communication") then
             return char[name]
         end
     end
-
     return nil
 end
 
+-- Нахождение ближайшего игрока к мыши
 local function findNearestToMouse()
     local mouseLocation = UserInputService:GetMouseLocation()
     local closestPlayer = nil
@@ -75,10 +58,10 @@ local function findNearestToMouse()
             end
         end
     end
-
     return closestPlayer
 end
 
+-- Обновление линии прицеливания
 local function updateLine()
     if not selectedTarget or not selectedTarget.Character or not selectedTarget.Character:FindFirstChild("Head") then
         if line then line:Remove() line = nil end
@@ -114,6 +97,7 @@ local function updateLine()
     end
 end
 
+-- Стрельба по цели с предсказанием
 local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
@@ -127,7 +111,7 @@ local function smartShoot(targetPlayer)
 
     local args = {
         {
-            {    targetHead,    predictedPos,    CFrame.new()   }
+            {targetHead, predictedPos, CFrame.new()}
         },
         {targetHead},
         true
@@ -136,6 +120,7 @@ local function smartShoot(targetPlayer)
     gun.Communication:FireServer(unpack(args))
 end
 
+-- Авто-стомп
 local function stomp(targetPlayer)
     local args = { targetPlayer.Character }
     game:GetService("ReplicatedStorage")
@@ -145,53 +130,46 @@ local function stomp(targetPlayer)
     SilentAim.EnabledAutoStomp = false
 end
 
+-- Блокировка стандартного клика
 local function blockShoot(actionName, inputState, inputObject)
-    if SilentAim.Enabled then
-        if inputState == Enum.UserInputState.Begin then
-            if getEquippedWeapon() and selectedTarget then
-                isShooting = true
-                return Enum.ContextActionResult.Sink
-            end
+    if SilentAim.Enabled and inputState == Enum.UserInputState.Begin then
+        if getEquippedWeapon() and selectedTarget then
+            isShooting = true
+            return Enum.ContextActionResult.Sink
         end
     end
     return Enum.ContextActionResult.Pass
 end
 
+-- Подписки на события
+local con, con1, con2, con3, con4, con5, con6
+
 con6 = RunService.RenderStepped:Connect(function()
-    if SilentAim.EnabledAutoStomp then
-        if not selectedTarget then return end
+    if SilentAim.EnabledAutoStomp and selectedTarget then
         stomp(selectedTarget)
     end
 end)
 
-if SilentAim.Enabled then
-    con = ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
-end
-
 con1 = UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
-    if SilentAim.Enabled then
-        if input.KeyCode == SilentAim.TargetBind then
+    if SilentAim.Enabled and SilentAim.TargetBind and input.KeyCode == SilentAim.TargetBind then
+        if selectedTarget then
+            selectedTarget = nil
+            if line then line:Remove() line = nil end
+        else
+            selectedTarget = findNearestToMouse()
             if selectedTarget then
-                selectedTarget = nil
-                if line then line:Remove() line = nil end
+                print("[SilentAim] New Target:", selectedTarget.Name)
             else
-                selectedTarget = findNearestToMouse()
-                if selectedTarget then
-                    print("[Legacy.win] New Target:", selectedTarget.Name)
-                else
-                    print("[Legacy.win] Target nil")
-                end
+                print("[SilentAim] Target nil")
             end
         end
     end
 end)
 
 con2 = UserInputService.InputEnded:Connect(function(input)
-    if SilentAim.Enabled then
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            isShooting = false
-        end
+    if SilentAim.Enabled and input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isShooting = false
     end
 end)
 
@@ -212,14 +190,13 @@ con4 = LocalPlayer.CharacterAdded:Connect(function()
 end)
 
 con5 = Players.PlayerRemoving:Connect(function(player)
-    if SilentAim.Enabled then
-        if player == selectedTarget then
-            selectedTarget = nil
-            if line then line:Remove() line = nil end
-        end
+    if SilentAim.Enabled and player == selectedTarget then
+        selectedTarget = nil
+        if line then line:Remove() line = nil end
     end
 end)
 
+-- Включение / выключение SilentAim
 function SilentAim:Enable()
     if self.Enabled then return end
     self.Enabled = true
@@ -228,11 +205,11 @@ end
 function SilentAim:Disable()
     isShooting = false
     selectedTarget = nil
-    line:Remove()
-    line = nil
+    if line then line:Remove() line = nil end
     self.Enabled = false
 end
 
+-- Рисуем модуль в GUI
 function SilentAim:drawModule(MainTab)
     local Folder = MainTab.Folder("Silent Aim", "[Info] Automatically finds the target and destroys it")
 
@@ -244,11 +221,16 @@ function SilentAim:drawModule(MainTab)
         end
     end)
 
-    local MyBind = Folder.Binding("Target Search", function(key)
-        self.TargetBind = key
+    -- **Простой биндинг клавиши без кнопки**
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if processed then return end
+        if input.UserInputType == Enum.UserInputType.Keyboard then
+            SilentAim.TargetBind = input.KeyCode
+            print("[SilentAim] TargetBind set to:", SilentAim.TargetBind)
+        end
     end)
 
-    local Stomp = Folder.SwitchAndBinding("Stomp", function(Status)
+    Folder.SwitchAndBinding("Stomp", function(Status)
         if Status then
             if self.EnabledAutoStomp then return end
             self.EnabledAutoStomp = true
@@ -256,8 +238,6 @@ function SilentAim:drawModule(MainTab)
             self.EnabledAutoStomp = false
         end
     end)
-
-    self.StompBind = Stomp
 end
 
 return SilentAim
