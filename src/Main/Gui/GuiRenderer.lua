@@ -23,13 +23,13 @@
 
 -- [ Initialize ] --
 -- Destroy Previous UI's --
-if _G.Luminosity_Loaded and _G.Luminosity then
-    _G.Luminosity:Destroy()
+if _G.Luminosity_Loaded and _G.MyGui then
+    _G.MyGui:Destroy()
 end
 
 -- Set Globals --
 _G.Luminosity_Loaded = true
-_G.Luminosity = nil
+_G.MyGui = nil
 
 -- [ Yield ] --
 if not game:IsLoaded() then
@@ -204,11 +204,11 @@ function Utility.CreateDrag(Frame, Parent, Settings)
 end
 
 -- // Main Module \\ --
--- [ Luminosity ] --
-local Luminosity = {
+-- [ MyGui ] --
+local MyGui = {
     ScreenGui = Utility.new("ScreenGui", {
         DisplayOrder = 5,
-        Name = "Luminosity",
+        Name = "MyGui",
         Parent = Services.RunService:IsStudio() and LocalPlayer:FindFirstChildOfClass("PlayerGui") or Services.CoreGui,
         IgnoreGuiInset = true,
         ResetOnSpawn = false
@@ -222,19 +222,19 @@ local Luminosity = {
         Text = Color3.new(255, 255, 255);
     };
 }
-_G.Luminosity = Luminosity.ScreenGui
+_G.MyGui = MyGui.ScreenGui
 for i,v in pairs({Name = "Template", Debug = false}) do
-    if Luminosity.Settings[i] == nil then
-        Luminosity.Settings[i] = v
+    if MyGui.Settings[i] == nil then
+        MyGui.Settings[i] = v
     end
 end
 
 -- Intro --
-function Luminosity.LoadingScreen()
+function MyGui.LoadingScreen()
     coroutine.wrap(function()
         local LoadingScreen = Utility.new("Frame", {
             Name = "LoadingScreen",
-            Parent = Luminosity.ScreenGui,
+            Parent = MyGui.ScreenGui,
             BackgroundColor3 = Color3.fromRGB(0, 0, 0),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
@@ -265,7 +265,7 @@ function Luminosity.LoadingScreen()
 
         -- Wait for all assets to load --
         Utility.Wait(2.5)
-        Services.ContentProvider:PreloadAsync({Luminosity.ScreenGui})
+        Services.ContentProvider:PreloadAsync({MyGui.ScreenGui})
         Utility.Wait(0.25)
 
         -- Destroy Screen --
@@ -363,7 +363,7 @@ local function CreateOptions(Frame)
 
         Container.Button.MouseButton1Down:Connect(function()
             local Success, Error = pcall(Properties.Function)
-            assert(Luminosity.Settings.Debug == false or Success, Error)
+            assert(MyGui.Settings.Debug == false or Success, Error)
         end)
 
         return setmetatable({}, {
@@ -427,7 +427,7 @@ local function CreateOptions(Frame)
 
         local Tweens = {
             [true] = {
-                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
+                Utility.Tween(Container.Switch, TweenInfo.new(0.5), {BackgroundColor3 = MyGui.ColorScheme.Primary}),
                 Utility.Tween(Container.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0)})
             };
 
@@ -443,7 +443,7 @@ local function CreateOptions(Frame)
                 v:Play()
             end
             local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(Luminosity.Settings.Debug == false or Success, Error)
+            assert(MyGui.Settings.Debug == false or Success, Error)
         end)
 
         return setmetatable({}, {
@@ -458,7 +458,7 @@ local function CreateOptions(Frame)
                         v:Play()
                     end
                     local Success, Error = pcall(Properties.Function, Value)
-                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                    assert(MyGui.Settings.Debug == false or Success, Error)
                 end
                 Properties[Index] = Value
             end;
@@ -528,7 +528,7 @@ local function CreateOptions(Frame)
                 v:Play()
             end
             local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(Luminosity.Settings.Debug == false or Success, Error)
+            assert(MyGui.Settings.Debug == false or Success, Error)
         end)
 
         return setmetatable({}, {
@@ -543,7 +543,7 @@ local function CreateOptions(Frame)
                         v:Play()
                     end
                     local Success, Error = pcall(Properties.Function, Value)
-                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                    assert(MyGui.Settings.Debug == false or Success, Error)
                 end
                 Properties[Index] = Value
             end
@@ -622,7 +622,7 @@ local function CreateOptions(Frame)
             if EnterPressed then
                 coroutine.wrap(function()
                     local Success, Error = pcall(Properties.Function, Properties.Value)
-                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                    assert(MyGui.Settings.Debug == false or Success, Error)
                 end)
                 Container.TextBox.Input.Text = ""
             end
@@ -733,7 +733,7 @@ local function CreateOptions(Frame)
 
         local Tweens = {
             [true] = {
-                Utility.Tween(SwitchFrame, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
+                Utility.Tween(SwitchFrame, TweenInfo.new(0.5), {BackgroundColor3 = MyGui.ColorScheme.Primary}),
                 Utility.Tween(SwitchFrame.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0)})
             },
             [false] = {
@@ -749,7 +749,7 @@ local function CreateOptions(Frame)
                 tween:Play()
             end
             local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(Luminosity.Settings.Debug == false or Success, Error)
+            assert(MyGui.Settings.Debug == false or Success, Error)
         end
 
         Container.MouseButton1Down:Connect(ToggleSwitch)
@@ -796,7 +796,7 @@ local function CreateOptions(Frame)
                         tween:Play()
                     end
                     local Success, Error = pcall(Properties.Function, Value)
-                    assert(Luminosity.Settings.Debug == false or Success, Error)
+                    assert(MyGui.Settings.Debug == false or Success, Error)
                 elseif Index == "Keybind" then
                     CurrentKey = Value
                     KeybindButton.Text = Value and tostring(Value):gsub("Enum.KeyCode.", "") or "None"
@@ -875,7 +875,7 @@ local function CreateOptions(Frame)
                     BackgroundTransparency = 1,
                     Size = UDim2.new(0, 0, 1, 0),
                     Image = "rbxassetid://5028857472",
-                    ImageColor3 = Luminosity.ColorScheme.Primary,
+                    ImageColor3 = MyGui.ColorScheme.Primary,
                     ScaleType = Enum.ScaleType.Slice,
                     SliceCenter = Rect.new(2, 2, 298, 298)
                 }, {
@@ -930,7 +930,7 @@ local function CreateOptions(Frame)
                 UpdateSlider(((Input.Position.X - Container.Bar.AbsolutePosition.X) / Container.Bar.AbsoluteSize.X) * Properties.Settings.Max)
                 Info.LastSelected = time()
                 local Success, Error = pcall(Properties.Function, Properties.Value)
-                assert(Luminosity.Settings.Debug == false or Success, Error)
+                assert(MyGui.Settings.Debug == false or Success, Error)
             end
         end)
 
@@ -949,7 +949,7 @@ local function CreateOptions(Frame)
             CircleTweens.Visible:Play()
             RippleTweens.Visible:Play()
             local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(Luminosity.Settings.Debug == false or Success, Error)
+            assert(MyGui.Settings.Debug == false or Success, Error)
         end)
         Container.InputEnded:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -978,7 +978,7 @@ local function CreateOptions(Frame)
             end
             UpdateSlider(tonumber(Container.TextBox.Text) or Options.Min)
             local Success, Error = pcall(Properties.Function, Properties.Value)
-            assert(Luminosity.Settings.Debug == false or Success, Error)
+            assert(MyGui.Settings.Debug == false or Success, Error)
         end)
 
         Container.Value:GetPropertyChangedSignal("Text"):Connect(function()
@@ -1009,7 +1009,7 @@ local function CreateOptions(Frame)
     return Options
 end
 
-function Luminosity.new(Name, Header, Icon)
+function MyGui.new(Name, Header, Icon)
     local Main = Utility.new(
         -- Class --
         "ImageButton",
@@ -1017,7 +1017,7 @@ function Luminosity.new(Name, Header, Icon)
         -- Properties --
         {
             Name = "Main",
-            Parent = Luminosity.ScreenGui,
+            Parent = MyGui.ScreenGui,
             Active = true,
             Modal = true,
             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1089,7 +1089,7 @@ function Luminosity.new(Name, Header, Icon)
                         Position = UDim2.new(0, 35, 0, 15),
                         Size = UDim2.new(1, -35, 0, 25),
                         Font = Enum.Font.GothamBold,
-                        Text = Name and tostring(Name) or "Luminosity",
+                        Text = Name and tostring(Name) or "MyGui",
                         TextColor3 = Color3.fromRGB(255, 255, 255),
                         TextScaled = true,
                         TextWrapped = true,
@@ -1195,11 +1195,12 @@ function Luminosity.new(Name, Header, Icon)
 
     -- Window --
     local Window = {
-        Title = Name and tostring(Name) or "Luminosity";
+        Title = Name and tostring(Name) or "MyGui";
         Header = Header and tostring(Header) or "v1.0.0";
         Icon = tostring(Icon) or "4370345701";
         Toggled = true;
     }
+    
     local WindowInfo = {
         SizeSave = UDim2.new(0, 700, 0, 500)
     }
@@ -1237,7 +1238,7 @@ function Luminosity.new(Name, Header, Icon)
         local TabButton = Utility.new("Frame", {
             Name = "Button",
             Parent = Main.SideBar,
-            BackgroundColor3 = Luminosity.ColorScheme.Primary,
+            BackgroundColor3 = MyGui.ColorScheme.Primary,
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
             Size = UDim2.new(1, 0, 0, 40)
@@ -1415,8 +1416,8 @@ function Luminosity.new(Name, Header, Icon)
                         Base.Icon.Image = "rbxassetid://6026681577"
                     end,
                     Utility.Tween(Base.Arrow, TweenInfo.new(0.5), {ImageTransparency = 0, Rotation = 180}),
-                    Utility.Tween(Base.Title, TweenInfo.new(0.5), {TextTransparency = 0, TextColor3 = Luminosity.ColorScheme.Primary}),
-                    Utility.Tween(Base.Icon, TweenInfo.new(0.5), {ImageTransparency = 0, ImageColor3 = Luminosity.ColorScheme.Primary}),
+                    Utility.Tween(Base.Title, TweenInfo.new(0.5), {TextTransparency = 0, TextColor3 = MyGui.ColorScheme.Primary}),
+                    Utility.Tween(Base.Icon, TweenInfo.new(0.5), {ImageTransparency = 0, ImageColor3 = MyGui.ColorScheme.Primary}),
                 };
                 [false] = {
                     function()
@@ -1597,8 +1598,8 @@ function Luminosity.new(Name, Header, Icon)
                         Base.Icon.Image = "rbxassetid://6026681577"
                     end,
                     Utility.Tween(Base.Arrow, TweenInfo.new(0.5), {ImageTransparency = 0, Rotation = 180}),
-                    Utility.Tween(Base.Title, TweenInfo.new(0.5), {TextTransparency = 0, TextColor3 = Luminosity.ColorScheme.Primary}),
-                    Utility.Tween(Base.Icon, TweenInfo.new(0.5), {ImageTransparency = 0, ImageColor3 = Luminosity.ColorScheme.Primary}),
+                    Utility.Tween(Base.Title, TweenInfo.new(0.5), {TextTransparency = 0, TextColor3 = MyGui.ColorScheme.Primary}),
+                    Utility.Tween(Base.Icon, TweenInfo.new(0.5), {ImageTransparency = 0, ImageColor3 = MyGui.ColorScheme.Primary}),
                 };
                 [false] = {
                     function()
@@ -1614,7 +1615,7 @@ function Luminosity.new(Name, Header, Icon)
 
             local SwitchTweens = {
                 [true] = {
-                    Utility.Tween(Base.Switch, TweenInfo.new(0.5), {BackgroundColor3 = Luminosity.ColorScheme.Primary}),
+                    Utility.Tween(Base.Switch, TweenInfo.new(0.5), {BackgroundColor3 = MyGui.ColorScheme.Primary}),
                     Utility.Tween(Base.Switch.Circle, TweenInfo.new(0.25), {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0)})
                 };
 
@@ -1645,7 +1646,7 @@ function Luminosity.new(Name, Header, Icon)
                     v:Play()
                 end
                 local Success, Error = pcall(Properties.Function, Info.Toggled)
-                assert(Luminosity.Settings.Debug == false or Success, Error)
+                assert(MyGui.Settings.Debug == false or Success, Error)
             end)
 
             Base.Info.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -1673,7 +1674,7 @@ function Luminosity.new(Name, Header, Icon)
                             v:Play()
                         end
                         local Success, Error = pcall(Properties.Function, Info.Toggled)
-                        assert(Luminosity.Settings.Debug == false or Success, Error)
+                        assert(MyGui.Settings.Debug == false or Success, Error)
                     end
                     rawset(Self, Index, Value)
                 end
@@ -1695,7 +1696,7 @@ function Luminosity.new(Name, Header, Icon)
 
     return setmetatable(Window, {__newindex = function(Self, Index, Value)
         if Index == "Title" then
-            Main.SideBar.Info.Title.Text = Value and tostring(Value) or "Luminosity"
+            Main.SideBar.Info.Title.Text = Value and tostring(Value) or "MyGui"
         elseif Index == "Header" then
             Main.SideBar.Info.Header.Text = Value and tostring(Value) or "v1.0.0"
         elseif Index == "Icon" then
@@ -1705,4 +1706,4 @@ function Luminosity.new(Name, Header, Icon)
     end})
 end
 
-return Luminosity
+return MyGui
