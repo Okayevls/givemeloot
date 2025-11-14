@@ -244,6 +244,10 @@ function SilentAim:drawModule(MainTab)
         end
     end)
 
+    local MyBind = Folder.Binding("Target Search", function(key)
+        self.TargetBind = key
+    end)
+
     local Stomp = Folder.SwitchAndBinding("Stomp", function(Status)
         if Status then
             if self.EnabledAutoStomp then return end

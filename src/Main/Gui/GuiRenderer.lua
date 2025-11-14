@@ -803,6 +803,54 @@ local function CreateOptions(Frame)
         })
     end
 
+    function Options.Binding(Title, Callback)
+        local Properties = {
+            Title = Title and tostring(Title) or "Bind",
+            Keybind = nil,
+            Function = Callback or function() end,
+        }
+
+        local Binding = false
+
+        function Properties:StartBinding()
+            Binding = true
+        end
+
+        Services.UserInputService.InputBegan:Connect(function(Input, Processed)
+            if Processed then return end
+
+            if Binding then
+                if Input.UserInputType == Enum.UserInputType.Keyboard then
+                    if Input.KeyCode == Enum.KeyCode.Delete then
+                        Properties.Keybind = nil
+                    else
+                        Properties.Keybind = Input.KeyCode
+                    end
+                    Binding = false
+                end
+                return
+            end
+
+            if Properties.Keybind and Input.KeyCode == Properties.Keybind then
+                pcall(Properties.Function, Properties.Keybind)
+            end
+        end)
+
+        return setmetatable({}, {
+            __index = function(_, Index)
+                return Properties[Index]
+            end,
+            __newindex = function(_, Index, Value)
+                if Index == "Keybind" then
+                    Properties.Keybind = Value
+                elseif Index == "Function" then
+                    Properties.Function = Value
+                end
+                Properties[Index] = Value
+            end
+        })
+    end
+
     function Options.Dropdown(Title, List, Callback, Placeholder)
 
     end
