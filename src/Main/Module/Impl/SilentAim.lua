@@ -4,7 +4,6 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.TargetBind = nil
-SilentAim.StompBind = nil
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -19,24 +18,9 @@ local isShooting = false
 local con, con1, con2, con3, con4, con5, con6
 
 local SupportedWeapons = {
-    ["AW1"] = true,
-    ["Ak"] = true,
-    ["Barrett"] = true,
-    ["Deagle"] = true,
-    ["Double Barrel"] = true,
-    ["Draco"] = true,
-    ["Glock"] = true,
-    ["Heli"] = true,
-    ["M249"] = true,
-    ["M37"] = true,
-    ["M4"] = true,
-    ["Micro Uzi"] = true,
-    ["Rpg"] = true,
-    ["Silencer"] = true,
-    ["Spas"] = true,
-    ["Taser"] = true,
-    ["Tec"] = true,
-    ["Ump"] = true
+    ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
+    ["Glock"] = true, ["Heli"] = true, ["M249"] = true, ["M37"] = true, ["M4"] = true, ["Micro Uzi"] = true,
+    ["Rpg"] = true, ["Silencer"] = true, ["Spas"] = true, ["Taser"] = true, ["Tec"] = true, ["Ump"] = true
 }
 
 local function getEquippedWeapon()
@@ -155,7 +139,7 @@ local function blockShoot(actionName, inputState, inputObject)
     return Enum.ContextActionResult.Pass
 end
 
-con6 = RunService.RenderStepped:Connect(function()
+con = RunService.RenderStepped:Connect(function()
     if SilentAim.EnabledAutoStomp then
         if not selectedTarget then return end
         stomp(selectedTarget)
@@ -163,10 +147,10 @@ con6 = RunService.RenderStepped:Connect(function()
 end)
 
 if SilentAim.Enabled then
-    con = ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
+    con1 = ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
 end
 
-con1 = UserInputService.InputBegan:Connect(function(input, processed)
+con2 = UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if SilentAim.Enabled then
         if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
@@ -185,7 +169,7 @@ con1 = UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
-con2 = UserInputService.InputEnded:Connect(function(input)
+con3 = UserInputService.InputEnded:Connect(function(input)
     if SilentAim.Enabled then
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isShooting = false
@@ -193,7 +177,7 @@ con2 = UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-con3 = RunService.RenderStepped:Connect(function()
+con4 = RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
         updateLine()
         if isShooting and selectedTarget then
@@ -202,14 +186,14 @@ con3 = RunService.RenderStepped:Connect(function()
     end
 end)
 
-con4 = LocalPlayer.CharacterAdded:Connect(function()
+con5 = LocalPlayer.CharacterAdded:Connect(function()
     if SilentAim.Enabled then
         selectedTarget = nil
         if line then line:Remove() line = nil end
     end
 end)
 
-con5 = Players.PlayerRemoving:Connect(function(player)
+con6 = Players.PlayerRemoving:Connect(function(player)
     if SilentAim.Enabled then
         if player == selectedTarget then
             selectedTarget = nil
@@ -255,7 +239,7 @@ function SilentAim:drawModule(MainTab)
         end
     end)
 
-    self.StompBind = Stomp
+    return self
 end
 
 return SilentAim
