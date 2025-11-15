@@ -218,7 +218,7 @@ end
 function SilentAim:drawModule(MainTab)
     local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
-    Folder.SwitchAndBinding("Toggle", function(Status)
+    Folder.Switch("Toggle", function(Status)
         if Status then
             self:Enable()
         else
