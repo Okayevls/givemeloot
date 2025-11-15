@@ -140,9 +140,10 @@ local function blockShoot(actionName, inputState, inputObject)
 end
 
 con = RunService.RenderStepped:Connect(function()
-    if SilentAim.EnabledAutoStomp and not SilentAim.Enabled then
-        if not selectedTarget then return end
-        stomp(selectedTarget)
+    if SilentAim.EnabledAutoStomp and SilentAim.Enabled then
+        if selectedTarget ~= nil then
+            stomp(selectedTarget)
+        end
     end
 end)
 
@@ -228,13 +229,8 @@ function SilentAim:drawModule(MainTab)
         self.TargetBind = key
     end)
 
-    local Stomp = Folder.SwitchAndBinding("Stomp", function(Status)
-        if Status then
-            if self.EnabledAutoStomp then return end
-            self.EnabledAutoStomp = true
-        else
-            self.EnabledAutoStomp = false
-        end
+    Folder.SwitchAndBinding("Stomp", function(Status)
+        self.EnabledAutoStomp = Status
     end)
 
     return self

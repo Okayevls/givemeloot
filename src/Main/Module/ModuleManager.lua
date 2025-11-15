@@ -17,7 +17,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
     local Fly = loader:Get("Fly"):drawModule(CharacterTab)
 
-    print("Base ModuleManager Build | 0x000000000111")
+    print("Base ModuleManager Build | 0x000000000112")
 
 end
 
