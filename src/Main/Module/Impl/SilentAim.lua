@@ -132,6 +132,7 @@ local function blockShoot(actionName, inputState, inputObject)
         if inputState == Enum.UserInputState.Begin then
             if getEquippedWeapon() and selectedTarget then
                 isShooting = true
+                print("5")
                 return Enum.ContextActionResult.Sink
             end
         end
@@ -148,6 +149,7 @@ end)
 
 if SilentAim.Enabled then
     con1 = ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
+    print("3")
 end
 
 con2 = UserInputService.InputBegan:Connect(function(input, processed)
@@ -172,6 +174,7 @@ end)
 con3 = UserInputService.InputEnded:Connect(function(input)
     if SilentAim.Enabled then
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            print("2")
             isShooting = false
         end
     end
@@ -181,6 +184,7 @@ con4 = RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
         updateLine()
         if isShooting and selectedTarget then
+            print("1")
             smartShoot(selectedTarget)
         end
     end
