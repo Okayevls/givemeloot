@@ -812,25 +812,70 @@ local function CreateOptions(Frame)
 
         local Binding = false
 
-        function Properties:StartBinding()
+        -- контейнер
+        local Container = Utility.new("Frame", {
+            Name = "BindContainer",
+            Parent = Frame,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 25),
+        })
+
+        -- название
+        local TitleLabel = Utility.new("TextLabel", {
+            Name = "Title",
+            Parent = Container,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0.5, 0),
+            Size = UDim2.new(1, -50, 1, 0),
+            Font = Enum.Font.Gotham,
+            Text = Properties.Title,
+            TextSize = 14,
+            TextTransparency = 0.3,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            AnchorPoint = Vector2.new(0, 0.5),
+            TextXAlignment = Enum.TextXAlignment.Left
+        })
+
+        -- кнопка бинда
+        local KeyButton = Utility.new("TextButton", {
+            Name = "KeybindButton",
+            Parent = Container,
+            BackgroundColor3 = Color3.fromRGB(50, 55, 60),
+            Size = UDim2.new(0, 40, 0, 18),
+            Position = UDim2.new(1, -45, 0.5, -9),
+            Text = "None",
+            Font = Enum.Font.Gotham,
+            TextSize = 10,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+        }, {
+            Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
+        })
+
+        KeyButton.MouseButton1Down:Connect(function()
             Binding = true
-        end
+            KeyButton.Text = "..."
+        end)
 
         Services.UserInputService.InputBegan:Connect(function(Input, Processed)
             if Processed then return end
 
             if Binding then
                 if Input.UserInputType == Enum.UserInputType.Keyboard then
+
                     if Input.KeyCode == Enum.KeyCode.Delete then
                         Properties.Keybind = nil
+                        KeyButton.Text = "None"
                     else
                         Properties.Keybind = Input.KeyCode
+                        KeyButton.Text = tostring(Input.KeyCode):gsub("Enum.KeyCode.", "")
                     end
+
                     Binding = false
                 end
                 return
             end
 
+            -- trigger
             if Properties.Keybind and Input.KeyCode == Properties.Keybind then
                 pcall(Properties.Function, Properties.Keybind)
             end
@@ -841,11 +886,18 @@ local function CreateOptions(Frame)
                 return Properties[Index]
             end,
             __newindex = function(_, Index, Value)
-                if Index == "Keybind" then
+
+                if Index == "Title" then
+                    TitleLabel.Text = Value
+
+                elseif Index == "Keybind" then
                     Properties.Keybind = Value
+                    KeyButton.Text = Value and tostring(Value):gsub("Enum.KeyCode.", "") or "None"
+
                 elseif Index == "Function" then
                     Properties.Function = Value
                 end
+
                 Properties[Index] = Value
             end
         })
