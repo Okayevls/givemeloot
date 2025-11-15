@@ -231,6 +231,7 @@ function SilentAim:drawModule(MainTab)
 
     Folder.SwitchAndBinding("Stomp", function(Status)
         self.EnabledAutoStomp = Status
+        Status = self.EnabledAutoStomp
     end)
 
     return self
