@@ -30,30 +30,9 @@ local function hideOriginalNames(character)
     end
 end
 
-local function animateTag(tag, color)
-    tag.TextColor3 = color
-    tag.BackgroundTransparency = 1
-    tag.TextTransparency = 1
-    tag.Visible = true
-
-    TweenService:Create(tag, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
-        TextTransparency = 0
-    }):Play()
-
-    task.wait(2)
-
-    TweenService:Create(tag, TweenInfo.new(1, Enum.EasingStyle.Quad), {
-        TextTransparency = 1
-    }):Play()
-
-    task.wait(1)
-    tag.Visible = false
-end
-
 local function fadeInLabel(label)
     label.TextTransparency = 1
     label.Visible = true
-
     TweenService:Create(label, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {
         TextTransparency = 0
     }):Play()
@@ -67,7 +46,7 @@ local function createESP(character, name)
     highlight.Adornee = character
     highlight.FillTransparency = 1
     highlight.OutlineColor = SETTINGS.Color
-    highlight.OutlineTransparency = 1 -- hidden until enabled
+    highlight.OutlineTransparency = 1
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     highlight.Parent = espFolder
 
@@ -92,16 +71,6 @@ local function createESP(character, name)
     nameLabel.Visible = false
     nameLabel.Parent = billboard
 
-    local statusTag = Instance.new("TextLabel")
-    statusTag.Size = UDim2.new(1, 0, 1, 0)
-    statusTag.BackgroundTransparency = 1
-    statusTag.TextTransparency = 1
-    statusTag.Font = Enum.Font.GothamBold
-    statusTag.TextSize = 12
-    statusTag.BorderSizePixel = 0
-    statusTag.Visible = false
-    statusTag.Parent = billboard
-
     local tracer = Instance.new("Frame")
     tracer.Name = name .. "_Tracer"
     tracer.BackgroundColor3 = SETTINGS.Color
@@ -110,25 +79,7 @@ local function createESP(character, name)
     tracer.Visible = false
     tracer.Parent = espFolder
 
-    -- Анимация Spawn работает ТОЛЬКО при включенном ESP
-    task.spawn(function()
-        if Esp.Enabled then
-            nameLabel.Visible = false
-            highlight.OutlineTransparency = 1
-            statusTag.Text = "Spawned"
-            animateTag(statusTag, Color3.fromRGB(0, 200, 0))
-            fadeInLabel(nameLabel)
-            highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
-        else
-            -- Полностью скрываем
-            highlight.OutlineTransparency = 1
-            billboard.Enabled = false
-            nameLabel.Visible = false
-            tracer.Visible = false
-        end
-    end)
-
-    return {highlight, billboard, tracer, character, nameLabel, statusTag}
+    return {highlight, billboard, tracer, character, nameLabel}
 end
 
 local function updateESP(data)
@@ -143,12 +94,10 @@ local function updateESP(data)
     highlight.OutlineTransparency = onScreen and (SETTINGS.ShowBox and 0 or 1) or 1
     billboard.Enabled = onScreen and SETTINGS.ShowName or false
 
-    if onScreen and SETTINGS.ShowTracer then
-        tracer.Visible = true
+    tracer.Visible = onScreen and SETTINGS.ShowTracer or false
+    if tracer.Visible then
         tracer.Position = UDim2.new(0, vec.X, 0, vec.Y)
         tracer.Size = UDim2.new(0, 100, 0, 1)
-    else
-        tracer.Visible = false
     end
 end
 
@@ -166,9 +115,7 @@ end
 for _, plr in ipairs(Players:GetPlayers()) do
     if plr ~= LocalPlayer then setupESP(plr) end
 end
-
 Players.PlayerAdded:Connect(setupESP)
-
 Players.PlayerRemoving:Connect(function(plr)
     if espData[plr] then
         for _, v in ipairs(espData[plr]) do
@@ -180,8 +127,7 @@ end)
 
 RunService.RenderStepped:Connect(function()
     if not Esp.Enabled then return end
-
-    for plr, data in pairs(espData) do
+    for _, data in pairs(espData) do
         if data[4] and data[4].Parent then
             updateESP(data)
         end
@@ -191,7 +137,6 @@ end)
 function Esp:Enable()
     if self.Enabled then return end
     self.Enabled = true
-
     for _, data in pairs(espData) do
         local highlight, billboard = data[1], data[2]
         highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
@@ -201,7 +146,6 @@ end
 
 function Esp:Disable()
     self.Enabled = false
-
     for _, data in pairs(espData) do
         local highlight, billboard, tracer = data[1], data[2], data[3]
         highlight.OutlineTransparency = 1
@@ -213,16 +157,12 @@ end
 function Esp:drawModule(MainTab)
     local Folder = MainTab.Folder("Esp", "[Info] Shows all players")
 
-    -- Главный переключатель ESP
     Folder.Switch("ESP Enabled", function(Status)
-        if Status then self:Enable()
-        else self:Disable() end
+        if Status then self:Enable() else self:Disable() end
     end)
 
-    -- Переключатель бокса
     Folder.Switch("Show Box", function(State)
         SETTINGS.ShowBox = State
-
         if not Esp.Enabled then return end
         for _, data in pairs(espData) do
             local highlight = data[1]
@@ -230,10 +170,8 @@ function Esp:drawModule(MainTab)
         end
     end)
 
-    -- Переключатель имени
     Folder.Switch("Show Name", function(State)
         SETTINGS.ShowName = State
-
         if not Esp.Enabled then return end
         for _, data in pairs(espData) do
             local billboard = data[2]
@@ -241,19 +179,7 @@ function Esp:drawModule(MainTab)
         end
     end)
 
-    -- Переключатель трейсеров
-    Folder.Switch("Show Tracer", function(State)
-        SETTINGS.ShowTracer = State
-
-        if not Esp.Enabled then return end
-        for _, data in pairs(espData) do
-            local tracer = data[3]
-            tracer.Visible = State
-        end
-    end)
-
     return self
 end
-
 
 return Esp
