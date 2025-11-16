@@ -8,6 +8,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
         SilentAim = "src/Main/Module/Impl/SilentAim.lua",
         Fly = "src/Main/Module/Impl/Fly.lua",
         ChatSpy = "src/Main/Module/Impl/ChatSpy.lua",
+        AutoRedeem = "src/Main/Module/Impl/AutoRedeem.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
 
@@ -20,7 +21,8 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
     local Fly = loader:Get("Fly"):drawModule(CharacterTab)
 
-    local ChatSpy = loader:Get("ChaySpy"):drawModule(OtherTab)
+    local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
+    local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
 
     print("Base ModuleManager Build | 0x000000000115")
 
