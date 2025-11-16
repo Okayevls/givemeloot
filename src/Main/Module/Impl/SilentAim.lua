@@ -17,8 +17,6 @@ local selectedTarget = nil
 local line = nil
 local isShooting = false
 
-local con, con1, con2, con3, con4, con5, con6
-
 local SupportedWeapons = {
     ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
     ["Glock"] = true, ["Heli"] = true, ["M249"] = true, ["M37"] = true, ["M4"] = true, ["Micro Uzi"] = true,
@@ -142,7 +140,7 @@ local function blockShoot(actionName, inputState, inputObject)
     return Enum.ContextActionResult.Pass
 end
 
-con = RunService.RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function()
     if SilentAim.EnabledAutoStomp and SilentAim.Enabled then
         if selectedTarget ~= nil then
             stomp(selectedTarget)
@@ -150,9 +148,9 @@ con = RunService.RenderStepped:Connect(function()
     end
 end)
 
-con1 = ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
+ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
 
-con2 = UserInputService.InputBegan:Connect(function(input, processed)
+UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if SilentAim.Enabled then
         if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
@@ -171,7 +169,7 @@ con2 = UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
-con3 = UserInputService.InputEnded:Connect(function(input)
+UserInputService.InputEnded:Connect(function(input)
     if SilentAim.Enabled then
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isShooting = false
@@ -179,7 +177,7 @@ con3 = UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-con4 = RunService.RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
         updateLine()
         if isShooting and selectedTarget then
@@ -188,14 +186,14 @@ con4 = RunService.RenderStepped:Connect(function()
     end
 end)
 
-con5 = LocalPlayer.CharacterAdded:Connect(function()
+LocalPlayer.CharacterAdded:Connect(function()
     if SilentAim.Enabled then
         selectedTarget = nil
         if line then line:Remove() line = nil end
     end
 end)
 
-con6 = Players.PlayerRemoving:Connect(function(player)
+Players.PlayerRemoving:Connect(function(player)
     if SilentAim.Enabled then
         if player == selectedTarget then
             selectedTarget = nil
