@@ -5,6 +5,8 @@ SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.TargetBind = nil
 
+SilentAim._StompSwitch = nil
+
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -125,6 +127,7 @@ local function stomp(targetPlayer)
         :WaitForChild("Stomp")
         :InvokeServer(unpack(args))
     SilentAim.EnabledAutoStomp = false
+    if SilentAim._StompSwitch then SilentAim._StompSwitch.Value = false end
 end
 
 local function blockShoot(actionName, inputState, inputObject)
@@ -212,28 +215,23 @@ function SilentAim:Disable()
     line:Remove()
     line = nil
     self.Enabled = false
+    if self._StompSwitch then self._StompSwitch.Value = false end
 end
 
 function SilentAim:drawModule(MainTab)
     local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
     Folder.Switch("Toggle", function(Status)
-        if Status then
-            self:Enable()
-        else
-            self:Disable()
-        end
+        if Status then self:Enable() else self:Disable() end
     end)
 
     local MyBind = Folder.Binding("Target Search", function(key)
         self.TargetBind = key
     end)
 
-    local Stomp = Folder.SwitchAndBinding("Stomp", function(Status)
-        self.EnabledAutoStomp = Status
+    self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
+        self.EnabledAutoStomp = st
     end)
-
-    Stomp.Value = self.EnabledAutoStomp
 
     return self
 end
