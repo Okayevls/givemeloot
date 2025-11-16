@@ -18,7 +18,7 @@ end
 
 
 function ChatSpy:drawModule(MainTab)
-    local Folder = MainTab.Folder("Fly", "[Info] Allows the player to fly")
+    local Folder = MainTab.Folder("ChatSpy", "[Info] Makes the chat visible")
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
             self:Enable()
