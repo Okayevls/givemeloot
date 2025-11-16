@@ -6,7 +6,6 @@ Esp.Enabled = false
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
@@ -16,8 +15,8 @@ espFolder.Parent = CoreGui
 
 local SETTINGS = {
     Color = Color3.fromRGB(255, 255, 255),
-    ShowName = true,
-    ShowBox = true
+    ShowName = false, -- по умолчанию выключено
+    ShowBox = false   -- по умолчанию выключено
 }
 
 local espData = {}
@@ -37,7 +36,7 @@ local function createESP(character, name)
     highlight.Adornee = character
     highlight.FillTransparency = 1
     highlight.OutlineColor = SETTINGS.Color
-    highlight.OutlineTransparency = 1
+    highlight.OutlineTransparency = 1 -- скрыт
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     highlight.Parent = espFolder
 
@@ -59,7 +58,7 @@ local function createESP(character, name)
     nameLabel.Text = name
     nameLabel.Font = Enum.Font.Gotham
     nameLabel.BorderSizePixel = 0
-    nameLabel.Visible = false
+    nameLabel.Visible = false -- скрыт по умолчанию
     nameLabel.Parent = billboard
 
     return {highlight, billboard, character, nameLabel}
@@ -75,7 +74,7 @@ local function updateESP(data)
     local vec, onScreen = Camera:WorldToViewportPoint(root.Position)
 
     highlight.OutlineTransparency = onScreen and (SETTINGS.ShowBox and 0 or 1) or 1
-    billboard.Enabled = onScreen
+    billboard.Enabled = onScreen and SETTINGS.ShowName
     nameLabel.Visible = onScreen and SETTINGS.ShowName
 end
 
@@ -128,6 +127,7 @@ function Esp:Disable()
         local highlight, _, _, nameLabel = data[1], data[2], data[3], data[4]
         highlight.OutlineTransparency = 1
         nameLabel.Visible = false
+        data[2].Enabled = false
     end
 end
 
