@@ -33,10 +33,9 @@ function Notifications:Send(message, duration)
         ScreenGui.Parent = game.CoreGui
     end
 
-    -- Frame уведомления
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, self.width, 0, self.height)
-    Frame.Position = UDim2.new(1, -10 - self.width, 0, -self.height) -- старт скрыт сверху
+    Frame.Position = UDim2.new(1, -10 - self.width, 0, -self.height)
     Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     Frame.BorderSizePixel = 0
     Frame.AnchorPoint = Vector2.new(0,0)
@@ -45,18 +44,17 @@ function Notifications:Send(message, duration)
     Frame.ZIndex = 2
     Frame.BackgroundTransparency = 1
 
-    -- Текст
     local Text = Instance.new("TextLabel")
-    Text.Size = UDim2.new(1, -10, 1, 0)
-    Text.Position = UDim2.new(0,5,0,0)
-    Text.BackgroundTransparency = 1 -- прозрачный фон текста
+    Text.Size = UDim2.new(1, 0, 1, 0) -- занимает весь фрейм
+    Text.Position = UDim2.new(0,0,0,0)
+    Text.BackgroundTransparency = 1
     Text.Text = message
     Text.TextColor3 = Color3.fromRGB(255,255,255)
     Text.TextSize = 14
     Text.Font = Enum.Font.Gotham
-    Text.TextXAlignment = Enum.TextXAlignment.Left
-    Text.TextYAlignment = Enum.TextYAlignment.Center
-    Text.ZIndex = 3 -- выше Frame
+    Text.TextXAlignment = Enum.TextXAlignment.Left -- можно Center, если нужно по горизонтали центр
+    Text.TextYAlignment = Enum.TextYAlignment.Center -- ровно по середине вертикально
+    Text.ZIndex = 3
     Text.Parent = Frame
 
     table.insert(self.queue, Frame)
@@ -128,7 +126,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
 
-    print("Base ModuleManager Build | 0x000000000138")
+    print("Base ModuleManager Build | 0x000000000139")
 end
 
 return ModuleManager, Notifier
