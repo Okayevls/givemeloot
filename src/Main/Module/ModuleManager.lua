@@ -1,4 +1,3 @@
--- Notifications.lua
 local TweenService = game:GetService("TweenService")
 
 local Notifications = {}
@@ -6,10 +5,10 @@ Notifications.__index = Notifications
 
 function Notifications:Init()
     self.queue = {} -- очередь уведомлений
-    self.margin = 8 -- отступ между уведомлениями
+    self.margin = 6 -- отступ между уведомлениями
 end
 
--- Обновление всех позиций уведомлений
+-- Обновление позиции всех уведомлений
 function Notifications:UpdatePositions()
     local yOffset = 10
     for _, frame in ipairs(self.queue) do
@@ -32,21 +31,23 @@ function Notifications:Send(message, duration)
     end
 
     local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 250, 0, 40)
-    Frame.Position = UDim2.new(0, 10, 0, -50) -- скрыто сверху
-    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Frame.Size = UDim2.new(0, 200, 0, 30) -- уменьшенный размер
+    Frame.Position = UDim2.new(0, 10, 0, -40) -- скрыто сверху слева
+    Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     Frame.BorderSizePixel = 0
     Frame.BackgroundTransparency = 0
     Frame.Parent = ScreenGui
     Frame.ClipsDescendants = true
+    Frame.AnchorPoint = Vector2.new(0, 0)
+    Frame.Rounded = 6
 
     local Text = Instance.new("TextLabel")
-    Text.Size = UDim2.new(1, -14, 1, 0)
-    Text.Position = UDim2.new(0, 7, 0, 0)
+    Text.Size = UDim2.new(1, -10, 1, 0)
+    Text.Position = UDim2.new(0, 5, 0, 0)
     Text.BackgroundTransparency = 1
     Text.Text = message
     Text.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Text.TextSize = 16
+    Text.TextSize = 14 -- уменьшенный шрифт
     Text.Font = Enum.Font.Gotham
     Text.TextXAlignment = Enum.TextXAlignment.Left
     Text.Parent = Frame
@@ -54,17 +55,17 @@ function Notifications:Send(message, duration)
     table.insert(self.queue, Frame)
     self:UpdatePositions()
 
-    -- Плавное появление
-    Frame.Position = UDim2.new(0, 10, 0, -50)
+    -- плавное появление
+    Frame.Position = UDim2.new(0, 10, 0, -40)
     TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Position = Frame.Position
     }):Play()
 
-    -- Удаление уведомления через duration
+    -- удаление через duration
     task.delay(duration, function()
         if Frame and Frame.Parent then
             TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                Position = UDim2.new(0, 10, 0, -50),
+                Position = UDim2.new(0, 10, 0, -40),
                 BackgroundTransparency = 1
             }):Play()
 
@@ -72,7 +73,6 @@ function Notifications:Send(message, duration)
                 if Frame.Parent then
                     Frame:Destroy()
                 end
-                -- удалить из очереди и обновить позиции
                 for i, f in ipairs(self.queue) do
                     if f == Frame then
                         table.remove(self.queue, i)
@@ -118,7 +118,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
 
-    print("Base ModuleManager Build | 0x000000000132")
+    print("Base ModuleManager Build | 0x000000000133")
 end
 
 return ModuleManager, Notifier
