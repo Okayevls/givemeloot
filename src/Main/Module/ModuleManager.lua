@@ -33,7 +33,7 @@ function Notifications:Send(message, duration)
         ScreenGui.Parent = game.CoreGui
     end
 
-    -- Фрейм уведомления
+    -- Frame уведомления
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, self.width, 0, self.height)
     Frame.Position = UDim2.new(1, -10 - self.width, 0, -self.height) -- старт скрыт сверху
@@ -42,27 +42,27 @@ function Notifications:Send(message, duration)
     Frame.AnchorPoint = Vector2.new(0,0)
     Frame.Parent = ScreenGui
     Frame.ClipsDescendants = true
-    Frame.ZIndex = 10
-    Frame.BackgroundTransparency = 1 -- изначально прозрачное
+    Frame.ZIndex = 2
+    Frame.BackgroundTransparency = 1
 
     -- Текст
     local Text = Instance.new("TextLabel")
     Text.Size = UDim2.new(1, -10, 1, 0)
     Text.Position = UDim2.new(0,5,0,0)
-    Text.BackgroundTransparency = 1
+    Text.BackgroundTransparency = 1 -- прозрачный фон текста
     Text.Text = message
     Text.TextColor3 = Color3.fromRGB(255,255,255)
     Text.TextSize = 14
     Text.Font = Enum.Font.Gotham
     Text.TextXAlignment = Enum.TextXAlignment.Left
     Text.TextYAlignment = Enum.TextYAlignment.Center
+    Text.ZIndex = 3 -- выше Frame
     Text.Parent = Frame
 
-    -- Добавляем в очередь
     table.insert(self.queue, Frame)
     self:UpdatePositions()
 
-    -- Анимация появления: slide + fade-in
+    -- Появление: slide + fade-in
     Frame.Position = UDim2.new(1, -10 - self.width, 0, -10)
     local appearTween = TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Position = UDim2.new(1, -10 - self.width, 0, 10 + (#self.queue-1)*(self.height + self.margin)),
@@ -70,7 +70,7 @@ function Notifications:Send(message, duration)
     })
     appearTween:Play()
 
-    -- Таймер на исчезновение
+    -- Таймер исчезновения
     task.delay(duration, function()
         if Frame and Frame.Parent then
             local hideTween = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
@@ -128,7 +128,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
 
-    print("Base ModuleManager Build | 0x000000000137")
+    print("Base ModuleManager Build | 0x000000000138")
 end
 
 return ModuleManager, Notifier
