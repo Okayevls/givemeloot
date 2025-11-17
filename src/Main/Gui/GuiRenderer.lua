@@ -964,7 +964,7 @@ local function CreateOptions(Frame)
                 ZIndex = 2
             }),
 
-            Utility.new("Frame", {
+            Utility.new("ScrollingFrame", {
                 Name = "OptionsContainer",
                 BackgroundColor3 = Color3.fromRGB(30, 30, 30),
                 BorderSizePixel = 0,
@@ -972,7 +972,9 @@ local function CreateOptions(Frame)
                 Size = UDim2.new(1, 0, 0, 0),
                 ClipsDescendants = true,
                 Visible = false,
-                ZIndex = 3
+                ScrollBarThickness = 3,
+                CanvasSize = UDim2.new(0, 0, 0, 0),
+                ZIndex = 10
             }, {
                 Utility.new("UICorner", {
                     CornerRadius = UDim.new(0, 4)
@@ -980,10 +982,6 @@ local function CreateOptions(Frame)
                 Utility.new("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Padding = UDim.new(0, 1)
-                }),
-                Utility.new("UIPadding", {
-                    PaddingTop = UDim.new(0, 5),
-                    PaddingBottom = UDim.new(0, 5)
                 })
             })
         })
@@ -994,17 +992,22 @@ local function CreateOptions(Frame)
 
         -- Создание опций
         local function createOptions()
-            for _, option in ipairs(Properties.List) do
+            for i, option in ipairs(Properties.List) do
                 local OptionButton = Utility.new("TextButton", {
                     Name = option,
-                    BackgroundTransparency = 1,
+                    BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+                    BorderSizePixel = 0,
                     Size = UDim2.new(1, -10, 0, 25),
+                    Position = UDim2.new(0, 5, 0, (i-1)*26),
                     Font = Enum.Font.Gotham,
                     Text = option,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
                     TextSize = 14,
-                    TextTransparency = 0.3,
-                    ZIndex = 4
+                    ZIndex = 11
+                }, {
+                    Utility.new("UICorner", {
+                        CornerRadius = UDim.new(0, 3)
+                    })
                 })
 
                 OptionButton.MouseButton1Click:Connect(function()
@@ -1014,8 +1017,24 @@ local function CreateOptions(Frame)
                     toggleDropdown()
                 end)
 
+                OptionButton.MouseEnter:Connect(function()
+                    Utility.Tween(OptionButton, TweenInfo.new(0.1), {
+                        BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                    }):Play()
+                end)
+
+                OptionButton.MouseLeave:Connect(function()
+                    Utility.Tween(OptionButton, TweenInfo.new(0.1), {
+                        BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                    }):Play()
+                end)
+
                 OptionButton.Parent = OptionsContainer
             end
+
+            -- Обновляем размер канваса
+            local optionCount = #Properties.List
+            OptionsContainer.CanvasSize = UDim2.new(0, 0, 0, optionCount * 26)
         end
 
         -- Переключение dropdown
@@ -1025,7 +1044,8 @@ local function CreateOptions(Frame)
             if Properties.Open then
                 OptionsContainer.Visible = true
                 local optionCount = #Properties.List
-                local height = math.min(optionCount * 26 + 10, 150) -- Максимальная высота 150
+                local height = math.min(optionCount * 26, 150) -- Максимальная высота 150
+
                 Utility.Tween(OptionsContainer, TweenInfo.new(0.2), {
                     Size = UDim2.new(1, 0, 0, height)
                 }):Play()
@@ -1039,8 +1059,13 @@ local function CreateOptions(Frame)
                 Utility.Tween(Arrow, TweenInfo.new(0.2), {
                     Rotation = 0
                 }):Play()
-                wait(0.2)
-                OptionsContainer.Visible = false
+
+                -- Ждем окончания анимации перед скрытием
+                delay(0.2, function()
+                    if not Properties.Open then
+                        OptionsContainer.Visible = false
+                    end
+                end)
             end
         end
 
@@ -1048,19 +1073,32 @@ local function CreateOptions(Frame)
         local function closeDropdown(input)
             if Properties.Open and input.UserInputType == Enum.UserInputType.MouseButton1 then
                 local mousePos = Services.UserInputService:GetMouseLocation()
-                local absolutePos = OptionsContainer.AbsolutePosition
-                local absoluteSize = OptionsContainer.AbsoluteSize
+                local containerPos = Container.AbsolutePosition
+                local containerSize = Container.AbsoluteSize
+                local optionsPos = OptionsContainer.AbsolutePosition
+                local optionsSize = OptionsContainer.AbsoluteSize
 
-                if not (mousePos.X >= absolutePos.X and mousePos.X <= absolutePos.X + absoluteSize.X and
-                        mousePos.Y >= absolutePos.Y and mousePos.Y <= absolutePos.Y + absoluteSize.Y) then
+                local inContainer = mousePos.X >= containerPos.X and mousePos.X <= containerPos.X + containerSize.X and
+                        mousePos.Y >= containerPos.Y and mousePos.Y <= containerPos.Y + containerSize.Y
+
+                local inOptions = mousePos.X >= optionsPos.X and mousePos.X <= optionsPos.X + optionsSize.X and
+                        mousePos.Y >= optionsPos.Y and mousePos.Y <= optionsPos.Y + optionsSize.Y
+
+                if not inContainer and not inOptions then
                     toggleDropdown()
                 end
             end
         end
 
         -- Обработчики событий
-        Container.MouseButton1Click:Connect(toggleDropdown)
-        ValueButton.MouseButton1Click:Connect(toggleDropdown)
+        Container.MouseButton1Click:Connect(function()
+            toggleDropdown()
+        end)
+
+        ValueButton.MouseButton1Click:Connect(function()
+            toggleDropdown()
+        end)
+
         Services.UserInputService.InputBegan:Connect(closeDropdown)
 
         -- Создаем опции
