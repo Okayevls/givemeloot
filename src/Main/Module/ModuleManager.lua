@@ -81,25 +81,17 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local VisualTab = Window.Tab("Visuals", 16149111790)
     local OtherTab = Window.Tab("Other", 16149111790)
 
-    local SilentAim = loader:Get("SilentAim"):drawModule(CombatTab)
-    Notifier:Send("SilentAim loaded")
+    local SilentAim = loader:Get("SilentAim"):drawModule(CombatTab, Notifier)
 
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
-    Notifier:Send("Speed loaded")
-
     local Fly = loader:Get("Fly"):drawModule(CharacterTab)
-    Notifier:Send("Fly loaded")
 
     local Esp = loader:Get("Esp"):drawModule(VisualTab)
-    Notifier:Send("ESP loaded")
 
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
-    Notifier:Send("ChatSpy loaded")
-
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
-    Notifier:Send("AutoRedeem loaded")
 
-    print("Base ModuleManager Build | 0x000000000128")
+    print("Base ModuleManager Build | 0x000000000130")
 end
 
 return ModuleManager, Notifier

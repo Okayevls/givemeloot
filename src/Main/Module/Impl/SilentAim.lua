@@ -216,11 +216,17 @@ function SilentAim:Disable()
     if self._StompSwitch then self._StompSwitch.Value = false end
 end
 
-function SilentAim:drawModule(MainTab)
+function SilentAim:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
     Folder.Switch("Toggle", function(Status)
-        if Status then self:Enable() else self:Disable() end
+        if Status then
+            Notifier:Send("[Legacy.wip] SilentAim - Enable!")
+            self:Enable()
+        else
+            Notifier:Send("[Legacy.wip] SilentAim - Disable!")
+            self:Disable()
+        end
     end)
 
     local MyBind = Folder.Binding("Target Search", function(key)
