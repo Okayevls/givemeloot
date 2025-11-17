@@ -6,7 +6,6 @@ SilentAim.EnabledAutoStomp = false
 SilentAim.TargetBind = nil
 SilentAim.RapidFireEnabled = false
 SilentAim.BulletsPerShot = 1
-SilentAim.RapidFireMethod = "Instant" -- "Instant", "Spread", "Delayed"
 
 SilentAim._StompSwitch = nil
 
@@ -111,59 +110,16 @@ local function rapidFireShoot(targetPlayer)
     local velocity = targetRoot.Velocity
     local basePos = targetHead.Position
 
-    if SilentAim.RapidFireMethod == "Instant" then
-        -- Мгновенная отправка всех пакетов
-        for i = 1, SilentAim.BulletsPerShot do
-            local predictedPos = basePos + (velocity * (0.15 + i * 0.01))
-            local args = {
-                {
-                    { targetHead, predictedPos, CFrame.new() }
-                },
-                {targetHead},
-                true
-            }
-            gun.Communication:FireServer(unpack(args))
-        end
-    elseif SilentAim.RapidFireMethod == "Spread" then
-        -- Разброс пуль вокруг цели
-        for i = 1, SilentAim.BulletsPerShot do
-            local spreadOffset = Vector3.new(
-                    (math.random() - 0.5) * 2,
-                    (math.random() - 0.5) * 2,
-                    (math.random() - 0.5) * 2
-            ) * 0.5
-            local predictedPos = basePos + (velocity * 0.15) + spreadOffset
-            local args = {
-                {
-                    { targetHead, predictedPos, CFrame.new() }
-                },
-                {targetHead},
-                true
-            }
-            gun.Communication:FireServer(unpack(args))
-        end
-    elseif SilentAim.RapidFireMethod == "Delayed" then
-        -- Отправка с небольшими задержками через RenderStepped
-        local bulletsFired = 0
-        local connection
-        connection = RunService.RenderStepped:Connect(function()
-            if bulletsFired < SilentAim.BulletsPerShot then
-                bulletsFired = bulletsFired + 1
-                local predictedPos = basePos + (velocity * (0.15 + bulletsFired * 0.02))
-                local args = {
-                    {
-                        { targetHead, predictedPos, CFrame.new() }
-                    },
-                    {targetHead},
-                    true
-                }
-                gun.Communication:FireServer(unpack(args))
-
-                if bulletsFired >= SilentAim.BulletsPerShot then
-                    connection:Disconnect()
-                end
-            end
-        end)
+    for i = 1, SilentAim.BulletsPerShot do
+        local predictedPos = basePos + (velocity * (0.15 + i * 0.01))
+        local args = {
+            {
+                { targetHead, predictedPos, CFrame.new() }
+            },
+            {targetHead},
+            true
+        }
+        gun.Communication:FireServer(unpack(args))
     end
 end
 
@@ -316,10 +272,6 @@ function SilentAim:drawModule(MainTab)
     Folder.Slider("Bullets Per Shot", { Min = 0, Max = 15, Default = 1, Step = 1 }, function(value)
         self.BulletsPerShot = value
     end)
-
-    Folder.Dropdown("Rapid Fire Method", {"Instant", "Spread", "Delayed"}, function(value)
-        self.RapidFireMethod = value
-    end, "Select method")
 
     return self
 end
