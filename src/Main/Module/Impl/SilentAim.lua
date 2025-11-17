@@ -221,10 +221,10 @@ function SilentAim:drawModule(MainTab, Notifier)
 
     Folder.Switch("Toggle", function(Status)
         if Status then
-            Notifier:Send("[Legacy.wip] SilentAim - Enable!")
+            Notifier:Send("[Legacy.wip] SilentAim - Enable!",6)
             self:Enable()
         else
-            Notifier:Send("[Legacy.wip] SilentAim - Disable!")
+            Notifier:Send("[Legacy.wip] SilentAim - Disable!",6)
             self:Disable()
         end
     end)
