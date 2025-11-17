@@ -1,3 +1,5 @@
+-- Notifications Module (separate)
+local TweenService = game:GetService("TweenService")
 
 local Notifications = {}
 Notifications.__index = Notifications
@@ -34,16 +36,23 @@ function Notifications:Send(message, duration)
     Text.Font = Enum.Font.GothamMedium
     Text.Parent = Frame
 
-    -- animate show
-    Frame:TweenPosition(UDim2.new(1, -280, 1, -120), "Out", "Quad", 0.35, true)
-    Frame:TweenProperty({ BackgroundTransparency = 0 }, "Out", "Quad", 0.35, true)
+    -- Tween configs
+    local showTween = TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(1, -280, 1, -120),
+        BackgroundTransparency = 0
+    })
+
+    local hideTween = TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Position = UDim2.new(1, -280, 1, 0),
+        BackgroundTransparency = 1
+    })
+
+    showTween:Play()
 
     task.delay(duration, function()
         if Frame then
-            -- animate hide
-            Frame:TweenPosition(UDim2.new(1, -280, 1, 0), "In", "Quad", 0.35, true)
-            Frame:TweenProperty({ BackgroundTransparency = 1 }, "In", "Quad", 0.35, true)
-            task.wait(0.35)
+            hideTween:Play()
+            hideTween.Completed:Wait()
             Frame:Destroy()
         end
     end)
@@ -90,7 +99,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
     Notifier:Send("AutoRedeem loaded")
 
-    print("Base ModuleManager Build | 0x000000000127")
+    print("Base ModuleManager Build | 0x000000000128")
 end
 
 return ModuleManager, Notifier
