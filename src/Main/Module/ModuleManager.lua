@@ -33,6 +33,7 @@ function Notifications:Send(message, duration)
         ScreenGui.Parent = game.CoreGui
     end
 
+    -- Frame уведомления
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, self.width, 0, self.height)
     Frame.Position = UDim2.new(1, -10 - self.width, 0, -self.height)
@@ -44,23 +45,24 @@ function Notifications:Send(message, duration)
     Frame.ZIndex = 2
     Frame.BackgroundTransparency = 1
 
+    -- Текст по центру
     local Text = Instance.new("TextLabel")
-    Text.Size = UDim2.new(1, 0, 1, 0) -- занимает весь фрейм
+    Text.Size = UDim2.new(1, 0, 1, 0)
     Text.Position = UDim2.new(0,0,0,0)
     Text.BackgroundTransparency = 1
     Text.Text = message
     Text.TextColor3 = Color3.fromRGB(255,255,255)
     Text.TextSize = 14
     Text.Font = Enum.Font.Gotham
-    Text.TextXAlignment = Enum.TextXAlignment.Left -- можно Center, если нужно по горизонтали центр
-    Text.TextYAlignment = Enum.TextYAlignment.Center -- ровно по середине вертикально
+    Text.TextXAlignment = Enum.TextXAlignment.Center -- горизонтально по центру
+    Text.TextYAlignment = Enum.TextYAlignment.Center -- вертикально по центру
     Text.ZIndex = 3
     Text.Parent = Frame
 
     table.insert(self.queue, Frame)
     self:UpdatePositions()
 
-    -- Появление: slide + fade-in
+    -- Появление: slide сверху + fade-in
     Frame.Position = UDim2.new(1, -10 - self.width, 0, -10)
     local appearTween = TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
         Position = UDim2.new(1, -10 - self.width, 0, 10 + (#self.queue-1)*(self.height + self.margin)),
