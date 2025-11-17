@@ -15,9 +15,9 @@ espFolder.Parent = CoreGui
 
 local SETTINGS = {
     Color = Color3.fromRGB(255, 255, 255),
-    ShowName = true,
-    ShowBox = true,
-    ShowBackground = true,
+    ShowName = false,
+    ShowBox = false,
+    ShowBackground = false,
     TextSize = 14, -- фиксированный размер текста
     BoxSize = 1,   -- фиксированный размер Box (OutlineTransparency = 0)
 }
