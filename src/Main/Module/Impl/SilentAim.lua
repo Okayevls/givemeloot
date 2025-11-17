@@ -4,8 +4,6 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.TargetBind = nil
-SilentAim.RapidFireEnabled = false
-SilentAim.BulletsPerShot = 1
 
 SilentAim._StompSwitch = nil
 
@@ -18,7 +16,6 @@ local LocalPlayer = Players.LocalPlayer
 local selectedTarget = nil
 local line = nil
 local isShooting = false
-
 
 local SupportedWeapons = {
     ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
@@ -99,31 +96,7 @@ local function updateLine()
     end
 end
 
-local function rapidFireShoot(targetPlayer)
-    local gun = getEquippedWeapon()
-    if not gun then return end
-
-    local targetHead = targetPlayer.Character:FindFirstChild("Head")
-    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not targetHead or not targetRoot then return end
-
-    local velocity = targetRoot.Velocity
-    local basePos = targetHead.Position
-
-    for i = 1, SilentAim.BulletsPerShot do
-        local predictedPos = basePos + (velocity * (0.15 + i * 0.01))
-        local args = {
-            {
-                { targetHead, predictedPos, CFrame.new() }
-            },
-            {targetHead},
-            true
-        }
-        gun.Communication:FireServer(unpack(args))
-    end
-end
-
-local function normalShoot(targetPlayer)
+local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
@@ -136,21 +109,13 @@ local function normalShoot(targetPlayer)
 
     local args = {
         {
-            { targetHead, predictedPos, CFrame.new() }
+            {    targetHead,    predictedPos,    CFrame.new()   }
         },
         {targetHead},
         true
     }
 
     gun.Communication:FireServer(unpack(args))
-end
-
-local function smartShoot(targetPlayer)
-    if SilentAim.RapidFireEnabled and SilentAim.BulletsPerShot > 1 then
-        rapidFireShoot(targetPlayer)
-    else
-        normalShoot(targetPlayer)
-    end
 end
 
 local function stomp(targetPlayer)
@@ -245,7 +210,8 @@ end
 function SilentAim:Disable()
     isShooting = false
     selectedTarget = nil
-    if line then line:Remove() line = nil end
+    line:Remove()
+    line = nil
     self.Enabled = false
     if self._StompSwitch then self._StompSwitch.Value = false end
 end
@@ -263,14 +229,6 @@ function SilentAim:drawModule(MainTab)
 
     self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
         self.EnabledAutoStomp = st
-    end)
-
-    Folder.Switch("Rapid Fire", function(Status)
-        self.RapidFireEnabled = Status
-    end)
-
-    Folder.Slider("Bullets Per Shot", { Min = 0, Max = 15, Default = 1, Step = 1 }, function(value)
-        self.BulletsPerShot = value
     end)
 
     return self
