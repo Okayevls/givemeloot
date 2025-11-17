@@ -7,24 +7,25 @@ Notifications.__index = Notifications
 function Notifications:Init()
     self.queue = {} -- очередь уведомлений
     self.margin = 6 -- отступ между уведомлениями
+    self.width = 200 -- ширина уведомления
+    self.height = 30 -- высота уведомления
 end
 
 -- Обновление позиции всех уведомлений
 function Notifications:UpdatePositions()
     local yOffset = 10
     for _, frame in ipairs(self.queue) do
-        local targetPos = UDim2.new(0, 10, 0, yOffset)
+        local targetPos = UDim2.new(1, -10 - self.width, 0, yOffset) -- справа сверху
         TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Position = targetPos
         }):Play()
-        yOffset = yOffset + frame.Size.Y.Offset + self.margin
+        yOffset = yOffset + self.height + self.margin
     end
 end
 
 function Notifications:Send(message, duration)
     duration = duration or 3
 
-    -- Создание GUI, если его нет
     local ScreenGui = game.CoreGui:FindFirstChild("NotificationsGUI")
     if not ScreenGui then
         ScreenGui = Instance.new("ScreenGui")
@@ -32,53 +33,49 @@ function Notifications:Send(message, duration)
         ScreenGui.Parent = game.CoreGui
     end
 
-    -- Создание фрейма уведомления
     local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, 200, 0, 30)
-    Frame.Position = UDim2.new(0, 10, 0, -40) -- сверху слева, изначально скрыто
+    Frame.Size = UDim2.new(0, self.width, 0, self.height)
+    Frame.Position = UDim2.new(1, -10 - self.width, 0, -self.height) -- стартовая позиция скрыта сверху
     Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     Frame.BorderSizePixel = 0
-    Frame.BackgroundTransparency = 0
-    Frame.AnchorPoint = Vector2.new(0, 0)
+    Frame.AnchorPoint = Vector2.new(0,0)
     Frame.Parent = ScreenGui
     Frame.ClipsDescendants = true
-    Frame.ZIndex = 10
 
     local Text = Instance.new("TextLabel")
     Text.Size = UDim2.new(1, -10, 1, 0)
-    Text.Position = UDim2.new(0, 5, 0, 0)
+    Text.Position = UDim2.new(0,5,0,0)
     Text.BackgroundTransparency = 1
     Text.Text = message
-    Text.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Text.TextColor3 = Color3.fromRGB(255,255,255)
     Text.TextSize = 14
     Text.Font = Enum.Font.Gotham
     Text.TextXAlignment = Enum.TextXAlignment.Left
+    Text.TextYAlignment = Enum.TextYAlignment.Center
     Text.Parent = Frame
 
-    -- Добавляем уведомление в очередь
     table.insert(self.queue, Frame)
     self:UpdatePositions()
 
     -- Плавное появление
     TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Position = Frame.Position
+        Position = UDim2.new(1, -10 - self.width, 0, 10 + (#self.queue-1)*(self.height + self.margin))
     }):Play()
 
     -- Таймер на исчезновение
     task.delay(duration, function()
         if Frame and Frame.Parent then
-            -- Плавное исчезновение вверх
             local hideTween = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                Position = UDim2.new(0, 10, 0, -40),
+                Position = UDim2.new(1, -10 - self.width, 0, -self.height),
                 BackgroundTransparency = 1
             })
             hideTween:Play()
             hideTween.Completed:Wait()
 
-            -- Удаляем из UI и из очереди
             if Frame.Parent then
                 Frame:Destroy()
             end
+
             for i, f in ipairs(self.queue) do
                 if f == Frame then
                     table.remove(self.queue, i)
