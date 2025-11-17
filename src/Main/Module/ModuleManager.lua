@@ -5,18 +5,18 @@ local Notifications = {}
 Notifications.__index = Notifications
 
 function Notifications:Init()
-    self.queue = {} -- очередь уведомлений
-    self.margin = 6 -- отступ между уведомлениями
-    self.width = 200 -- ширина уведомления
-    self.height = 30 -- высота уведомления
+    self.queue = {}
+    self.margin = 6
+    self.width = 200
+    self.height = 30
 end
 
--- Обновление позиции всех уведомлений
+-- Обновление позиции всех уведомлений (Y-координата)
 function Notifications:UpdatePositions()
     local yOffset = 10
     for _, frame in ipairs(self.queue) do
-        local targetPos = UDim2.new(1, -10 - self.width, 0, yOffset) -- справа сверху
-        TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local targetPos = UDim2.new(1, -10 - self.width, 0, yOffset)
+        TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Position = targetPos
         }):Play()
         yOffset = yOffset + self.height + self.margin
@@ -35,12 +35,14 @@ function Notifications:Send(message, duration)
 
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, self.width, 0, self.height)
-    Frame.Position = UDim2.new(1, -10 - self.width, 0, -self.height) -- стартовая позиция скрыта сверху
+    Frame.Position = UDim2.new(1, -10 - self.width, 0, 0) -- временно сверху
     Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     Frame.BorderSizePixel = 0
-    Frame.AnchorPoint = Vector2.new(0,0)
+    Frame.AnchorPoint = Vector2.new(0, 0)
     Frame.Parent = ScreenGui
     Frame.ClipsDescendants = true
+    Frame.ZIndex = 10
+    Frame.BackgroundTransparency = 1 -- изначально прозрачное
 
     local Text = Instance.new("TextLabel")
     Text.Size = UDim2.new(1, -10, 1, 0)
@@ -57,15 +59,20 @@ function Notifications:Send(message, duration)
     table.insert(self.queue, Frame)
     self:UpdatePositions()
 
-    -- Плавное появление
-    TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Position = UDim2.new(1, -10 - self.width, 0, 10 + (#self.queue-1)*(self.height + self.margin))
-    }):Play()
+    -- Красивое появление: fade-in + scale + маленький сдвиг сверху
+    Frame.Position = UDim2.new(1, -10 - self.width, 0, -10)
+    Frame.Size = UDim2.new(0, self.width, 0, 0)
+    local appearTween = TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, self.width, 0, self.height),
+        Position = UDim2.new(1, -10 - self.width, 0, 10 + (#self.queue-1)*(self.height + self.margin)),
+        BackgroundTransparency = 0
+    })
+    appearTween:Play()
 
     -- Таймер на исчезновение
     task.delay(duration, function()
         if Frame and Frame.Parent then
-            local hideTween = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            local hideTween = TweenService:Create(Frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
                 Position = UDim2.new(1, -10 - self.width, 0, -self.height),
                 BackgroundTransparency = 1
             })
@@ -120,7 +127,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
 
-    print("Base ModuleManager Build | 0x000000000134")
+    print("Base ModuleManager Build | 0x000000000136")
 end
 
 return ModuleManager, Notifier
