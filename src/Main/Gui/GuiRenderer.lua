@@ -904,7 +904,190 @@ local function CreateOptions(Frame)
     end
 
     function Options.Dropdown(Title, List, Callback, Placeholder)
+        List = List or {}
+        Placeholder = Placeholder or "Select..."
 
+        local Properties = {
+            Title = Title or "Dropdown",
+            Value = nil,
+            List = List,
+            Function = Callback or function() end,
+            Open = false
+        }
+
+        local Container = Utility.new("ImageButton", {
+            Name = "Dropdown",
+            Parent = Frame,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 35),
+            ZIndex = 2
+        }, {
+            Utility.new("TextLabel", {
+                Name = "Title",
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 0, 0, 2),
+                Size = UDim2.new(1, -75, 0, 20),
+                Font = Enum.Font.Gotham,
+                Text = Title,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 14,
+                TextTransparency = 0.3,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 2
+            }),
+
+            Utility.new("TextButton", {
+                Name = "Value",
+                Active = true,
+                AnchorPoint = Vector2.new(1, 0),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(1, 0, 0, 2),
+                Size = UDim2.new(0, 75, 0, 20),
+                Font = Enum.Font.Gotham,
+                Text = Placeholder,
+                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextSize = 14,
+                TextTransparency = 0.3,
+                TextXAlignment = Enum.TextXAlignment.Right,
+                ZIndex = 2
+            }),
+
+            Utility.new("ImageLabel", {
+                Name = "Arrow",
+                AnchorPoint = Vector2.new(1, 0.5),
+                BackgroundTransparency = 1,
+                Position = UDim2.new(1, -5, 0.5, 0),
+                Size = UDim2.new(0, 12, 0, 12),
+                Image = "rbxassetid://6031091004",
+                ImageColor3 = Color3.fromRGB(200, 200, 200),
+                ImageTransparency = 0.3,
+                ZIndex = 2
+            }),
+
+            Utility.new("Frame", {
+                Name = "OptionsContainer",
+                BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 0, 1, 5),
+                Size = UDim2.new(1, 0, 0, 0),
+                ClipsDescendants = true,
+                Visible = false,
+                ZIndex = 3
+            }, {
+                Utility.new("UICorner", {
+                    CornerRadius = UDim.new(0, 4)
+                }),
+                Utility.new("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 1)
+                }),
+                Utility.new("UIPadding", {
+                    PaddingTop = UDim.new(0, 5),
+                    PaddingBottom = UDim.new(0, 5)
+                })
+            })
+        })
+
+        local OptionsContainer = Container:FindFirstChild("OptionsContainer")
+        local Arrow = Container:FindFirstChild("Arrow")
+        local ValueButton = Container:FindFirstChild("Value")
+
+        -- Создание опций
+        local function createOptions()
+            for _, option in ipairs(Properties.List) do
+                local OptionButton = Utility.new("TextButton", {
+                    Name = option,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, -10, 0, 25),
+                    Font = Enum.Font.Gotham,
+                    Text = option,
+                    TextColor3 = Color3.fromRGB(255, 255, 255),
+                    TextSize = 14,
+                    TextTransparency = 0.3,
+                    ZIndex = 4
+                })
+
+                OptionButton.MouseButton1Click:Connect(function()
+                    Properties.Value = option
+                    ValueButton.Text = option
+                    pcall(Properties.Function, option)
+                    toggleDropdown()
+                end)
+
+                OptionButton.Parent = OptionsContainer
+            end
+        end
+
+        -- Переключение dropdown
+        local function toggleDropdown()
+            Properties.Open = not Properties.Open
+
+            if Properties.Open then
+                OptionsContainer.Visible = true
+                local optionCount = #Properties.List
+                local height = math.min(optionCount * 26 + 10, 150) -- Максимальная высота 150
+                Utility.Tween(OptionsContainer, TweenInfo.new(0.2), {
+                    Size = UDim2.new(1, 0, 0, height)
+                }):Play()
+                Utility.Tween(Arrow, TweenInfo.new(0.2), {
+                    Rotation = 180
+                }):Play()
+            else
+                Utility.Tween(OptionsContainer, TweenInfo.new(0.2), {
+                    Size = UDim2.new(1, 0, 0, 0)
+                }):Play()
+                Utility.Tween(Arrow, TweenInfo.new(0.2), {
+                    Rotation = 0
+                }):Play()
+                wait(0.2)
+                OptionsContainer.Visible = false
+            end
+        end
+
+        -- Закрытие dropdown при клике вне его
+        local function closeDropdown(input)
+            if Properties.Open and input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local mousePos = Services.UserInputService:GetMouseLocation()
+                local absolutePos = OptionsContainer.AbsolutePosition
+                local absoluteSize = OptionsContainer.AbsoluteSize
+
+                if not (mousePos.X >= absolutePos.X and mousePos.X <= absolutePos.X + absoluteSize.X and
+                        mousePos.Y >= absolutePos.Y and mousePos.Y <= absolutePos.Y + absoluteSize.Y) then
+                    toggleDropdown()
+                end
+            end
+        end
+
+        -- Обработчики событий
+        Container.MouseButton1Click:Connect(toggleDropdown)
+        ValueButton.MouseButton1Click:Connect(toggleDropdown)
+        Services.UserInputService.InputBegan:Connect(closeDropdown)
+
+        -- Создаем опции
+        createOptions()
+
+        return setmetatable({}, {
+            __index = function(_, Index)
+                return Properties[Index]
+            end,
+            __newindex = function(_, Index, Value)
+                if Index == "List" then
+                    Properties.List = Value
+                    -- Очищаем и пересоздаем опции
+                    for _, child in ipairs(OptionsContainer:GetChildren()) do
+                        if child:IsA("TextButton") then
+                            child:Destroy()
+                        end
+                    end
+                    createOptions()
+                elseif Index == "Value" then
+                    Properties.Value = Value
+                    ValueButton.Text = Value or Placeholder
+                    pcall(Properties.Function, Value)
+                end
+                Properties[Index] = Value
+            end,
+        })
     end
 
     function Options.Slider(Title, Settings, Callback)
