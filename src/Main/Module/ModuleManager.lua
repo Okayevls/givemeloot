@@ -6,10 +6,10 @@ Notifications.__index = Notifications
 
 function Notifications:Init()
     self.queue = {} -- очередь уведомлений
-    self.margin = 10 -- отступ между уведомлениями
+    self.margin = 8 -- отступ между уведомлениями
 end
 
--- функция для обновления позиции всех уведомлений
+-- Обновление всех позиций уведомлений
 function Notifications:UpdatePositions()
     local yOffset = 10
     for _, frame in ipairs(self.queue) do
@@ -33,14 +33,12 @@ function Notifications:Send(message, duration)
 
     local Frame = Instance.new("Frame")
     Frame.Size = UDim2.new(0, 250, 0, 40)
-    Frame.Position = UDim2.new(0, 10, 0, -50) -- сначала скрыто сверху
-    Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Frame.Position = UDim2.new(0, 10, 0, -50) -- скрыто сверху
+    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Frame.BorderSizePixel = 0
-    Frame.BackgroundTransparency = 0.05
-    Frame.AnchorPoint = Vector2.new(0, 0)
+    Frame.BackgroundTransparency = 0
     Frame.Parent = ScreenGui
     Frame.ClipsDescendants = true
-    Frame.Rounded = 8
 
     local Text = Instance.new("TextLabel")
     Text.Size = UDim2.new(1, -14, 1, 0)
@@ -56,22 +54,25 @@ function Notifications:Send(message, duration)
     table.insert(self.queue, Frame)
     self:UpdatePositions()
 
-    -- плавное появление
+    -- Плавное появление
     Frame.Position = UDim2.new(0, 10, 0, -50)
     TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Position = Frame.Position
     }):Play()
 
-    -- скрытие после duration
+    -- Удаление уведомления через duration
     task.delay(duration, function()
-        if Frame then
+        if Frame and Frame.Parent then
             TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
                 Position = UDim2.new(0, 10, 0, -50),
                 BackgroundTransparency = 1
             }):Play()
 
             task.delay(0.35, function()
-                Frame:Destroy()
+                if Frame.Parent then
+                    Frame:Destroy()
+                end
+                -- удалить из очереди и обновить позиции
                 for i, f in ipairs(self.queue) do
                     if f == Frame then
                         table.remove(self.queue, i)
