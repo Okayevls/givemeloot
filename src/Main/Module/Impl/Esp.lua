@@ -15,8 +15,8 @@ espFolder.Parent = CoreGui
 
 local SETTINGS = {
     Color = Color3.fromRGB(255, 255, 255),
-    ShowName = false, -- по умолчанию выключено
-    ShowBox = false   -- по умолчанию выключено
+    ShowName = false,
+    ShowBox = false
 }
 
 local espData = {}
