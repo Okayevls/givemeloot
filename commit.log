@@ -1,3 +1,2 @@
-[main 8ea8e09] Auto-commit 17.11.2025 11:20:13,78
- 3 files changed, 48 insertions(+), 11 deletions(-)
- create mode 100644 src/Main/Module/Impl/AspectRatio.lua
+[main bed36b4] Auto-commit 17.11.2025 11:38:05,67
+ 3 files changed, 45 insertions(+), 35 deletions(-)
