@@ -4,6 +4,8 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.TargetBind = nil
+SilentAim.RapidFireEnabled = false
+SilentAim.BulletsPerShot = 1
 
 SilentAim._StompSwitch = nil
 
@@ -115,7 +117,17 @@ local function smartShoot(targetPlayer)
         true
     }
 
-    gun.Communication:FireServer(unpack(args))
+    -- Rapid Fire логика
+    if SilentAim.RapidFireEnabled and SilentAim.BulletsPerShot > 1 then
+        for i = 1, SilentAim.BulletsPerShot do
+            gun.Communication:FireServer(unpack(args))
+            if i < SilentAim.BulletsPerShot then
+                wait() -- Небольшая задержка между выстрелами
+            end
+        end
+    else
+        gun.Communication:FireServer(unpack(args))
+    end
 end
 
 local function stomp(targetPlayer)
@@ -210,8 +222,7 @@ end
 function SilentAim:Disable()
     isShooting = false
     selectedTarget = nil
-    line:Remove()
-    line = nil
+    if line then line:Remove() line = nil end
     self.Enabled = false
     if self._StompSwitch then self._StompSwitch.Value = false end
 end
@@ -229,6 +240,14 @@ function SilentAim:drawModule(MainTab)
 
     self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
         self.EnabledAutoStomp = st
+    end)
+
+    Folder.Switch("Rapid Fire", function(Status)
+        self.RapidFireEnabled = Status
+    end)
+
+    Folder.Slider("Bullets Per Shot", { Min = 0, Max = 15, Default = 1, Step = 1 }, function(value)
+        self.BulletsPerShot = value
     end)
 
     return self
