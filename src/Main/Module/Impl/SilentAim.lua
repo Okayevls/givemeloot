@@ -96,83 +96,22 @@ local function updateLine()
     end
 end
 
---local function smartShoot(targetPlayer)
---    local gun = getEquippedWeapon()
---    if not gun then return end
---
---    local targetHead = targetPlayer.Character:FindFirstChild("Head")
---    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
---    if not targetHead or not targetRoot then return end
---
---    local velocity = targetRoot.Velocity
---    local predictedPos = targetHead.Position + (velocity * 0.15)
---
---    local args = {
---        {
---            {    targetHead,    predictedPos,    CFrame.new()   }
---        },
---        {targetHead},
---        true
---    }
---
---    gun.Communication:FireServer(unpack(args))
---end
 local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
-    local char = targetPlayer.Character
-    if not char then return end
+    local targetHead = targetPlayer.Character:FindFirstChild("Head")
+    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not targetHead or not targetRoot then return end
 
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-
-    local camera = workspace.CurrentCamera
-    local myHead = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
-    if not myHead then return end
-
-    -- Позиция дула (примерно)
-    local gunHandle = gun:FindFirstChild("Handle") or gun:FindFirstChildWhichIsA("BasePart")
-    local fromPos = gunHandle and gunHandle.Position or myHead.Position + Vector3.new(0, 1, 0)
-
-    local velocity = root.Velocity
-    local predictTime = 0.15 
-    local bodyParts = {
-        "Head",           -- 1
-        "UpperTorso", "LowerTorso", -- 2
-        "LeftUpperArm", "RightUpperArm",
-        "LeftLowerArm", "RightLowerArm",
-        "LeftHand", "RightHand",
-        "LeftUpperLeg", "RightUpperLeg",
-        "LeftLowerLeg", "RightLowerLeg",
-        "LeftFoot", "RightFoot"
-    }
-
-    local chosenPart = nil
-    local chosenPredictedPos = nil
-
-    for _, partName in ipairs(bodyParts) do
-        local part = char:FindFirstChild(partName)
-        if part then
-            local predictedPos = part.Position + (velocity * predictTime)
-            local ray = Ray.new(fromPos, predictedPos - fromPos)
-            local hit = workspace:FindPartOnRayWithIgnoreList(ray, {LocalPlayer.Character, workspace.CurrentCamera, workspace.Terrain})
-
-            if not hit or not hit:IsDescendantOf(char) then
-                chosenPart = part
-                chosenPredictedPos = predictedPos
-                break
-            end
-        end
-    end
-
-    if not chosenPart then return end
+    local velocity = targetRoot.Velocity
+    local predictedPos = targetHead.Position + (velocity * 0.15)
 
     local args = {
         {
-            { chosenPart, chosenPredictedPos, CFrame.new() }
+            {    targetHead,    predictedPos,    CFrame.new()   }
         },
-        {chosenPart},
+        {targetHead},
         true
     }
 
