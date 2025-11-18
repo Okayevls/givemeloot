@@ -105,7 +105,6 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
         AutoRedeem = "src/Main/Module/Impl/AutoRedeem.lua",
         Esp = "src/Main/Module/Impl/Esp.lua",
         AspectRatio = "src/Main/Module/Impl/AspectRatio.lua",
-        InfStamina = "src/Main/Module/Impl/InfStamina.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
 
@@ -123,12 +122,10 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local Esp = loader:Get("Esp"):drawModule(VisualTab)
     local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab)
 
-    local InfStamina = loader:Get("InfStamina"):drawModule(PlayerTab)
-
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
 
-    print("Base ModuleManager Build | 0x000000000143")
+    print("Base ModuleManager Build | 0x000000000144")
 end
 
 return ModuleManager, Notifier
