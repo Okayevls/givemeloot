@@ -3,6 +3,7 @@ SilentAim.__index = SilentAim
 
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
+SilentAim.EnabledAntiBuy = false
 SilentAim.TargetBind = nil
 
 SilentAim._StompSwitch = nil
@@ -11,11 +12,15 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local ContextActionService = game:GetService("ContextActionService")
+local ProximityPromptService = game:GetService("ProximityPromptService")
 local LocalPlayer = Players.LocalPlayer
 
 local selectedTarget = nil
 local line = nil
 local isShooting = false
+
+local proximityEnabled = true
+local connection
 
 local SupportedWeapons = {
     ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
@@ -183,6 +188,28 @@ RunService.RenderStepped:Connect(function()
         if isShooting and selectedTarget then
             smartShoot(selectedTarget)
         end
+
+        if SilentAim.EnabledAntiBuy then
+            if selectedTarget ~= nil then
+                if connection then
+                    connection:Disconnect()
+                end
+                connection = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+                    prompt:SetInputEnabled(false)
+                end)
+                UserInputService.InputBegan:Connect(function(input, gameProcessed)
+                    if gameProcessed then return end
+                    if input.KeyCode == Enum.KeyCode.E then
+                        return
+                    end
+                end)
+            end
+        else
+            if connection then
+                connection:Disconnect()
+                connection = nil
+            end
+        end
     end
 end)
 
@@ -212,6 +239,10 @@ function SilentAim:Disable()
     selectedTarget = nil
     line:Remove()
     line = nil
+    if connection then
+        connection:Disconnect()
+        connection = nil
+    end
     self.Enabled = false
     if self._StompSwitch then self._StompSwitch.Value = false end
 end
@@ -235,6 +266,10 @@ function SilentAim:drawModule(MainTab, Notifier)
 
     self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
         self.EnabledAutoStomp = st
+    end)
+
+    Folder.SwitchAndBinding("AntiBuy", function(st)
+        self.EnabledAntiBuy = st
     end)
 
     return self
