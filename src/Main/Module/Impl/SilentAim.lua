@@ -19,14 +19,49 @@ local selectedTarget = nil
 local line = nil
 local isShooting = false
 
-local proximityEnabled = true
-local connection
+local proximityConnection = nil
+local originalPrompts = {}
 
 local SupportedWeapons = {
     ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
     ["Glock"] = true, ["Heli"] = true, ["M249"] = true, ["M37"] = true, ["M4"] = true, ["Micro Uzi"] = true,
     ["Rpg"] = true, ["Silencer"] = true, ["Spas"] = true, ["Taser"] = true, ["Tec"] = true, ["Ump"] = true
 }
+
+local function hideProximityPrompts()
+    if proximityConnection then
+        proximityConnection:Disconnect()
+        proximityConnection = nil
+    end
+
+    for _, prompt in pairs(workspace:GetDescendants()) do
+        if prompt:IsA("ProximityPrompt") then
+            originalPrompts[prompt] = prompt.Enabled
+            prompt.Enabled = false
+        end
+    end
+
+    proximityConnection = workspace.DescendantAdded:Connect(function(descendant)
+        if descendant:IsA("ProximityPrompt") then
+            originalPrompts[descendant] = descendant.Enabled
+            descendant.Enabled = false
+        end
+    end)
+end
+
+local function showProximityPrompts()
+    if proximityConnection then
+        proximityConnection:Disconnect()
+        proximityConnection = nil
+    end
+
+    for prompt, state in pairs(originalPrompts) do
+        if prompt and prompt:IsA("ProximityPrompt") then
+            prompt.Enabled = state
+        end
+    end
+    originalPrompts = {}
+end
 
 local function getEquippedWeapon()
     local char = LocalPlayer.Character
@@ -68,13 +103,19 @@ end
 
 local function updateLine()
     if not selectedTarget or not selectedTarget.Character or not selectedTarget.Character:FindFirstChild("Head") then
-        if line then line:Remove() line = nil end
+        if line then
+            line:Remove()
+            line = nil
+        end
         return
     end
 
     local localChar = LocalPlayer.Character
     if not localChar or not localChar:FindFirstChild("Head") then
-        if line then line:Remove() line = nil end
+        if line then
+            line:Remove()
+            line = nil
+        end
         return
     end
 
@@ -161,7 +202,10 @@ UserInputService.InputBegan:Connect(function(input, processed)
         if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
             if selectedTarget then
                 selectedTarget = nil
-                if line then line:Remove() line = nil end
+                if line then
+                    line:Remove()
+                    line = nil
+                end
             else
                 selectedTarget = findNearestToMouse()
                 if selectedTarget then
@@ -189,34 +233,24 @@ RunService.RenderStepped:Connect(function()
             smartShoot(selectedTarget)
         end
 
+        -- Управление ProximityPrompt для AntiBuy
         if SilentAim.EnabledAntiBuy then
-            if selectedTarget ~= nil then
-                if connection then
-                    connection:Disconnect()
-                end
-                connection = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
-                    prompt:SetInputEnabled(false)
-                end)
-                UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                    if gameProcessed then return end
-                    if input.KeyCode == Enum.KeyCode.E then
-                        return
-                    end
-                end)
-            end
+            hideProximityPrompts()
         else
-            if connection then
-                connection:Disconnect()
-                connection = nil
-            end
+            showProximityPrompts()
         end
+    else
+        showProximityPrompts()
     end
 end)
 
 LocalPlayer.CharacterAdded:Connect(function()
     if SilentAim.Enabled then
         selectedTarget = nil
-        if line then line:Remove() line = nil end
+        if line then
+            line:Remove()
+            line = nil
+        end
     end
 end)
 
@@ -224,7 +258,10 @@ Players.PlayerRemoving:Connect(function(player)
     if SilentAim.Enabled then
         if player == selectedTarget then
             selectedTarget = nil
-            if line then line:Remove() line = nil end
+            if line then
+                line:Remove()
+                line = nil
+            end
         end
     end
 end)
@@ -237,12 +274,11 @@ end
 function SilentAim:Disable()
     isShooting = false
     selectedTarget = nil
-    line:Remove()
-    line = nil
-    if connection then
-        connection:Disconnect()
-        connection = nil
+    if line then
+        line:Remove()
+        line = nil
     end
+    showProximityPrompts()
     self.Enabled = false
     if self._StompSwitch then self._StompSwitch.Value = false end
 end
@@ -270,6 +306,13 @@ function SilentAim:drawModule(MainTab, Notifier)
 
     Folder.SwitchAndBinding("AntiBuy", function(st)
         self.EnabledAntiBuy = st
+        if self.Enabled then
+            if st then
+                hideProximityPrompts()
+            else
+                showProximityPrompts()
+            end
+        end
     end)
 
     return self
