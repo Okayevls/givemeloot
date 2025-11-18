@@ -105,12 +105,14 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
         AutoRedeem = "src/Main/Module/Impl/AutoRedeem.lua",
         Esp = "src/Main/Module/Impl/Esp.lua",
         AspectRatio = "src/Main/Module/Impl/AspectRatio.lua",
+        InfStamina = "src/Main/Module/Impl/InfStamina.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
 
     local CombatTab = Window.Tab("Combat", 7485051733)
     local CharacterTab = Window.Tab("Character", 16149111790)
     local VisualTab = Window.Tab("Visuals", 16149111790)
+    local PlayerTab = Window.Tab("Player", 16149111790)
     local OtherTab = Window.Tab("Other", 16149111790)
 
     local SilentAim = loader:Get("SilentAim"):drawModule(CombatTab, Notifier)
@@ -120,6 +122,8 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
 
     local Esp = loader:Get("Esp"):drawModule(VisualTab)
     local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab)
+
+    local InfStamina = loader:Get("InfStamina"):drawModule(PlayerTab)
 
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
     local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
