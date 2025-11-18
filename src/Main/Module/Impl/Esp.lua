@@ -9,88 +9,67 @@ local CoreGui = game:GetService("CoreGui")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
+-- Папка для ESP
 local espFolder = Instance.new("Folder")
 espFolder.Name = "ESP"
 espFolder.Parent = CoreGui
 
+-- Настройки ESP
 local SETTINGS = {
-    Color = Color3.fromRGB(255, 255, 255),
-    ShowName = false,
-    ShowBox = false,
-    ShowBackground = false,
-    TextSize = 14, -- фиксированный размер текста
-    BoxSize = 1,   -- фиксированный размер Box (OutlineTransparency = 0)
+    BoxSize = Vector2.new(50, 50), -- размер кубика
+    RainbowSpeed = 2,              -- скорость переливания
 }
 
 local espData = {}
 
--- Скрываем оригинальные имена
-local function hideOriginalNames(character)
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+-- Генератор переливающегося цвета (двухцветного)
+local function rainbowColor(t)
+    local r = math.sin(t) * 0.5 + 0.5
+    local g = math.sin(t + 2) * 0.5 + 0.5
+    local b = math.sin(t + 4) * 0.5 + 0.5
+    return Color3.new(r, g, b)
+end
+
+-- Создание 2D кубика ESP
+local function createESP(character)
+    local box = Instance.new("Frame")
+    box.Size = UDim2.new(0, SETTINGS.BoxSize.X, 0, SETTINGS.BoxSize.Y)
+    box.BorderSizePixel = 2
+    box.BackgroundTransparency = 0.5
+    box.Position = UDim2.new(0, 0, 0, 0)
+    box.Parent = espFolder
+
+    return {box = box, character = character}
+end
+
+-- Обновление позиции и цвета кубика
+local function updateESP(data, time)
+    local char = data.character
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then
+        data.box.Visible = false
+        return
     end
+
+    local screenPos, onScreen = Camera:WorldToViewportPoint(root.Position)
+    data.box.Position = UDim2.new(0, screenPos.X - SETTINGS.BoxSize.X/2, 0, screenPos.Y - SETTINGS.BoxSize.Y/2)
+    data.box.Visible = onScreen
+
+    -- Переливающийся двухцветный эффект
+    local color1 = rainbowColor(time * SETTINGS.RainbowSpeed)
+    local color2 = rainbowColor(time * SETTINGS.RainbowSpeed + math.pi)
+    data.box.BackgroundColor3 = color1:Lerp(color2, 0.5)
 end
 
--- Создание ESP для игрока
-local function createESP(character, name)
-    hideOriginalNames(character)
-
-    local highlight = Instance.new("Highlight")
-    highlight.Name = name .. "_ESP"
-    highlight.Adornee = character
-    highlight.FillTransparency = 1
-    highlight.OutlineColor = SETTINGS.Color
-    highlight.OutlineTransparency = 0 -- всегда видно
-    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    highlight.Parent = espFolder
-
-    local billboard = Instance.new("BillboardGui")
-    billboard.Name = name .. "_Info"
-    billboard.Adornee = character:WaitForChild("Head")
-    billboard.Size = UDim2.new(0, 120, 0, 20)
-    billboard.StudsOffset = Vector3.new(0, 2, 0)
-    billboard.AlwaysOnTop = true
-    billboard.Enabled = true
-    billboard.Parent = espFolder
-
-    local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, 0, 1, 0)
-    nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
-    nameLabel.BackgroundColor3 = Color3.new(0,0,0)
-    nameLabel.TextColor3 = SETTINGS.Color
-    nameLabel.TextSize = SETTINGS.TextSize
-    nameLabel.Font = Enum.Font.Gotham
-    nameLabel.Text = name
-    nameLabel.BorderSizePixel = 0
-    nameLabel.Visible = SETTINGS.ShowName
-    nameLabel.Parent = billboard
-
-    return {highlight, billboard, character, nameLabel}
-end
-
-local function updateESP(data)
-    if not Esp.Enabled then return end
-    local highlight, billboard, character, nameLabel = data[1], data[2], data[3], data[4]
-    local root = character and character:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-
-    -- Всегда включаем
-    highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
-    billboard.Enabled = SETTINGS.ShowName
-    nameLabel.Visible = SETTINGS.ShowName
-    nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
-end
-
--- Настройка ESP для игрока
+-- Настройка ESP для всех игроков
 local function setupESP(plr)
     plr.CharacterAdded:Connect(function(char)
         task.wait(0.5)
-        espData[plr] = createESP(char, plr.Name)
+        espData[plr] = createESP(char)
     end)
 
     if plr.Character then
-        espData[plr] = createESP(plr.Character, plr.Name)
+        espData[plr] = createESP(plr.Character)
     end
 end
 
@@ -100,75 +79,45 @@ end
 Players.PlayerAdded:Connect(setupESP)
 Players.PlayerRemoving:Connect(function(plr)
     if espData[plr] then
-        for _, v in ipairs(espData[plr]) do
-            if typeof(v) == "Instance" then v:Destroy() end
-        end
+        espData[plr].box:Destroy()
         espData[plr] = nil
     end
 end)
 
+-- Главный цикл обновления
 RunService.RenderStepped:Connect(function()
     if not Esp.Enabled then return end
+    local time = tick()
     for _, data in pairs(espData) do
-        if data[3] and data[3].Parent then
-            updateESP(data)
+        if data.character and data.character.Parent then
+            updateESP(data, time)
         end
     end
 end)
 
--- Включение / выключение
+-- Включение / выключение ESP
 function Esp:Enable()
-    if self.Enabled then return end
     self.Enabled = true
     for _, data in pairs(espData) do
-        data[1].OutlineTransparency = SETTINGS.ShowBox and 0 or 1
-        data[2].Enabled = true
-        data[4].Visible = SETTINGS.ShowName
+        data.box.Visible = true
     end
 end
 
 function Esp:Disable()
     self.Enabled = false
     for _, data in pairs(espData) do
-        data[1].OutlineTransparency = 1
-        data[2].Enabled = false
-        data[4].Visible = false
+        data.box.Visible = false
     end
 end
 
--- UI
 function Esp:drawModule(MainTab)
-    local Folder = MainTab.Folder("ESP", "[Info] Shows all players with boxes")
+    local Folder = MainTab.Folder("ESP", "[Info] 2D Rainbow ESP Cubes")
 
     Folder.Switch("ESP Enabled", function(Status)
-        if Status then self:Enable() else self:Disable() end
-    end)
-
-    Folder.Switch("Show Box", function(State)
-        SETTINGS.ShowBox = State
-        if self.Enabled then
-            for _, data in pairs(espData) do
-                data[1].OutlineTransparency = State and 0 or 1
-            end
-        end
-    end)
-
-    Folder.Switch("Show Name", function(State)
-        SETTINGS.ShowName = State
-        if self.Enabled then
-            for _, data in pairs(espData) do
-                data[4].Visible = State
-                data[2].Enabled = State
-            end
-        end
-    end)
-
-    Folder.Switch("Show Background", function(State)
-        SETTINGS.ShowBackground = State
-        if self.Enabled then
-            for _, data in pairs(espData) do
-                data[4].BackgroundTransparency = State and 0.5 or 1
-            end
+        if Status then
+            self:Enable()
+        else
+            self:Disable()
         end
     end)
 
