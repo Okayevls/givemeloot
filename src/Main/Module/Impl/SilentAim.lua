@@ -13,6 +13,8 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local ContextActionService = game:GetService("ContextActionService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
+local CollectionService = game:GetService("CollectionService")
+
 local LocalPlayer = Players.LocalPlayer
 
 local selectedTarget = nil
@@ -101,6 +103,50 @@ local function updateLine()
     end
 end
 
+
+local function smartShoot(targetPlayer)
+    local gun = getEquippedWeapon()
+    if not gun then return end
+
+    local rayParams = RaycastParams.new()
+    rayParams.FilterDescendantsInstances = {self.Character, CollectionService:GetTagged("BulletPassThrough"), self:IgnoreOccupantsAndVehicles()}
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
+    local targetHead = targetPlayer.Character:FindFirstChild("Head")
+    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not targetHead or not targetRoot then return end
+
+    local hitParts = {}
+    local bulletPath = {}
+
+    local worldPos = gun.Main:WaitForChild("Front")
+    local cframe = CFrame.new(worldPos, targetPlayer)
+    local rayResult = workspace:Raycast(worldPos, cframe.LookVector * 100000, rayParams)
+
+    if rayResult then
+        local instance = rayResult.Instance
+        local humanoid = instance.Parent.Parent:FindFirstChild("Humanoid") or instance.Parent:FindFirstChild("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            table.insert(hitParts, {instance, instance.Position, instance.CFrame:ToObjectSpace(CFrame.new(rayResult.Position))})
+        end
+    end
+
+    local endPos = rayResult and rayResult.Position or (cframe * CFrame.new(0,0,-100000)).Position
+    table.insert(bulletPath, endPos)
+
+    gun.Communication:FireServer(hitParts, bulletPath, true)
+
+   --local args = {
+   --    {
+   --        {    targetHead,    predictedPos,    CFrame.new()   }
+   --    },
+   --    {targetHead},
+   --    true
+   --}
+
+   -- gun.Communication:FireServer(unpack(args))
+end
+
 --local function smartShoot(targetPlayer)
 --    local gun = getEquippedWeapon()
 --    if not gun then return end
@@ -122,31 +168,6 @@ end
 --
 --    gun.Communication:FireServer(unpack(args))
 --end
-local function smartShoot(targetPlayer)
-    local gun = getEquippedWeapon()
-    if not gun then return end
-
-    local root = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-    local head = targetPlayer.Character:FindFirstChild("Head")
-    if not head or not root then return end
-
-    -- предсказание движения
-    local predicted = head.Position + root.Velocity * 0.15
-
-    -- hitData: оборачиваем в таблицу таблиц
-    local hitData = {
-        { head, predicted, CFrame.new(predicted) }
-    }
-
-    local args = {
-        { hitData },  -- !!! Оборачиваем в список списков
-        { head },
-        true         -- флаг сквозь стены
-    }
-
-    gun.Communication:FireServer(unpack(args))
-end
-
 
 local function stomp(targetPlayer)
     local args = { targetPlayer.Character }
