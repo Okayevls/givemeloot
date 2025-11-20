@@ -104,24 +104,37 @@ local function updateLine()
 end
 
 local function GetVehicleFromSeat(seat)
-    if not seat or not seat:IsDescendantOf(workspace.CarChassis_Workspace) then return false end
-    if seat.Parent.Name ~= "Body" or not seat.Parent.Parent then return false end
+    if not seat or not seat:IsDescendantOf(workspace.CarChassis_Workspace) then return nil end
+    if seat.Parent.Name ~= "Body" or not seat.Parent.Parent then return nil end
     return seat.Parent
 end
 
-
+-- Создает список объектов для игнорирования при Raycast
 local function IgnoreOccupantsAndVehicles()
-    local vehicle = GetVehicleFromSeat(LocalPlayer.Humanoid.SeatPart)
+    local ignoreList = {}
+    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        table.insert(ignoreList, LocalPlayer.Character)
+    end
+
+    -- Добавляем транспорт
+    local seatPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.SeatPart
+    local vehicle = GetVehicleFromSeat(seatPart)
     if vehicle then
-        local ignoreList = {vehicle}
+        table.insert(ignoreList, vehicle)
         for _, part in pairs(vehicle:GetDescendants()) do
-            if part:IsA("VehicleSeat") or part:IsA("Seat") and part.Occupant then
+            if (part:IsA("VehicleSeat") or part:IsA("Seat")) and part.Occupant then
                 table.insert(ignoreList, part.Occupant.Parent)
             end
         end
-        return ignoreList
     end
-    return nil
+
+    -- Добавляем объекты с тегом "BulletPassThrough"
+    for _, obj in pairs(CollectionService:GetTagged("BulletPassThrough")) do
+        table.insert(ignoreList, obj)
+    end
+
+    return ignoreList
 end
 
 local function smartShoot(targetPlayer)
@@ -135,22 +148,16 @@ local function smartShoot(targetPlayer)
     local worldPos = gun.Main:WaitForChild("Front").Position
     local predictedPos = targetHead.Position + (targetRoot.Velocity * 0.15)
 
+    -- Настраиваем RaycastParams
     local rayParams = RaycastParams.new()
-    local ignoreList = {LocalPlayer.Character, unpack(CollectionService:GetTagged("BulletPassThrough"))}
-    local vehicles = IgnoreOccupantsAndVehicles()
-    if vehicles then
-        for _, v in ipairs(vehicles) do
-            table.insert(ignoreList, v)
-        end
-    end
-    rayParams.FilterDescendantsInstances = ignoreList
+    rayParams.FilterDescendantsInstances = IgnoreOccupantsAndVehicles()
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
+    -- Raycast
+    local rayResult = workspace:Raycast(worldPos, (predictedPos - worldPos).Unit * 100000, rayParams)
 
     local hitParts = {}
     local bulletPath = {}
-
-    local cframe = CFrame.new(worldPos, predictedPos)
-    local rayResult = workspace:Raycast(worldPos, cframe.LookVector * 100000, rayParams)
 
     if rayResult then
         local instance = rayResult.Instance
@@ -160,12 +167,11 @@ local function smartShoot(targetPlayer)
         end
     end
 
-    local endPos = rayResult and rayResult.Position or (cframe * CFrame.new(0,0,-100000)).Position
+    local endPos = rayResult and rayResult.Position or predictedPos
     table.insert(bulletPath, endPos)
 
     gun.Communication:FireServer(hitParts, bulletPath, true)
 end
-
 
 --local function smartShoot(targetPlayer)
 --    local gun = getEquippedWeapon()
