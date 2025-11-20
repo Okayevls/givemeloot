@@ -113,12 +113,18 @@ local function smartShoot(targetPlayer)
     local predictedPos = targetHead.Position + (velocity * 0.15)
 
     local args = {
-        {
-            {    targetHead,    predictedPos,    CFrame.new()   }
-        },
-        {targetHead},
-        true
+        nil, -- первый параметр (с позиции оружия до цели) можно оставить nil для обхода коллизий
+        {targetHead}, -- цель
+        true -- флаг "стрельба сквозь стены"
     }
+
+    --local args = {
+    --    {
+    --        {    targetHead,    predictedPos,    CFrame.new()   }
+    --    },
+    --    {targetHead},
+    --    true
+    --}
 
     gun.Communication:FireServer(unpack(args))
 end
