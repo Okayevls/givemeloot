@@ -133,20 +133,20 @@ local function smartShoot(targetPlayer)
     -- предсказание движения
     local predicted = head.Position + root.Velocity * 0.15
 
-    -- hitData: серверу НЕ НУЖНО ничего рейкастить — он принимает готовое попадание
+    -- hitData: оборачиваем в таблицу таблиц
     local hitData = {
-        {
-            head,                   -- объект, по которому "попали"
-            predicted,              -- куда попали
-            CFrame.new(predicted)   -- ориентация попадания
-        }
+        { head, predicted, CFrame.new(predicted) }
     }
 
-    local targetList = { head }
+    local args = {
+        { hitData },  -- !!! Оборачиваем в список списков
+        { head },
+        true         -- флаг сквозь стены
+    }
 
-    -- третий аргумент = allowThroughWalls
-    gun.Communication:FireServer(hitData, targetList, true)
+    gun.Communication:FireServer(unpack(args))
 end
+
 
 local function stomp(targetPlayer)
     local args = { targetPlayer.Character }
