@@ -118,7 +118,7 @@ local function IgnoreOccupantsAndVehicles()
     end
 
     -- Добавляем транспорт
-    local seatPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.SeatPart
+    local seatPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and workspace.Steaskua.Humanoid.SeatPart
     local vehicle = GetVehicleFromSeat(seatPart)
     if vehicle then
         table.insert(ignoreList, vehicle)
