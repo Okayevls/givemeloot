@@ -103,40 +103,6 @@ local function updateLine()
     end
 end
 
-local function GetVehicleFromSeat(seat)
-    if not seat or not seat:IsDescendantOf(workspace.CarChassis_Workspace) then return nil end
-    if seat.Parent.Name ~= "Body" or not seat.Parent.Parent then return nil end
-    return seat.Parent
-end
-
--- Создает список объектов для игнорирования при Raycast
-local function IgnoreOccupantsAndVehicles()
-    local ignoreList = {}
-    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
-    if humanoid then
-        table.insert(ignoreList, LocalPlayer.Character)
-    end
-
-    -- Добавляем транспорт
-    local seatPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and workspace.Steaskua.Humanoid.SeatPart
-    local vehicle = GetVehicleFromSeat(seatPart)
-    if vehicle then
-        table.insert(ignoreList, vehicle)
-        for _, part in pairs(vehicle:GetDescendants()) do
-            if (part:IsA("VehicleSeat") or part:IsA("Seat")) and part.Occupant then
-                table.insert(ignoreList, part.Occupant.Parent)
-            end
-        end
-    end
-
-    -- Добавляем объекты с тегом "BulletPassThrough"
-    for _, obj in pairs(CollectionService:GetTagged("BulletPassThrough")) do
-        table.insert(ignoreList, obj)
-    end
-
-    return ignoreList
-end
-
 local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
@@ -145,55 +111,19 @@ local function smartShoot(targetPlayer)
     local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not targetHead or not targetRoot then return end
 
-    local worldPos = gun.Main:WaitForChild("Front").Position
-    local predictedPos = targetHead.Position + (targetRoot.Velocity * 0.15)
+    local velocity = targetRoot.Velocity
+    local predictedPos = targetHead.Position + (velocity * 0.15)
 
-    -- Настраиваем RaycastParams
-    local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = IgnoreOccupantsAndVehicles()
-    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    local args = {
+        {
+            {    targetHead,    predictedPos,    CFrame.new()   }
+        },
+        {targetHead},
+        true
+    }
 
-    -- Raycast
-    local rayResult = workspace:Raycast(worldPos, (predictedPos - worldPos).Unit * 100000, rayParams)
-
-    local hitParts = {}
-    local bulletPath = {}
-
-    if rayResult then
-        local instance = rayResult.Instance
-        local humanoid = instance.Parent.Parent:FindFirstChild("Humanoid") or instance.Parent:FindFirstChild("Humanoid")
-        if humanoid and humanoid.Health > 0 then
-            table.insert(hitParts, {instance, instance.Position, instance.CFrame:ToObjectSpace(CFrame.new(rayResult.Position))})
-        end
-    end
-
-    local endPos = rayResult and rayResult.Position or predictedPos
-    table.insert(bulletPath, endPos)
-
-    gun.Communication:FireServer(hitParts, bulletPath, true)
+    gun.Communication:FireServer(unpack(args))
 end
-
---local function smartShoot(targetPlayer)
---    local gun = getEquippedWeapon()
---    if not gun then return end
---
---    local targetHead = targetPlayer.Character:FindFirstChild("Head")
---    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
---    if not targetHead or not targetRoot then return end
---
---    local velocity = targetRoot.Velocity
---    local predictedPos = targetHead.Position + (velocity * 0.15)
---
---    local args = {
---        {
---            {    targetHead,    predictedPos,    CFrame.new()   }
---        },
---        {targetHead},
---        true
---    }
---
---    gun.Communication:FireServer(unpack(args))
---end
 
 local function stomp(targetPlayer)
     local args = { targetPlayer.Character }
