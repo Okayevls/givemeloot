@@ -109,7 +109,7 @@ local function smartShoot(targetPlayer)
     if not gun then return end
 
     local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {self.Character, CollectionService:GetTagged("BulletPassThrough"), self:IgnoreOccupantsAndVehicles()}
+    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, CollectionService:GetTagged("BulletPassThrough"), self:IgnoreOccupantsAndVehicles()}
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
     local targetHead = targetPlayer.Character:FindFirstChild("Head")
