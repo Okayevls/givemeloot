@@ -102,7 +102,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
         SilentAim = "src/Main/Module/Impl/SilentAim.lua",
         Fly = "src/Main/Module/Impl/Fly.lua",
         ChatSpy = "src/Main/Module/Impl/ChatSpy.lua",
-        AutoRedeem = "src/Main/Module/Impl/AutoRedeem.lua",
+        RedeemCode = "src/Main/Module/Impl/RedeemCode.lua",
         Esp = "src/Main/Module/Impl/Esp.lua",
         AspectRatio = "src/Main/Module/Impl/AspectRatio.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
@@ -123,7 +123,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab, Notifier)
 
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
-    local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab, Notifier)
+    local AutoRedeem = loader:Get("RedeemCode"):drawModule(OtherTab, Notifier)
 
     print("Base ModuleManager Build | 0x000000000147")
 end

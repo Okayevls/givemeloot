@@ -101,32 +101,51 @@ local function updateLine()
     end
 end
 
+--local function smartShoot(targetPlayer)
+--    local gun = getEquippedWeapon()
+--    if not gun then return end
+--
+--    local targetHead = targetPlayer.Character:FindFirstChild("Head")
+--    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+--    if not targetHead or not targetRoot then return end
+--
+--    local velocity = targetRoot.Velocity
+--    local predictedPos = targetHead.Position + (velocity * 0.15)
+--
+--    local args = {
+--        {
+--            {    targetHead,    predictedPos,    CFrame.new()   }
+--        },
+--        {targetHead},
+--        true
+--    }
+--
+--    gun.Communication:FireServer(unpack(args))
+--end
 local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
-    local targetHead = targetPlayer.Character:FindFirstChild("Head")
-    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not targetHead or not targetRoot then return end
+    local root = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local head = targetPlayer.Character:FindFirstChild("Head")
+    if not head or not root then return end
 
-    local velocity = targetRoot.Velocity
-    local predictedPos = targetHead.Position + (velocity * 0.15)
+    -- предсказание движения
+    local predicted = head.Position + root.Velocity * 0.15
 
-    local args = {
-        nil, -- первый параметр (с позиции оружия до цели) можно оставить nil для обхода коллизий
-        {targetHead}, -- цель
-        true -- флаг "стрельба сквозь стены"
+    -- hitData: серверу НЕ НУЖНО ничего рейкастить — он принимает готовое попадание
+    local hitData = {
+        {
+            head,                   -- объект, по которому "попали"
+            predicted,              -- куда попали
+            CFrame.new(predicted)   -- ориентация попадания
+        }
     }
 
-    --local args = {
-    --    {
-    --        {    targetHead,    predictedPos,    CFrame.new()   }
-    --    },
-    --    {targetHead},
-    --    true
-    --}
+    local targetList = { head }
 
-    gun.Communication:FireServer(unpack(args))
+    -- третий аргумент = allowThroughWalls
+    gun.Communication:FireServer(hitData, targetList, true)
 end
 
 local function stomp(targetPlayer)
