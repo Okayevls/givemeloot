@@ -103,13 +103,26 @@ local function updateLine()
     end
 end
 
+local function IgnoreOccupantsAndVehicles()
+    local vehicle = self:GetVehicleFromSeat(self.Humanoid.SeatPart)
+    if vehicle then
+        local ignoreList = {vehicle}
+        for _, part in pairs(vehicle:GetDescendants()) do
+            if part:IsA("VehicleSeat") or part:IsA("Seat") and part.Occupant then
+                table.insert(ignoreList, part.Occupant.Parent)
+            end
+        end
+        return ignoreList
+    end
+    return nil
+end
 
 local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
     local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, CollectionService:GetTagged("BulletPassThrough"), self:IgnoreOccupantsAndVehicles()}
+    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, CollectionService:GetTagged("BulletPassThrough"), IgnoreOccupantsAndVehicles()}
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
     local targetHead = targetPlayer.Character:FindFirstChild("Head")
