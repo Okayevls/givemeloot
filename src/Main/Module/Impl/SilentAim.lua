@@ -103,8 +103,15 @@ local function updateLine()
     end
 end
 
+local function GetVehicleFromSeat(seat)
+    if not seat or not seat:IsDescendantOf(workspace.CarChassis_Workspace) then return false end
+    if seat.Parent.Name ~= "Body" or not seat.Parent.Parent then return false end
+    return seat.Parent
+end
+
+
 local function IgnoreOccupantsAndVehicles()
-    local vehicle = self:GetVehicleFromSeat(self.Humanoid.SeatPart)
+    local vehicle = GetVehicleFromSeat(LocalPlayer.Humanoid.SeatPart)
     if vehicle then
         local ignoreList = {vehicle}
         for _, part in pairs(vehicle:GetDescendants()) do
@@ -121,19 +128,28 @@ local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
-    local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, CollectionService:GetTagged("BulletPassThrough"), IgnoreOccupantsAndVehicles()}
-    rayParams.FilterType = Enum.RaycastFilterType.Exclude
-
     local targetHead = targetPlayer.Character:FindFirstChild("Head")
     local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not targetHead or not targetRoot then return end
 
+    local worldPos = gun.Main:WaitForChild("Front").Position
+    local predictedPos = targetHead.Position + (targetRoot.Velocity * 0.15)
+
+    local rayParams = RaycastParams.new()
+    local ignoreList = {LocalPlayer.Character, unpack(CollectionService:GetTagged("BulletPassThrough"))}
+    local vehicles = IgnoreOccupantsAndVehicles()
+    if vehicles then
+        for _, v in ipairs(vehicles) do
+            table.insert(ignoreList, v)
+        end
+    end
+    rayParams.FilterDescendantsInstances = ignoreList
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
     local hitParts = {}
     local bulletPath = {}
 
-    local worldPos = gun.Main:WaitForChild("Front")
-    local cframe = CFrame.new(worldPos, targetPlayer)
+    local cframe = CFrame.new(worldPos, predictedPos)
     local rayResult = workspace:Raycast(worldPos, cframe.LookVector * 100000, rayParams)
 
     if rayResult then
@@ -148,17 +164,8 @@ local function smartShoot(targetPlayer)
     table.insert(bulletPath, endPos)
 
     gun.Communication:FireServer(hitParts, bulletPath, true)
-
-   --local args = {
-   --    {
-   --        {    targetHead,    predictedPos,    CFrame.new()   }
-   --    },
-   --    {targetHead},
-   --    true
-   --}
-
-   -- gun.Communication:FireServer(unpack(args))
 end
+
 
 --local function smartShoot(targetPlayer)
 --    local gun = getEquippedWeapon()
