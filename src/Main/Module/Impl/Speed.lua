@@ -42,13 +42,15 @@ function Speed:Disable()
     self.Enabled = false
 end
 
-function Speed:drawModule(MainTab)
+function Speed:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
+            Notifier:Send("[Legacy.wip] Speed - Enable!", 6)
             self:Enable()
         else
+            Notifier:Send("[Legacy.wip] Speed - Disable!", 6)
             self:Disable()
         end
     end)

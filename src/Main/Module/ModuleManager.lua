@@ -116,16 +116,16 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
 
     local SilentAim = loader:Get("SilentAim"):drawModule(CombatTab, Notifier)
 
-    local Speed = loader:Get("Speed"):drawModule(CharacterTab)
-    local Fly = loader:Get("Fly"):drawModule(CharacterTab)
+    local Speed = loader:Get("Speed"):drawModule(CharacterTab, Notifier)
+    local Fly = loader:Get("Fly"):drawModule(CharacterTab, Notifier)
 
-    local Esp = loader:Get("Esp"):drawModule(VisualTab)
-    local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab)
+    local Esp = loader:Get("Esp"):drawModule(VisualTab, Notifier)
+    local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab, Notifier)
 
-    local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab)
-    local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab)
+    local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
+    local AutoRedeem = loader:Get("AutoRedeem"):drawModule(OtherTab, Notifier)
 
-    print("Base ModuleManager Build | 0x000000000145")
+    print("Base ModuleManager Build | 0x000000000146")
 end
 
 return ModuleManager, Notifier

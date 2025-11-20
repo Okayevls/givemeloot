@@ -83,12 +83,14 @@ function Fly:Destroy()
     self:Disable()
 end
 
-function Fly:drawModule(MainTab)
+function Fly:drawModule(MainTab, Notifier)
    local Folder = MainTab.Folder("Fly", "[Info] Allows the player to fly")
    Folder.SwitchAndBinding("Toggle", function(Status)
        if Status then
+           Notifier:Send("[Legacy.wip] Fly - Enable!",6)
            self:Enable()
        else
+           Notifier:Send("[Legacy.wip] Fly - Disable!",6)
            self:Disable()
        end
    end)

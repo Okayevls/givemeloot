@@ -21,12 +21,14 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
-function AspectRatio:drawModule(MainTab)
+function AspectRatio:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("AspectRatio", "[Info] Stretches the screen")
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
+            Notifier:Send("[Legacy.wip] AspectRatio - Enable!",6)
             self:Enable()
         else
+            Notifier:Send("[Legacy.wip] AspectRatio - Disable!",6)
             self:Disable()
         end
     end)

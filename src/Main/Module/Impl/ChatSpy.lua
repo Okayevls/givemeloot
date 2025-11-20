@@ -17,12 +17,14 @@ function ChatSpy:Disable()
 end
 
 
-function ChatSpy:drawModule(MainTab)
+function ChatSpy:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("ChatSpy", "[Info] Makes the chat visible")
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
+            Notifier:Send("[Legacy.wip] ChatSpy - Enable!",6)
             self:Enable()
         else
+            Notifier:Send("[Legacy.wip] ChatSpy - Disable!",6)
             self:Disable()
         end
     end)

@@ -137,11 +137,17 @@ function Esp:Disable()
 end
 
 -- UI
-function Esp:drawModule(MainTab)
+function Esp:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("ESP", "[Info] Shows all players with boxes")
 
     Folder.Switch("ESP Enabled", function(Status)
-        if Status then self:Enable() else self:Disable() end
+        if Status then
+            Notifier:Send("[Legacy.wip] Esp - Enable!",6)
+            self:Enable()
+        else
+            Notifier:Send("[Legacy.wip] Esp - Disable!",6)
+            self:Disable()
+        end
     end)
 
     Folder.Switch("Show Box", function(State)

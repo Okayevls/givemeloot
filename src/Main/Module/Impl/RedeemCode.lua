@@ -1,8 +1,8 @@
-local AutoRedeem = {}
-AutoRedeem.__index = AutoRedeem
+local RedeemCode = {}
+RedeemCode.__index = RedeemCode
 
-AutoRedeem.Enabled = false
-AutoRedeem._Switch = nil
+RedeemCode.Enabled = false
+RedeemCode._Switch = nil
 
 local CODES = {
     "20MVISITS",
@@ -33,7 +33,7 @@ local function findRemote()
         return true
     end
 
-    warn("[AutoRedeem] Remote 'RedeemCode' не найден!")
+    warn("[RedeemCode] Remote 'RedeemCode' не найден!")
     return false
 end
 
@@ -51,18 +51,18 @@ local function redeem(code)
 
     if success then
         redeemed[code] = true
-        print("[AutoRedeem] Активирован код:", code)
+        print("[RedeemCode] Активирован код:", code)
     else
-        warn("[AutoRedeem] Ошибка при вводе", code, ":", result)
+        warn("[RedeemCode] Ошибка при вводе", code, ":", result)
     end
 end
 
-function AutoRedeem:Run()
+function RedeemCode:Run()
     if not self.Enabled then return end
 
     if not RedeemRemote then
         if not findRemote() then
-            warn("[AutoRedeem] Не найден Remote — остановка.")
+            warn("[RedeemCode] Не найден Remote — остановка.")
             return
         end
     end
@@ -72,17 +72,17 @@ function AutoRedeem:Run()
         task.wait(1)
     end
 
-    print("[AutoRedeem] Все коды введены.")
+    print("[RedeemCode] Все коды введены.")
     self.Enabled = false
 
     if self._Switch then
         self._Switch.Value = false
     end
 
-    print("[AutoRedeem] Модуль отключён автоматически.")
+    print("[RedeemCode] Модуль отключён автоматически.")
 end
 
-function AutoRedeem:Enable()
+function RedeemCode:Enable()
     if self.Enabled then return end
     self.Enabled = true
 
@@ -91,17 +91,19 @@ function AutoRedeem:Enable()
     end)
 end
 
-function AutoRedeem:Disable()
+function RedeemCode:Disable()
     self.Enabled = false
 end
 
-function AutoRedeem:drawModule(MainTab)
-    local Folder = MainTab.Folder("AutoRedeem", "[Info] Auto Redeem all game code")
+function RedeemCode:drawModule(MainTab, Notifier)
+    local Folder = MainTab.Folder("RedeemCode", "[Info] Auto Redeem all game code")
 
     self._Switch = Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
+            Notifier:Send("[Legacy.wip] RedeemCode - Enable!",6)
             self:Enable()
         else
+            Notifier:Send("[Legacy.wip] RedeemCode - Disable!",6)
             self:Disable()
         end
     end)
@@ -109,4 +111,4 @@ function AutoRedeem:drawModule(MainTab)
     return self
 end
 
-return AutoRedeem
+return RedeemCode
