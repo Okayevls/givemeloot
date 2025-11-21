@@ -1,6 +1,2 @@
-[main 4ea36fa] Auto-commit 21.11.2025  9:44:59,07
- 7 files changed, 4950 insertions(+), 118 deletions(-)
- create mode 100644 src/Main/Gui/GuiPanel.lua
- create mode 100644 src/Main/Gui/Signal.lua
- delete mode 100644 src/Main/Util/Render/UFontRenderer.lua
- delete mode 100644 src/Main/Util/Render/URender2D.lua
+[main 3dcbc4e] Auto-commit 21.11.2025  9:53:50,75
+ 2 files changed, 20 insertions(+), 8 deletions(-)

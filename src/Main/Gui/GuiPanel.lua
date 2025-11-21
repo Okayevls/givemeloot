@@ -418,8 +418,11 @@ do
     function utility:GetHoverObject()
         local objects = {}
         for i,v in next, library.drawings do
-            if v.Object.Visible and v.Class == 'Square' and self:MouseOver(v.Object) then
-                table.insert(objects,v.Object)
+            if v.Object and typeof(v.Object) ~= "number" and v.Class == 'Square' then
+                local success, visible = pcall(function() return v.Object.Visible end)
+                if success and visible and self:MouseOver(v.Object) then
+                    table.insert(objects,v.Object)
+                end
             end
         end
         table.sort(objects,function(a,b)
@@ -427,6 +430,7 @@ do
         end)
         return objects[1]
     end
+
 
     function utility:Draw(class, properties)
         local blacklistedProperties = {'Object','Children','Class'}
@@ -454,26 +458,50 @@ do
         }
 
         function drawing:Update()
-            -- if drawing.Parent then
+            -- Получаем родителя
             local parent = drawing.Parent ~= nil and library.drawings[drawing.Parent.Object] or nil
             local parentSize,parentPos,parentVis = workspace.CurrentCamera.ViewportSize, Vector2.new(0,0), true;
-            if parent ~= nil then
-                parentSize = (parent.Class == 'Square' or parent.Class == 'Image') and parent.Object.Size or parent.Class == 'Text' and parent.TextBounds or workspace.CurrentCamera.ViewportSize
-                parentPos = parent.Object.Position
-                parentVis = parent.Object.Visible
+
+            if parent ~= nil and parent.Object and typeof(parent.Object) ~= "number" then
+                -- Размер родителя
+                if parent.Class == 'Square' or parent.Class == 'Image' then
+                    parentSize = typeof(parent.Object.Size) == "Vector2" and parent.Object.Size or workspace.CurrentCamera.ViewportSize
+                elseif parent.Class == 'Text' then
+                    parentSize = parent.TextBounds or workspace.CurrentCamera.ViewportSize
+                end
+
+                -- Позиция родителя
+                parentPos = typeof(parent.Object.Position) == "Vector2" and parent.Object.Position or Vector2.new(0,0)
+
+                -- Видимость родителя
+                local success, vis = pcall(function() return parent.Object.Visible end)
+                parentVis = success and vis or true
             end
 
-            if drawing.Class == 'Square' or drawing.Class == 'Image' then
-                drawing.Object.Size = typeof(drawing.Size) == 'Vector2' and drawing.Size or typeof(drawing.Size) == 'UDim2' and utility:UDim2ToVector2(drawing.Size,parentSize)
+            if drawing.Object and typeof(drawing.Object) ~= "number" then
+                -- Размер объекта
+                if drawing.Class == 'Square' or drawing.Class == 'Image' then
+                    if typeof(drawing.Size) == 'Vector2' then
+                        drawing.Object.Size = drawing.Size
+                    elseif typeof(drawing.Size) == 'UDim2' then
+                        drawing.Object.Size = utility:UDim2ToVector2(drawing.Size,parentSize)
+                    end
+                end
+
+                -- Позиция объекта
+                if drawing.Class == 'Square' or drawing.Class == 'Image' or drawing.Class == 'Circle' or drawing.Class == 'Text' then
+                    local pos = typeof(drawing.Position) == 'Vector2' and drawing.Position or utility:UDim2ToVector2(drawing.Position,parentSize)
+                    drawing.Object.Position = parentPos + pos
+                end
+
+                -- Видимость объекта
+                local visible = (parentVis and drawing.Visible)
+                local success, _ = pcall(function() drawing.Object.Visible = visible end)
+                if not success then
+                    -- Если не удалось установить Visible — игнорируем
+                end
             end
 
-            if drawing.Class == 'Square' or drawing.Class == 'Image' or drawing.Class == 'Circle' or drawing.Class == 'Text' then
-                drawing.Object.Position = parentPos + (typeof(drawing.Position) == 'Vector2' and drawing.Position or utility:UDim2ToVector2(drawing.Position,parentSize))
-            end
-
-            drawing.Object.Visible = (parentVis and drawing.Visible) and true or false
-
-            -- end
             drawing:UpdateChildren()
         end
 
@@ -508,11 +536,23 @@ do
                         local lastval = drawing[i]
 
                         if i == 'Size' and (class == 'Square' or class == 'Image') then
-                            drawing.Object.Size = utility:UDim2ToVector2(v,drawing.Parent == nil and workspace.CurrentCamera.ViewportSize or drawing.Parent.Object.Size);
-                            drawing.AbsoluteSize = drawing.Object.Size;
+                            if drawing.Object and typeof(drawing.Object) ~= "number" then
+                                local parentSize = workspace.CurrentCamera.ViewportSize
+                                if drawing.Parent and drawing.Parent.Object and typeof(drawing.Parent.Object) ~= "number" then
+                                    parentSize = drawing.Parent.Object.Size
+                                end
+                                drawing.Object.Size = utility:UDim2ToVector2(v,parentSize)
+                                drawing.AbsoluteSize = drawing.Object.Size
+                            end
                         elseif i == 'Position' and (class == 'Square' or class == 'Image' or class == 'Text') then
-                            drawing.Object.Position =  utility:UDim2ToVector2(v,drawing.Parent == nil and newVector2(0,0) or drawing.Parent.Object.Position);
-                            drawing.AbsolutePosition = drawing.Object.Position;
+                            if drawing.Object and typeof(drawing.Object) ~= "number" then
+                                local parentPos = Vector2.new(0,0)
+                                if drawing.Parent and drawing.Parent.Object and typeof(drawing.Parent.Object) ~= "number" then
+                                    parentPos = drawing.Parent.Object.Position
+                                end
+                                drawing.Object.Position = utility:UDim2ToVector2(v,parentPos)
+                                drawing.AbsolutePosition = drawing.Object.Position
+                            end
                         elseif i == 'Parent' then
                             if drawing.Parent ~= nil then
                                 drawing.Parent.Children[drawing] = nil
@@ -526,9 +566,12 @@ do
                             v = 1
                         end
 
-                        pcall(function()
-                            drawing.Object[i] = v
-                        end)
+                        if drawing.Object and typeof(drawing.Object) ~= "number" then
+                            pcall(function()
+                                drawing.Object[i] = v
+                            end)
+                        end
+
                         if drawing[i] ~= nil or i == 'Parent' then
                             drawing[i] = v
                         end
@@ -536,6 +579,7 @@ do
                         if table.find({'Size','Position','Position','Visible','Parent'},i) then
                             drawing:Update()
                         end
+
                         if table.find({'ThemeColor','OutlineThemeColor','ThemeColorOffset','OutlineThemeColorOffset'},i) and lastval ~= v then
                             library.UpdateThemeColors()
                         end
@@ -702,16 +746,24 @@ function library:init()
     self.cursor1 = utility:Draw('Triangle', {Filled = true, Color = fromrgb(255,255,255), ZIndex = self.zindexOrder.cursor});
     self.cursor2 = utility:Draw('Triangle', {Filled = true, Color = fromrgb(85,85,85), self.zindexOrder.cursor-1});
     local function updateCursor()
-        self.cursor1.Visible = self.open
-        self.cursor2.Visible = self.open
-        if self.cursor1.Visible then
-            local pos = inputservice:GetMouseLocation();
-            self.cursor1.PointA = pos;
-            self.cursor1.PointB = pos + newVector2(16,5);
-            self.cursor1.PointC = pos + newVector2(5,16);
-            self.cursor2.PointA = self.cursor1.PointA + newVector2(0, 0)
-            self.cursor2.PointB = self.cursor1.PointB + newVector2(1, 1)
-            self.cursor2.PointC = self.cursor1.PointC + newVector2(1, 1)
+        if self.cursor1 and typeof(self.cursor1) ~= "number" then
+            self.cursor1.Visible = self.open
+        end
+        if self.cursor2 and typeof(self.cursor2) ~= "number" then
+            self.cursor2.Visible = self.open
+        end
+
+        if self.cursor1 and typeof(self.cursor1) ~= "number" and self.cursor1.Visible then
+            local pos = inputservice:GetMouseLocation()
+            self.cursor1.PointA = pos
+            self.cursor1.PointB = pos + newVector2(16,5)
+            self.cursor1.PointC = pos + newVector2(5,16)
+
+            if self.cursor2 and typeof(self.cursor2) ~= "number" then
+                self.cursor2.PointA = self.cursor1.PointA + newVector2(0,0)
+                self.cursor2.PointB = self.cursor1.PointB + newVector2(1,1)
+                self.cursor2.PointC = self.cursor1.PointC + newVector2(1,1)
+            end
         end
     end
 
@@ -848,7 +900,9 @@ function library:init()
         end
 
         library.CurrentTooltip = nil;
-        tooltipObjects.background.Visible = false
+        if tooltipObjects and tooltipObjects.background and typeof(tooltipObjects.background) == "Instance" then
+            tooltipObjects.background.Visible = false
+        end
     end
 
     function self.UpdateThemeColors()
@@ -1040,28 +1094,43 @@ function library:init()
             local xSize  = 125
             local yPos  = 0
             table.sort(self.values, function(a,b)
-                return a.order < b.order;
+                return a.order < b.order
             end)
 
             for _,v in next, self.values do
-                v.objects.keyLabel.Text = tostring(v.key);
-                v.objects.valueLabel.Text = tostring(v.value);
+                if v.objects and v.objects.keyLabel and typeof(v.objects.keyLabel) == "Instance" then
+                    v.objects.keyLabel.Text = tostring(v.key)
+                end
 
-                v.objects.valueLabel.Position = newUDim2(1,-(v.objects.valueLabel.TextBounds.X + 3),0,0)
-                v.objects.background.Position = newUDim2(0,0,1,3 + yPos)
-                v.objects.background.Visible = v.enabled
+                if v.objects and v.objects.valueLabel and typeof(v.objects.valueLabel) == "Instance" then
+                    v.objects.valueLabel.Text = tostring(v.value)
+                    v.objects.valueLabel.Position = newUDim2(1,-(v.objects.valueLabel.TextBounds.X + 3),0,0)
+                end
+
+                if v.objects and v.objects.background and typeof(v.objects.background) == "Instance" then
+                    v.objects.background.Position = newUDim2(0,0,1,3 + yPos)
+                    v.objects.background.Visible = v.enabled
+                end
 
                 if v.enabled then
                     yPos = yPos + 16 + 3
-                    local x = (v.objects.keyLabel.TextBounds.X + 10 + v.objects.valueLabel.TextBounds.X)
+                    local x = 0
+                    if v.objects and v.objects.keyLabel and typeof(v.objects.keyLabel) == "Instance" then
+                        x = v.objects.keyLabel.TextBounds.X
+                    end
+                    if v.objects and v.objects.valueLabel and typeof(v.objects.valueLabel) == "Instance" then
+                        x = x + 10 + v.objects.valueLabel.TextBounds.X
+                    end
                     if x > xSize then
                         xSize = x
                     end
                 end
             end
 
-            self.objects.background.Size = newUDim2(0,xSize + 8,0,16)
-            self.objects.background.Position = self.position
+            if self.objects and self.objects.background and typeof(self.objects.background) == "Instance" then
+                self.objects.background.Size = newUDim2(0,xSize + 8,0,16)
+                self.objects.background.Position = self.position
+            end
         end
 
         function indicator:AddValue(data)
@@ -1172,9 +1241,11 @@ function library:init()
 
         function indicator:SetEnabled(bool)
             if typeof(bool) == 'boolean' then
-                self.enabled = bool;
-                self.objects.background.Visible = bool;
-                self:Update();
+                self.enabled = bool
+                if self.objects and self.objects.background and typeof(self.objects.background) == "Instance" then
+                    self.objects.background.Visible = bool
+                end
+                self:Update()
             end
         end
 
@@ -1821,12 +1892,18 @@ function library:init()
                                         end
                                     end
 
-                                    currentList:Select(newSelected);
+                                    currentList:Select(newSelected)
                                     if not currentList.multi then
-                                        currentList.open = false;
-                                        currentList.objects.openText.Text = '+';
-                                        window.dropdown.selected = nil;
-                                        window.dropdown.objects.background.Visible = false;
+                                        currentList.open = false
+                                        if currentList.objects and currentList.objects.openText and typeof(currentList.objects.openText) == "Instance" then
+                                            currentList.objects.openText.Text = '+'
+                                        end
+
+                                        window.dropdown.selected = nil
+
+                                        if window.dropdown and window.dropdown.objects and window.dropdown.objects.background and typeof(window.dropdown.objects.background) == "Instance" then
+                                            window.dropdown.objects.background.Visible = false
+                                        end
                                     end
 
                                     for idx, val in next, currentList.values do
@@ -1849,16 +1926,28 @@ function library:init()
                         end
                     end
 
-                    local y,padding = 2,2
+                    local y, padding = 2, 2
                     for idx, obj in next, self.objects.values do
                         local valueStr = list.values[idx]
-                        obj.background.Visible = valueStr ~= nil
-                        if valueStr ~= nil then
-                            obj.background.Position = newUDim2(0,2,0,y);
-                            obj.text.Text = valueStr;
-                            y = y + obj.background.Object.Size.Y + padding;
+
+                        if obj.background and typeof(obj.background) == "Instance" then
+                            obj.background.Visible = valueStr ~= nil
+
+                            if valueStr ~= nil then
+                                obj.background.Position = newUDim2(0, 2, 0, y)
+                                if obj.text and typeof(obj.text) == "Instance" then
+                                    obj.text.Text = valueStr
+                                end
+
+                                if obj.background.Object and typeof(obj.background.Object) == "Instance" then
+                                    y = y + obj.background.Object.Size.Y + padding
+                                else
+                                    y = y + 16 + padding -- fallback height
+                                end
+                            end
                         end
                     end
+
 
                     self.objects.background.Size = newUDim2(1,-6,0,y);
 
@@ -1871,16 +1960,28 @@ function library:init()
 
         local function tooltip(option)
             utility:Connection(option.objects.holder.MouseEnter, function()
-                tooltipObjects.background.Visible = (not (option.tooltip == '' or option.tooltip == nil)) and true or false;
-                tooltipObjects.riskytext.Visible = option.risky;
-                tooltipObjects.text.Position = option.risky and newUDim2(0,60,0,0) or newUDim2(0,3,0,0)
-                tooltipObjects.text.Text = tostring(option.tooltip);
-                library.CurrentTooltip = option;
+                if tooltipObjects and tooltipObjects.background and typeof(tooltipObjects.background) == "Instance" then
+                    tooltipObjects.background.Visible = (not (option.tooltip == '' or option.tooltip == nil)) and true or false
+                end
+
+                if tooltipObjects and tooltipObjects.riskytext and typeof(tooltipObjects.riskytext) == "Instance" then
+                    tooltipObjects.riskytext.Visible = option.risky
+                end
+
+                if tooltipObjects and tooltipObjects.text and typeof(tooltipObjects.text) == "Instance" then
+                    tooltipObjects.text.Position = option.risky and newUDim2(0,60,0,0) or newUDim2(0,3,0,0)
+                    tooltipObjects.text.Text = tostring(option.tooltip)
+                end
+
+                library.CurrentTooltip = option
             end)
+
             utility:Connection(option.objects.holder.MouseLeave, function()
                 if library.CurrentTooltip == option then
-                    library.CurrentTooltip = nil;
-                    tooltipObjects.background.Visible = false
+                    library.CurrentTooltip = nil
+                    if tooltipObjects and tooltipObjects.background and typeof(tooltipObjects.background) == "Instance" then
+                        tooltipObjects.background.Visible = false
+                    end
                 end
             end)
         end
@@ -1890,26 +1991,31 @@ function library:init()
 
         function window:SetOpen(bool)
             if typeof(bool) == 'boolean' then
-                self.open = bool;
+                self.open = bool
 
-                local objs = self.objects.background:GetDescendants()
-                table.insert(objs, self.objects.background)
+                local objs = {}
+                if self.objects and self.objects.background and typeof(self.objects.background) == "Instance" then
+                    objs = self.objects.background:GetDescendants()
+                    table.insert(objs, self.objects.background)
+                end
 
                 task.spawn(function()
                     if not bool then
-                        task.wait(.1);
+                        task.wait(0.1)
                     end
-                    self.objects.background.Visible = bool;
+                    if self.objects and self.objects.background and typeof(self.objects.background) == "Instance" then
+                        self.objects.background.Visible = bool
+                    end
                 end)
 
                 for _,v in next, objs do
-                    if v.Object.Transparency ~= 0 then
+                    if v.Object and typeof(v.Object) == "Instance" and v.Object.Transparency ~= 0 then
                         task.spawn(function()
                             if bool then
-                                utility:Tween(v.Object, 'Transparency', visValues[v] or 1, .1);
+                                utility:Tween(v.Object, 'Transparency', visValues[v] or 1, 0.1)
                             else
-                                visValues[v] = v.Object.Transparency;
-                                utility:Tween(v.Object, 'Transparency', .05, .1);
+                                visValues[v] = v.Object.Transparency
+                                utility:Tween(v.Object, 'Transparency', 0.05, 0.1)
                             end
                         end)
                     end
@@ -2067,18 +2173,28 @@ function library:init()
                         return a.order < b.order
                     end)
 
-                    local ySize, padding = 15, 0;
-                    for i,option in next, self.options do
-                        option.objects.holder.Visible = option.enabled
-                        if option.enabled then
-                            option.objects.holder.Position = newUDim2(0,0,0,ySize-15);
-                            ySize += option.objects.holder.Object.Size.Y + padding;
+                    local ySize, padding = 15, 0
+                    for i, option in next, self.options do
+                        if option.objects and option.objects.holder and typeof(option.objects.holder) == "Instance" then
+                            option.objects.holder.Visible = option.enabled
+
+                            if option.enabled then
+                                option.objects.holder.Position = newUDim2(0,0,0,ySize - 15)
+
+                                if option.objects.holder.Object and typeof(option.objects.holder.Object) == "Instance" then
+                                    ySize = ySize + option.objects.holder.Object.Size.Y + padding
+                                else
+                                    ySize = ySize + 16 + padding -- fallback height
+                                end
+                            end
                         end
                     end
 
-                    self.objects.background.Size = newUDim2(1,0,0,ySize);
-
+                    if self.objects and self.objects.background and typeof(self.objects.background) == "Instance" then
+                        self.objects.background.Size = newUDim2(1,0,0,ySize)
+                    end
                 end
+
 
                 function section:SetEnabled(bool)
                     if typeof(bool) == 'boolean' then
@@ -2220,23 +2336,40 @@ function library:init()
                         end)
 
                         local x, y = 0, 0
-                        for i,option in next, self.options do
-                            option.objects.holder.Visible = option.enabled
-                            if option.enabled then
-                                if option.class == 'color' or option.class == 'bind' then
-                                    option.objects.holder.Position = newUDim2(1,-option.objects.holder.Object.Size.X-x,0,0);
-                                    x = x + option.objects.holder.Object.Size.X;
-                                elseif option.class == 'slider' or option.class == 'list' then
-                                    option.objects.holder.Position = newUDim2(0,0,1,-option.objects.holder.Object.Size.Y-y);
-                                    y = y + option.objects.holder.Object.Size.Y;
+                        for i, option in next, self.options do
+                            if option.objects and option.objects.holder and typeof(option.objects.holder) == "Instance" then
+                                option.objects.holder.Visible = option.enabled
+
+                                if option.enabled then
+                                    if option.objects.holder.Object and typeof(option.objects.holder.Object) == "Instance" then
+                                        if option.class == 'color' or option.class == 'bind' then
+                                            option.objects.holder.Position = newUDim2(1, -option.objects.holder.Object.Size.X - x, 0, 0)
+                                            x = x + option.objects.holder.Object.Size.X
+                                        elseif option.class == 'slider' or option.class == 'list' then
+                                            option.objects.holder.Position = newUDim2(0, 0, 1, -option.objects.holder.Object.Size.Y - y)
+                                            y = y + option.objects.holder.Object.Size.Y
+                                        end
+                                    else
+                                        -- fallback размеры, если Object нет
+                                        if option.class == 'color' or option.class == 'bind' then
+                                            x = x + 50
+                                        elseif option.class == 'slider' or option.class == 'list' then
+                                            y = y + 16
+                                        end
+                                    end
                                 end
                             end
                         end
 
-                        self.objects.holder.Size = newUDim2(1,0,0,17 + y);
-                        section:UpdateOptions()
+                        if self.objects and self.objects.holder and typeof(self.objects.holder) == "Instance" then
+                            self.objects.holder.Size = newUDim2(1,0,0,17 + y)
+                        end
 
+                        if section and typeof(section.UpdateOptions) == "function" then
+                            section:UpdateOptions()
+                        end
                     end
+
 
                     -- // Toggle Addons
                     function toggle:AddColor(data)
@@ -2372,7 +2505,9 @@ function library:init()
                                 elseif window.colorpicker.selected == color then
                                     window.colorpicker.selected = nil;
                                     window.colorpicker.objects.background.Parent = window.objects.background;
-                                    window.colorpicker.objects.background.Visible = false;
+                                    if typeof(window.colorpicker.objects.background) == "Instance" then
+                                        window.colorpicker.objects.background.Visible = false;
+                                    end
                                 end
                             end
                         end
@@ -2866,7 +3001,9 @@ function library:init()
                                     objs.openText.Text = '+';
                                     if window.dropdown.selected == list then
                                         window.dropdown.selected = nil;
-                                        window.dropdown.objects.background.Visible = false;
+                                        if typeof(window.dropdown.objects.background) == "Instance" then
+                                            window.dropdown.objects.background.Visible = false;
+                                        end
                                     end
                                 else
                                     if window.dropdown.selected ~= nil then
@@ -3746,7 +3883,9 @@ function library:init()
                             elseif window.colorpicker.selected == color then
                                 window.colorpicker.selected = nil;
                                 window.colorpicker.objects.background.Parent = window.objects.background;
-                                window.colorpicker.objects.background.Visible = false;
+                                if typeof(window.colorpicker.objects.background) == "Instance" then
+                                    window.colorpicker.objects.background.Visible = false;
+                                end
                             end
                         end
                     end
@@ -4276,7 +4415,10 @@ function library:init()
                                 objs.openText.Text = '+';
                                 if window.dropdown.selected == list then
                                     window.dropdown.selected = nil;
-                                    window.dropdown.objects.background.Visible = false;
+                                    if typeof(window.dropdown.objects.background) == "Instance" then
+                                        window.dropdown.objects.background.Visible = false;
+
+                                    end
                                 end
                             else
                                 if window.dropdown.selected ~= nil then
@@ -4436,31 +4578,41 @@ function library:init()
                     return a.order < b.order
                 end)
 
-                local last1,last2;
-                local padding = 15;
-                for _,section in next, self.sections do
-
-                    if section.objects.background.Visible ~= (section.enabled and tab.selected) then
-                        section.objects.background.Visible = section.enabled and tab.selected
-                        section:UpdateOptions();
-                    end
-
-                    if section.enabled then
-                        if section.side == 1 then
-                            if last1 then
-                                section.objects.background.Position = last1.objects.background.Position + newUDim2(0,0,0,last1.objects.background.Object.Size.Y + padding);
+                local last1, last2
+                local padding = 15
+                for _, section in next, self.sections do
+                    if section.objects and section.objects.background and typeof(section.objects.background) == "Instance" then
+                        local shouldBeVisible = section.enabled and tab.selected
+                        if section.objects.background.Visible ~= shouldBeVisible then
+                            section.objects.background.Visible = shouldBeVisible
+                            if typeof(section.UpdateOptions) == "function" then
+                                section:UpdateOptions()
                             end
-                            last1 = section;
-                        elseif section.side == 2 then
-                            if last2 then
-                                section.objects.background.Position = last2.objects.background.Position + newUDim2(0,0,0,last2.objects.background.Object.Size.Y + padding);
+                        end
+
+                        if section.enabled then
+                            local bgSizeY = 16 -- fallback
+                            if section.objects.background.Object and typeof(section.objects.background.Object) == "Instance" then
+                                bgSizeY = section.objects.background.Object.Size.Y
                             end
-                            last2 = section;
+
+                            if section.side == 1 and last1 and last1.objects and last1.objects.background and last1.objects.background.Object then
+                                local lastY = last1.objects.background.Object.Size.Y or 16
+                                section.objects.background.Position = last1.objects.background.Position + newUDim2(0,0,0,lastY + padding)
+                            end
+                            if section.side == 2 and last2 and last2.objects and last2.objects.background and last2.objects.background.Object then
+                                local lastY = last2.objects.background.Object.Size.Y or 16
+                                section.objects.background.Position = last2.objects.background.Position + newUDim2(0,0,0,lastY + padding)
+                            end
+
+                            if section.side == 1 then last1 = section end
+                            if section.side == 2 then last2 = section end
                         end
                     end
 
-                    section:SetText(section.text)
-
+                    if typeof(section.SetText) == "function" then
+                        section:SetText(section.text)
+                    end
                 end
             end
 
@@ -4592,40 +4744,46 @@ function library:init()
         }
 
         function self.watermark:Update()
-            self.objects.background.Visible = library.flags.watermark_enabled
-            if library.flags.watermark_enabled then
-                local date = {os.date('%b',os.time()), os.date('%d',os.time()), os.date('%Y',os.time())}
-                local daySuffix = math.floor(date[2]%10)
-                date[2] = date[2]..(daySuffix == 1 and 'st' or daySuffix == 2 and 'nd' or daySuffix == 3 and 'rd' or 'th')
+            if self.objects and self.objects.background and typeof(self.objects.background) == "Instance" then
+                self.objects.background.Visible = library.flags.watermark_enabled
 
-                self.text[4][1] = library.stats.fps..' fps'
-                self.text[5][1] = floor(library.stats.ping)..'ms'
-                self.text[6][1] = os.date('%X', os.time())
-                self.text[7][1] = table.concat(date, ', ')
+                if library.flags.watermark_enabled then
+                    local date = {os.date('%b', os.time()), os.date('%d', os.time()), os.date('%Y', os.time())}
+                    local daySuffix = math.floor(date[2]%10)
+                    date[2] = date[2]..(daySuffix == 1 and 'st' or daySuffix == 2 and 'nd' or daySuffix == 3 and 'rd' or 'th')
 
-                local text = {};
-                for _,v in next, self.text do
-                    if v[2] then
-                        table.insert(text, v[1]);
+                    self.text[4][1] = library.stats.fps..' fps'
+                    self.text[5][1] = math.floor(library.stats.ping)..'ms'
+                    self.text[6][1] = os.date('%X', os.time())
+                    self.text[7][1] = table.concat(date, ', ')
+
+                    local text = {}
+                    for _, v in next, self.text do
+                        if v[2] then
+                            table.insert(text, v[1])
+                        end
+                    end
+
+                    if self.objects.text and typeof(self.objects.text) == "Instance" then
+                        self.objects.text.Text = table.concat(text, ' | ')
+                        local textWidth = self.objects.text.TextBounds and self.objects.text.TextBounds.X or 100
+                        self.objects.background.Size = newUDim2(0, textWidth + 10, 0, 17)
+
+                        local size = self.objects.background.Object and self.objects.background.Object.Size or Vector2.new(100, 17)
+                        local screensize = workspace.CurrentCamera.ViewportSize
+
+                        self.position = (
+                                self.lock == 'Top Right' and newUDim2(0, screensize.X - size.X - 15, 0, 15) or
+                                        self.lock == 'Top Left' and newUDim2(0, 15, 0, 15) or
+                                        self.lock == 'Bottom Right' and newUDim2(0, screensize.X - size.X - 15, 0, screensize.Y - size.Y - 15) or
+                                        self.lock == 'Bottom Left' and newUDim2(0, 15, 0, screensize.Y - size.Y - 15) or
+                                        self.lock == 'Top' and newUDim2(0, screensize.X / 2 - size.X / 2, 0, 15) or
+                                        newUDim2(library.flags.watermark_x / 100, 0, library.flags.watermark_y / 100, 0)
+                        )
+
+                        self.objects.background.Position = self.position
                     end
                 end
-
-                self.objects.text.Text = table.concat(text,' | ')
-                self.objects.background.Size = newUDim2(0, self.objects.text.TextBounds.X + 10, 0, 17)
-
-                local size = self.objects.background.Object.Size;
-                local screensize = workspace.CurrentCamera.ViewportSize;
-
-                self.position = (
-                        self.lock == 'Top Right' and newUDim2(0, screensize.X - size.X - 15, 0, 15) or
-                                self.lock == 'Top Left' and newUDim2(0, 15, 0, 15) or
-                                self.lock == 'Bottom Right' and newUDim2(0, screensize.X - size.X - 15, 0, screensize.Y - size.Y - 15) or
-                                self.lock == 'Bottom Left' and newUDim2(0, 15, 0, screensize.Y - size.Y - 15) or
-                                self.lock == 'Top' and newUDim2(0, screensize.X / 2 - size.X / 2, 0, 15) or
-                                newUDim2(library.flags.watermark_x / 100, 0, library.flags.watermark_y / 100, 0)
-                )
-
-                self.objects.background.Position = self.position
             end
         end
 
