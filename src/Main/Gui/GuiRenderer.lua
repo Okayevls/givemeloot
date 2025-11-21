@@ -1289,28 +1289,40 @@ function MyGui.new(Name, Header, Icon)
     function Window:Toggle(Value)
         Window.Toggled = Value or not Window.Toggled
 
-        -- Инициализация сохраненных значений при первом открытии
+        -- Инициализация сохранённых значений при первом открытии
         WindowInfo.SizeSave = WindowInfo.SizeSave or Main.Size
         WindowInfo.PositionSave = WindowInfo.PositionSave or Main.Position
         WindowInfo.AnchorSave = WindowInfo.AnchorSave or Main.AnchorPoint
 
         if Window.Toggled then
+            -- Восстанавливаем позицию и размер
             Main.Visible = true
             Main.AnchorPoint = WindowInfo.AnchorSave
             Main.Position = WindowInfo.PositionSave
 
-            -- Плавное появление
-            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = WindowInfo.SizeSave}):Yield()
+            Utility.Tween(Main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+                Size = WindowInfo.SizeSave
+            }):Yield()
         else
-            -- Классная анимация закрытия:
-            local targetSize = UDim2.new(0,0,0,0)
-            local targetPos = WindowInfo.PositionSave + UDim2.fromOffset(WindowInfo.SizeSave.X.Offset/2, WindowInfo.SizeSave.Y.Offset/2)
+            -- Сохраняем текущий размер и позицию
+            WindowInfo.SizeSave = Main.Size
+            WindowInfo.PositionSave = Main.Position
+            WindowInfo.AnchorSave = Main.AnchorPoint
 
-            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = targetSize, Position = targetPos}):Yield()
+            -- Анимация закрытия: сжатие к центру окна
+            local centerOffset = UDim2.fromOffset(WindowInfo.SizeSave.X.Offset/2, WindowInfo.SizeSave.Y.Offset/2)
+            local targetPos = WindowInfo.PositionSave + centerOffset
+
+            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+                Size = UDim2.new(0,0,0,0),
+                Position = targetPos
+            }):Yield()
+
             Main.Visible = false
         end
     end
-    
+
+
     function Window.Tab(Title, Icon)
         local TabFrame = Utility.new("ScrollingFrame", {
             Name = "Tab",
