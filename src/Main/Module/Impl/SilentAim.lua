@@ -68,6 +68,43 @@ local function findNearestToMouse()
     return closestPlayer
 end
 
+local function createBulletTracer(fromPos, toPos)
+    local cam = workspace.CurrentCamera
+    local fromScreen, fromVisible = cam:WorldToViewportPoint(fromPos)
+    local toScreen, toVisible = cam:WorldToViewportPoint(toPos)
+
+    if not fromVisible or not toVisible then return end
+
+    -- tracer
+    local tracer = Drawing.new("Line")
+    tracer.From = Vector2.new(fromScreen.X, fromScreen.Y)
+    tracer.To = Vector2.new(toScreen.X, toScreen.Y)
+    tracer.Color = Color3.fromRGB(255, 200, 80)
+    tracer.Thickness = 1.5
+    tracer.Transparency = 1
+    tracer.Visible = true
+
+    -- glow
+    local glow = Drawing.new("Line")
+    glow.From = tracer.From
+    glow.To = tracer.To
+    glow.Color = Color3.fromRGB(255, 150, 0)
+    glow.Thickness = 6
+    glow.Transparency = 0.35
+    glow.Visible = true
+
+    -- fade-out
+    task.spawn(function()
+        for i = 1, 12 do
+            tracer.Transparency = tracer.Transparency - 0.08
+            glow.Transparency = glow.Transparency - 0.04
+            task.wait(0.016)
+        end
+        tracer:Remove()
+        glow:Remove()
+    end)
+end
+
 local function updateLine()
     if not selectedTarget or not selectedTarget.Character or not selectedTarget.Character:FindFirstChild("Head") then
         if line then line:Remove() line = nil end
@@ -123,6 +160,16 @@ local function smartShoot(targetPlayer)
     }
 
     gun.Communication:FireServer(unpack(args))
+
+    local muzzle = nil
+
+    if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
+        muzzle = gun.Main.Front.Position   --> из дула
+    else
+        muzzle = LocalPlayer.Character.Head.Position --> запасной вариант
+    end
+
+    createBulletTracer(muzzle, predictedPos)
 end
 
 local function stomp(targetPlayer)
@@ -160,19 +207,19 @@ ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputT
 UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if SilentAim.Enabled then
-        if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
-            if selectedTarget then
-                selectedTarget = nil
-                if line then line:Remove() line = nil end
-            else
-                selectedTarget = findNearestToMouse()
-                if selectedTarget then
-                    print("[Legacy.win] New Target:", selectedTarget.Name)
-                else
-                    print("[Legacy.win] Target nil")
-                end
-            end
-        end
+        --if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
+        --    if selectedTarget then
+        --        selectedTarget = nil
+        --        if line then line:Remove() line = nil end
+        --    else
+        --        selectedTarget = findNearestToMouse()
+        --        if selectedTarget then
+        --            print("[Legacy.win] New Target:", selectedTarget.Name)
+        --        else
+        --            print("[Legacy.win] Target nil")
+        --        end
+        --    end
+        --end
     end
 end)
 
@@ -186,7 +233,10 @@ end)
 
 RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
-        updateLine()
+        selectedTarget = findNearestToMouse()
+
+        --updateLine()
+
         if isShooting and selectedTarget then
             smartShoot(selectedTarget)
         end
