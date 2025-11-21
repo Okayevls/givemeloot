@@ -18,13 +18,12 @@ local SETTINGS = {
     ShowName = false,
     ShowBox = false,
     ShowBackground = false,
-    TextSize = 14, -- фиксированный размер текста
-    BoxSize = 1,   -- фиксированный размер Box (OutlineTransparency = 0)
+    TextSize = 14,
 }
 
 local espData = {}
 
--- Скрываем оригинальные имена
+-- Скрываем оригинальные имена игроков
 local function hideOriginalNames(character)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if humanoid then
@@ -32,57 +31,82 @@ local function hideOriginalNames(character)
     end
 end
 
--- Создание ESP для игрока
-local function createESP(character, name)
+-- Создание ESP объектов
+local function createESP(character, plrName)
     hideOriginalNames(character)
 
+    -- Дожидаемся HRP
+    local root = character:WaitForChild("HumanoidRootPart", 5)
+    if not root then return end -- если персонаж кастомный и нет HRP
+
+    -- На случай отсутствия головы
+    local head = character:FindFirstChild("Head")
+    if not head then
+        -- создадим пустую точку, привязанную к HRP
+        head = Instance.new("Part")
+        head.Name = "FakeHead"
+        head.Size = Vector3.new(1,1,1)
+        head.Transparency = 1
+        head.CanCollide = false
+        head.Anchored = false
+        head.Parent = character
+
+        local weld = Instance.new("WeldConstraint")
+        weld.Part0 = head
+        weld.Part1 = root
+        weld.Parent = head
+    end
+
+    -- Highlight
     local highlight = Instance.new("Highlight")
-    highlight.Name = name .. "_ESP"
+    highlight.Name = plrName .. "_ESP"
     highlight.Adornee = character
     highlight.FillTransparency = 1
     highlight.OutlineColor = SETTINGS.Color
-    highlight.OutlineTransparency = 0 -- всегда видно
+    highlight.OutlineTransparency = 1
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
     highlight.Parent = espFolder
 
+    -- BillboardGui
     local billboard = Instance.new("BillboardGui")
-    billboard.Name = name .. "_Info"
-    billboard.Adornee = character:WaitForChild("Head")
+    billboard.Name = plrName .. "_Info"
+    billboard.Adornee = head
     billboard.Size = UDim2.new(0, 120, 0, 20)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
     billboard.AlwaysOnTop = true
-    billboard.Enabled = true
+    billboard.Enabled = false
     billboard.Parent = espFolder
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(1, 0, 1, 0)
-    nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
-    nameLabel.BackgroundColor3 = Color3.new(0,0,0)
+    nameLabel.BackgroundTransparency = 1
     nameLabel.TextColor3 = SETTINGS.Color
     nameLabel.TextSize = SETTINGS.TextSize
     nameLabel.Font = Enum.Font.Gotham
-    nameLabel.Text = name
+    nameLabel.Text = plrName
     nameLabel.BorderSizePixel = 0
-    nameLabel.Visible = SETTINGS.ShowName
+    nameLabel.Visible = false
     nameLabel.Parent = billboard
 
+    -- ВОЗВРАЩАЕМ датасет
     return {highlight, billboard, character, nameLabel}
 end
 
+-- Обновление ESP
 local function updateESP(data)
     if not Esp.Enabled then return end
+
     local highlight, billboard, character, nameLabel = data[1], data[2], data[3], data[4]
-    local root = character and character:FindFirstChild("HumanoidRootPart")
+    local root = character:FindFirstChild("HumanoidRootPart")
     if not root then return end
 
-    -- Всегда включаем
     highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
     billboard.Enabled = SETTINGS.ShowName
     nameLabel.Visible = SETTINGS.ShowName
     nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
 end
 
--- Настройка ESP для игрока
+-- Подключение ESP к игроку
 local function setupESP(plr)
     plr.CharacterAdded:Connect(function(char)
         task.wait(0.5)
@@ -94,19 +118,29 @@ local function setupESP(plr)
     end
 end
 
+-- Первые игроки
 for _, plr in ipairs(Players:GetPlayers()) do
-    if plr ~= LocalPlayer then setupESP(plr) end
+    if plr ~= LocalPlayer then
+        setupESP(plr)
+    end
 end
+
+-- Новые игроки
 Players.PlayerAdded:Connect(setupESP)
+
+-- Уходящие игроки
 Players.PlayerRemoving:Connect(function(plr)
     if espData[plr] then
         for _, v in ipairs(espData[plr]) do
-            if typeof(v) == "Instance" then v:Destroy() end
+            if typeof(v) == "Instance" then
+                v:Destroy()
+            end
         end
         espData[plr] = nil
     end
 end)
 
+-- Обновление каждый кадр
 RunService.RenderStepped:Connect(function()
     if not Esp.Enabled then return end
     for _, data in pairs(espData) do
@@ -116,17 +150,19 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Включение / выключение
+-- Включение
 function Esp:Enable()
     if self.Enabled then return end
     self.Enabled = true
+
     for _, data in pairs(espData) do
         data[1].OutlineTransparency = SETTINGS.ShowBox and 0 or 1
-        data[2].Enabled = true
+        data[2].Enabled = SETTINGS.ShowName
         data[4].Visible = SETTINGS.ShowName
     end
 end
 
+-- Выключение
 function Esp:Disable()
     self.Enabled = false
     for _, data in pairs(espData) do
@@ -136,17 +172,17 @@ function Esp:Disable()
     end
 end
 
--- UI
+-- UI модуль
 function Esp:drawModule(MainTab, Notifier)
-    local Folder = MainTab.Folder("ESP", "[Info] Shows all players with boxes")
+    local Folder = MainTab.Folder("ESP", "[Info] Shows players with boxes")
 
-    Folder.Switch("ESP Enabled", function(Status)
-        if Status then
-            Notifier:Send("[Legacy.wip] Esp - Enable!",6)
+    Folder.Switch("ESP Enabled", function(State)
+        if State then
             self:Enable()
+            Notifier:Send("ESP Enabled", 4)
         else
-            Notifier:Send("[Legacy.wip] Esp - Disable!",6)
             self:Disable()
+            Notifier:Send("ESP Disabled", 4)
         end
     end)
 

@@ -4,7 +4,7 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
-SilentAim.TargetBind = nil
+--SilentAim.TargetBind = nil
 
 SilentAim._StompSwitch = nil
 
@@ -262,8 +262,11 @@ RunService.RenderStepped:Connect(function()
         if isShooting and selectedTarget then
             smartShoot(selectedTarget)
         end
-        
+
         ProximityPromptService.Enabled = not SilentAim.EnabledAntiBuy
+    else
+        selectedTarget = nil
+        ProximityPromptService.Enabled = true
     end
 end)
 
@@ -311,9 +314,9 @@ function SilentAim:drawModule(MainTab, Notifier)
         end
     end)
 
-    local MyBind = Folder.Binding("Target Search", function(key)
-        self.TargetBind = key
-    end)
+    --local MyBind = Folder.Binding("Target Search", function(key)
+    --    self.TargetBind = key
+    --end)
 
     self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
         self.EnabledAutoStomp = st
