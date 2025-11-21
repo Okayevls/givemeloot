@@ -1289,24 +1289,29 @@ function MyGui.new(Name, Header, Icon)
     function Window:Toggle(Value)
         Window.Toggled = Value or not Window.Toggled
 
-        if not WindowInfo.SizeSave then
-            WindowInfo.SizeSave = Main.Size
-        end
-        local originalSize = WindowInfo.SizeSave
-
-        Main.AnchorPoint = Vector2.new(0, 0)
-        Main.Position = Main.Position or UDim2.new(0.5, -originalSize.X.Offset/2, 0.5, -originalSize.Y.Offset/2)
+        -- Инициализация сохраненных значений при первом открытии
+        WindowInfo.SizeSave = WindowInfo.SizeSave or Main.Size
+        WindowInfo.PositionSave = WindowInfo.PositionSave or Main.Position
+        WindowInfo.AnchorSave = WindowInfo.AnchorSave or Main.AnchorPoint
 
         if Window.Toggled then
             Main.Visible = true
-            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = originalSize}):Yield()
+            Main.AnchorPoint = WindowInfo.AnchorSave
+            Main.Position = WindowInfo.PositionSave
+
+            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = WindowInfo.SizeSave}):Yield()
         else
+            -- Сохраняем текущий размер и позицию перед сворачиванием
             WindowInfo.SizeSave = Main.Size
+            WindowInfo.PositionSave = Main.Position
+            WindowInfo.AnchorSave = Main.AnchorPoint
+
             Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Yield()
             Main.Visible = false
         end
     end
-    
+
+
     function Window.Tab(Title, Icon)
         local TabFrame = Utility.new("ScrollingFrame", {
             Name = "Tab",
