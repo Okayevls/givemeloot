@@ -224,12 +224,12 @@ function Esp:drawModule(MainTab, Notifier)
         end
     end)
 
-    Folder.Slider("Distance Render Min Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
-        self.DistanceMinSize = value
-    end)
-
     Folder.Slider("Distance Render Max Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
         self.DistanceMaxSize = value
+    end)
+
+    Folder.Slider("Distance Render Min Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
+        self.DistanceMinSize = value
     end)
 
     return self
