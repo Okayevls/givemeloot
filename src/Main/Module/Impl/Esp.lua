@@ -35,9 +35,11 @@ end
 local function createESP(character, plrName)
     hideOriginalNames(character)
 
+    -- Дождаться HRP
     local root = character:WaitForChild("HumanoidRootPart", 5)
     if not root then return end
 
+    -- Head (или FakeHead)
     local head = character:FindFirstChild("Head")
     if not head then
         head = Instance.new("Part")
@@ -54,8 +56,9 @@ local function createESP(character, plrName)
         weld.Parent = head
     end
 
+    -- Highlight
     local highlight = Instance.new("Highlight")
-    highlight.Name = plrName .. "_ESP"
+    highlight.Name = plrName.."_ESP"
     highlight.Adornee = character
     highlight.FillTransparency = 1
     highlight.OutlineColor = SETTINGS.Color
@@ -64,29 +67,18 @@ local function createESP(character, plrName)
     highlight.Enabled = false
     highlight.Parent = espFolder
 
+    -- BillboardGui
     local billboard = Instance.new("BillboardGui")
-    billboard.Name = plrName .. "_Info"
+    billboard.Name = plrName.."_Info"
     billboard.Adornee = head
-    --billboard.MaxDistance = Esp.DistanceMaxSize
-
-    if root then
-        local distance = (Camera.CFrame.Position - root.Position).Magnitude
-
-        local maxSize = Esp.DistanceMaxSize
-        local minSize = Esp.DistanceMinSize
-
-        local size = math.clamp(distance * 0.6, minSize, maxSize)
-
-        billboard.Size = UDim2.fromOffset(size, size * 0.2)
-    end
-    billboard.Size = UDim2.new(0, 120, 0, 20)
+    billboard.Size = UDim2.fromOffset(Esp.DistanceMaxSize, Esp.DistanceMaxSize*0.2)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
     billboard.AlwaysOnTop = true
     billboard.Enabled = false
     billboard.Parent = espFolder
 
     local nameLabel = Instance.new("TextLabel")
-    nameLabel.Size = UDim2.new(1, 0, 1, 0)
+    nameLabel.Size = UDim2.new(1,0,1,0)
     nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
     nameLabel.BackgroundColor3 = Color3.new(0,0,0)
     nameLabel.TextColor3 = SETTINGS.Color
@@ -107,11 +99,20 @@ local function updateESP(data)
     local root = character:FindFirstChild("HumanoidRootPart")
     if not root then return end
 
+    -- Включаем/выключаем Highlight и Billboard
     highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
+    highlight.Enabled = SETTINGS.ShowBox
     billboard.Enabled = SETTINGS.ShowName
     nameLabel.Visible = SETTINGS.ShowName
     nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
+
+    -- Динамический лимит размера по расстоянию
+    local distance = (Camera.CFrame.Position - root.Position).Magnitude
+    local sizeX = math.clamp(distance * 0.6, Esp.DistanceMinSize, Esp.DistanceMaxSize)
+    local sizeY = sizeX * 0.2
+    billboard.Size = UDim2.fromOffset(sizeX, sizeY)
 end
+
 
 local function setupESP(plr)
     plr.CharacterAdded:Connect(function(char)
