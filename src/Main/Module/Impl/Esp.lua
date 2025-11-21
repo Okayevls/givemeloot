@@ -65,7 +65,9 @@ local function createESP(character, plrName)
     highlight.OutlineColor = SETTINGS.Color
     highlight.OutlineTransparency = 1
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Enabled = false -- ❗ Полностью выключаем при создании
     highlight.Parent = espFolder
+
 
     -- BillboardGui
     local billboard = Instance.new("BillboardGui")
@@ -156,21 +158,34 @@ function Esp:Enable()
     self.Enabled = true
 
     for _, data in pairs(espData) do
-        data[1].OutlineTransparency = SETTINGS.ShowBox and 0 or 1
-        data[2].Enabled = SETTINGS.ShowName
-        data[4].Visible = SETTINGS.ShowName
+        local highlight = data[1]
+        local billboard = data[2]
+        local nameLabel = data[4]
+
+        highlight.Enabled = true
+        highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
+
+        billboard.Enabled = SETTINGS.ShowName
+        nameLabel.Visible = SETTINGS.ShowName
     end
 end
+
 
 -- Выключение
 function Esp:Disable()
     self.Enabled = false
+
     for _, data in pairs(espData) do
-        data[1].OutlineTransparency = 1
-        data[2].Enabled = false
-        data[4].Visible = false
+        local highlight = data[1]
+        local billboard = data[2]
+        local nameLabel = data[4]
+
+        highlight.Enabled = false
+        billboard.Enabled = false
+        nameLabel.Visible = false
     end
 end
+
 
 -- UI модуль
 function Esp:drawModule(MainTab, Notifier)

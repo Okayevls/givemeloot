@@ -1,4 +1,2 @@
-[main d3c1016] Auto-commit 21.11.2025 19:48:27,68
- 5 files changed, 3 insertions(+), 4764 deletions(-)
- delete mode 100644 src/Main/Gui/GuiPanel.lua
- delete mode 100644 src/Main/Gui/Signal.lua
+[main dcb688a] Auto-commit 21.11.2025 20:54:35,75
+ 4 files changed, 76 insertions(+), 35 deletions(-)
