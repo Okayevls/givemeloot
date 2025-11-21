@@ -2,8 +2,8 @@ local Esp = {}
 Esp.__index = Esp
 
 Esp.Enabled = false
-Esp.DistanceMinSize = 150
-Esp.DistanceMaxSize = 40
+Esp.DistanceMinSize = 10
+Esp.DistanceMaxSize = 150
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -228,7 +228,7 @@ function Esp:drawModule(MainTab, Notifier)
         self.DistanceMaxSize = value
     end)
 
-    Folder.Slider("Distance Render Min Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
+    Folder.Slider("Distance Render Min Size", { Min = 5, Max = 5000, Default = 150, Step = 5 }, function(value)
         self.DistanceMinSize = value
     end)
 
