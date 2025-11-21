@@ -1289,22 +1289,24 @@ function MyGui.new(Name, Header, Icon)
     function Window:Toggle(Value)
         Window.Toggled = Value or not Window.Toggled
 
-        local originalSize = WindowInfo.SizeSave or Main.Size
+        if not WindowInfo.SizeSave then
+            WindowInfo.SizeSave = Main.Size
+        end
+        local originalSize = WindowInfo.SizeSave
+
+        Main.AnchorPoint = Vector2.new(0, 0)
+        Main.Position = Main.Position or UDim2.new(0.5, -originalSize.X.Offset/2, 0.5, -originalSize.Y.Offset/2)
 
         if Window.Toggled then
             Main.Visible = true
-            Main.AnchorPoint = Vector2.new(0, 0)
             Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = originalSize}):Yield()
         else
             WindowInfo.SizeSave = Main.Size
-
             Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Yield()
-
             Main.Visible = false
         end
     end
-
-
+    
     function Window.Tab(Title, Icon)
         local TabFrame = Utility.new("ScrollingFrame", {
             Name = "Tab",
