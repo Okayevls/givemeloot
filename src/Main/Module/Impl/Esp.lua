@@ -81,7 +81,8 @@ local function createESP(character, plrName)
 
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(1, 0, 1, 0)
-    nameLabel.BackgroundTransparency = 1
+    nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
+    nameLabel.BackgroundColor3 = Color3.new(0,0,0)
     nameLabel.TextColor3 = SETTINGS.Color
     nameLabel.TextSize = SETTINGS.TextSize
     nameLabel.Font = Enum.Font.Gotham
