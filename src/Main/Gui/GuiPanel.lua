@@ -564,8 +564,8 @@ do
             properties.Filled = true;
         end
 
-        if properties.Visible == nil then
-            properties.Visible = true;
+        if properties ~= nil and properties.Visible == nil then
+            properties.Visible = true
         end
 
         for i,v in next, properties do
@@ -2365,7 +2365,9 @@ function library:init()
                                     end
                                     window.colorpicker.selected = color
                                     window.colorpicker.objects.background.Parent = self.objects.background;
-                                    window.colorpicker.objects.background.Visible = true;
+                                    if typeof(window.colorpicker.objects.background) == "Instance" then
+                                        window.colorpicker.objects.background.Visible = true
+                                    end
                                     window.colorpicker:Visualize(color.color, color.trans)
                                 elseif window.colorpicker.selected == color then
                                     window.colorpicker.selected = nil;
@@ -2873,7 +2875,9 @@ function library:init()
                                     list.open = true;
                                     objs.openText.Text = '-';
                                     window.dropdown.selected = list;
-                                    window.dropdown.objects.background.Visible = true;
+                                    if typeof(window.dropdown.objects.background) == "Instance" then
+                                        window.dropdown.objects.background.Visible = true;
+                                    end
                                     window.dropdown.objects.background.Parent = objs.holder;
                                     window.dropdown:Refresh();
                                 end
@@ -3735,7 +3739,9 @@ function library:init()
                                 end
                                 window.colorpicker.selected = color
                                 window.colorpicker.objects.background.Parent = self.objects.background;
-                                window.colorpicker.objects.background.Visible = true;
+                                if typeof(window.colorpicker.objects.background) == "Instance" then
+                                    window.colorpicker.objects.background.Visible = true;
+                                end
                                 window.colorpicker:Visualize(color.color, color.trans)
                             elseif window.colorpicker.selected == color then
                                 window.colorpicker.selected = nil;
@@ -4279,7 +4285,9 @@ function library:init()
                                 list.open = true;
                                 objs.openText.Text = '-';
                                 window.dropdown.selected = list;
-                                window.dropdown.objects.background.Visible = true;
+                                if typeof(window.dropdown.objects.background) == "Instance" then
+                                    window.dropdown.objects.background.Visible = true;
+                                end
                                 window.dropdown.objects.background.Parent = objs.holder;
                                 window.dropdown:Refresh();
                             end
