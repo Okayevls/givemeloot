@@ -5,7 +5,6 @@ SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
 SilentAim.TargetBind = nil
-SilentAim.WallCheck = true
 
 SilentAim._StompSwitch = nil
 
@@ -101,47 +100,32 @@ local function create3DTracer(fromAttachment, targetPosition)
     beam.Attachment0 = fromAttachment
     beam.Attachment1 = attachEnd
     beam.FaceCamera = true
-    beam.Width0 = 0.08
-    beam.Width1 = 0.08
-    beam.LightEmission = 1
-    beam.Color = ColorSequence.new(Color3.fromRGB(255,140,0), Color3.fromRGB(255,60,0))
-    beam.Transparency = NumberSequence.new(0,1)
+
+    -- мягкие astolfo цвета (розовый -> фиолетовый)
+    beam.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 190, 255)), -- нежный розовый
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 140, 255))  -- мягкий фиолетовый
+    })
+
+    beam.Width0 = 0.1
+    beam.Width1 = 0.1
+    beam.LightEmission = 0.9
+
+    -- мягкая прозрачность
+    beam.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0),     -- начало видно
+        NumberSequenceKeypoint.new(1, 0.8)    -- мягкое исчезновение
+    })
+
     beam.Parent = workspace
 
-    local heatPart = Instance.new("Part")
-    heatPart.Size = Vector3.new(0.2,0.2,0.2)
-    heatPart.Transparency = 1
-    heatPart.Anchored = true
-    heatPart.CanCollide = false
-    heatPart.Position = fromAttachment.WorldPosition
-    heatPart.Parent = workspace
-
-    local heat = Instance.new("ParticleEmitter")
-    heat.Texture = "rbxassetid://9150644694"
-    heat.Rate = 200
-    heat.Lifetime = NumberRange.new(0.15,0.2)
-    heat.Speed = NumberRange.new(2,4)
-    heat.Rotation = NumberRange.new(0,360)
-    heat.RotSpeed = NumberRange.new(80,140)
-    heat.Size = NumberSequence.new({
-        NumberSequenceKeypoint.new(0,0.25),
-        NumberSequenceKeypoint.new(1,0)
-    })
-    heat.Transparency = NumberSequence.new(0.3,1)
-    heat.Parent = heatPart
-
-    task.delay(0.5,function()
-        heat.Enabled = false
-        task.wait(0.3)
-        heatPart:Destroy()
-    end)
-
     task.spawn(function()
-        for i = 1,12 do
-            beam.Width0 -= 0.006
-        beam.Width1 -= 0.006
-        task.wait(0.02)
+        for i = 1, 20 do
+            beam.Width0 = beam.Width0 * 0.88
+            beam.Width1 = beam.Width1 * 0.88
+            task.wait(0.02)
         end
+
         beam:Destroy()
         point:Destroy()
     end)
@@ -195,12 +179,6 @@ local function smartShoot(targetPlayer)
     local muzzle
     if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
         muzzle = gun.Main.Front
-    end
-
-    local muzzlePos = muzzle and muzzle.WorldPosition or LocalPlayer.Character.Head.Position
-
-    if SilentAim.WallCheck and not isVisible(muzzlePos, predicted) then
-        return
     end
 
     gun.Communication:FireServer(
@@ -344,11 +322,6 @@ function SilentAim:drawModule(MainTab, Notifier)
     Folder.SwitchAndBinding("AntiBuy", function(st)
         self.EnabledAntiBuy = st
     end)
-
-    Folder.SwitchAndBinding("WallCheck", function(st)
-        SilentAim.WallCheck = st
-    end)
-
 
     return self
 end

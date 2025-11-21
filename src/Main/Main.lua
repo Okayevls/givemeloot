@@ -10,13 +10,12 @@ local latestSHA = data["sha"]
 
 local modules = {
     Chat          = "src/Main/Util/Chat/UChat.lua",
-    Render        = "src/Main/Util/Render/URender2D.lua",
-    FontRender    = "src/Main/Util/Render/UFontRenderer.lua",
     Updater       = "src/Main/Module/Update/Updater.lua",
     GuiRenderer   = "src/Main/Gui/GuiRenderer.lua",
     GuiInstance   = "src/Main/Gui/GuiInstance.lua",
     ModuleManager = "src/Main/Module/ModuleManager.lua",
     ModuleLoader  = "src/Main/Core/ModuleLoader.lua",
+    GuiSignal   = "src/Main/Gui/GuiRenderer.lua",
     EventLoader   = "src/Main/Core/EventLoader.lua"
 }
 
@@ -34,8 +33,6 @@ EventLoader:Init(modules)
 
 local Chat          = EventLoader:Get("Chat")
 local Updater       = EventLoader:Get("Updater")
-local Render        = EventLoader:Get("Render")
-local FontRender    = EventLoader:Get("FontRender")
 local GuiRenderer   = EventLoader:Get("GuiRenderer")
 local GuiInstance   = EventLoader:Get("GuiInstance")
 local ModuleManager = EventLoader:Get("ModuleManager")
