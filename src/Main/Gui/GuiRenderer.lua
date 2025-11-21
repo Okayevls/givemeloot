@@ -1299,19 +1299,18 @@ function MyGui.new(Name, Header, Icon)
             Main.AnchorPoint = WindowInfo.AnchorSave
             Main.Position = WindowInfo.PositionSave
 
+            -- Плавное появление
             Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = WindowInfo.SizeSave}):Yield()
         else
-            -- Сохраняем текущий размер и позицию перед сворачиванием
-            WindowInfo.SizeSave = Main.Size
-            WindowInfo.PositionSave = Main.Position
-            WindowInfo.AnchorSave = Main.AnchorPoint
+            -- Классная анимация закрытия:
+            local targetSize = UDim2.new(0,0,0,0)
+            local targetPos = WindowInfo.PositionSave + UDim2.fromOffset(WindowInfo.SizeSave.X.Offset/2, WindowInfo.SizeSave.Y.Offset/2)
 
-            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Yield()
+            Utility.Tween(Main, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = targetSize, Position = targetPos}):Yield()
             Main.Visible = false
         end
     end
-
-
+    
     function Window.Tab(Title, Icon)
         local TabFrame = Utility.new("ScrollingFrame", {
             Name = "Tab",
