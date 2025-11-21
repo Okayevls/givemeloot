@@ -202,6 +202,14 @@ do
         for Index, Value in pairs(Properties) do
             pcall(function()
                 Instance[Index] = Value
+                if InstanceType == "Text" then
+                    if Index == "Font" then
+                        Instance.Font = Library.Theme.Font
+                    end
+                    if Index == "Size" then
+                        Instance.Size = Library.Theme.TextSize
+                    end
+                end
             end)
         end
 
