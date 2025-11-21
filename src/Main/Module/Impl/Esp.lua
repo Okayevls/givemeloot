@@ -2,11 +2,11 @@ local Esp = {}
 Esp.__index = Esp
 
 Esp.Enabled = false
+Esp.DistanceMaxSize = 150
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
-local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
 local espFolder = Instance.new("Folder")
@@ -23,7 +23,6 @@ local SETTINGS = {
 
 local espData = {}
 
--- Скрываем оригинальные имена игроков
 local function hideOriginalNames(character)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if humanoid then
@@ -31,18 +30,14 @@ local function hideOriginalNames(character)
     end
 end
 
--- Создание ESP объектов
 local function createESP(character, plrName)
     hideOriginalNames(character)
 
-    -- Дожидаемся HRP
     local root = character:WaitForChild("HumanoidRootPart", 5)
-    if not root then return end -- если персонаж кастомный и нет HRP
+    if not root then return end
 
-    -- На случай отсутствия головы
     local head = character:FindFirstChild("Head")
     if not head then
-        -- создадим пустую точку, привязанную к HRP
         head = Instance.new("Part")
         head.Name = "FakeHead"
         head.Size = Vector3.new(1,1,1)
@@ -57,7 +52,6 @@ local function createESP(character, plrName)
         weld.Parent = head
     end
 
-    -- Highlight
     local highlight = Instance.new("Highlight")
     highlight.Name = plrName .. "_ESP"
     highlight.Adornee = character
@@ -65,14 +59,13 @@ local function createESP(character, plrName)
     highlight.OutlineColor = SETTINGS.Color
     highlight.OutlineTransparency = 1
     highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-    highlight.Enabled = false -- ❗ Полностью выключаем при создании
+    highlight.Enabled = false
     highlight.Parent = espFolder
 
-
-    -- BillboardGui
     local billboard = Instance.new("BillboardGui")
     billboard.Name = plrName .. "_Info"
     billboard.Adornee = head
+    billboard.MaxDistance = Esp.DistanceMaxSize
     billboard.Size = UDim2.new(0, 120, 0, 20)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
     billboard.AlwaysOnTop = true
@@ -91,11 +84,9 @@ local function createESP(character, plrName)
     nameLabel.Visible = false
     nameLabel.Parent = billboard
 
-    -- ВОЗВРАЩАЕМ датасет
     return {highlight, billboard, character, nameLabel}
 end
 
--- Обновление ESP
 local function updateESP(data)
     if not Esp.Enabled then return end
 
@@ -109,7 +100,6 @@ local function updateESP(data)
     nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
 end
 
--- Подключение ESP к игроку
 local function setupESP(plr)
     plr.CharacterAdded:Connect(function(char)
         task.wait(0.5)
@@ -121,17 +111,14 @@ local function setupESP(plr)
     end
 end
 
--- Первые игроки
 for _, plr in ipairs(Players:GetPlayers()) do
     if plr ~= LocalPlayer then
         setupESP(plr)
     end
 end
 
--- Новые игроки
 Players.PlayerAdded:Connect(setupESP)
 
--- Уходящие игроки
 Players.PlayerRemoving:Connect(function(plr)
     if espData[plr] then
         for _, v in ipairs(espData[plr]) do
@@ -143,7 +130,6 @@ Players.PlayerRemoving:Connect(function(plr)
     end
 end)
 
--- Обновление каждый кадр
 RunService.RenderStepped:Connect(function()
     if not Esp.Enabled then return end
     for _, data in pairs(espData) do
@@ -153,7 +139,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- Включение
 function Esp:Enable()
     if self.Enabled then return end
     self.Enabled = true
@@ -171,8 +156,6 @@ function Esp:Enable()
     end
 end
 
-
--- Выключение
 function Esp:Disable()
     self.Enabled = false
 
@@ -187,8 +170,6 @@ function Esp:Disable()
     end
 end
 
-
--- UI модуль
 function Esp:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("ESP", "[Info] Shows players with boxes")
 
@@ -228,6 +209,10 @@ function Esp:drawModule(MainTab, Notifier)
                 data[4].BackgroundTransparency = State and 0.5 or 1
             end
         end
+    end)
+
+    Folder.Slider("Distance Render Max Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
+        self.DistanceMaxSize = value
     end)
 
     return self
