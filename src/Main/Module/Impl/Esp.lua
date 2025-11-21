@@ -2,11 +2,13 @@ local Esp = {}
 Esp.__index = Esp
 
 Esp.Enabled = false
-Esp.DistanceMaxSize = 150
+Esp.DistanceMinSize = 150
+Esp.DistanceMaxSize = 40
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
+local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
 local espFolder = Instance.new("Folder")
@@ -65,7 +67,18 @@ local function createESP(character, plrName)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = plrName .. "_Info"
     billboard.Adornee = head
-    billboard.MaxDistance = Esp.DistanceMaxSize
+    --billboard.MaxDistance = Esp.DistanceMaxSize
+
+    if root then
+        local distance = (Camera.CFrame.Position - root.Position).Magnitude
+
+        local maxSize = Esp.DistanceMaxSize
+        local minSize = Esp.DistanceMinSize
+
+        local size = math.clamp(distance * 0.6, minSize, maxSize)
+
+        billboard.Size = UDim2.fromOffset(size, size * 0.2)
+    end
     billboard.Size = UDim2.new(0, 120, 0, 20)
     billboard.StudsOffset = Vector3.new(0, 2, 0)
     billboard.AlwaysOnTop = true
@@ -209,6 +222,10 @@ function Esp:drawModule(MainTab, Notifier)
                 data[4].BackgroundTransparency = State and 0.5 or 1
             end
         end
+    end)
+
+    Folder.Slider("Distance Render Min Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
+        self.DistanceMinSize = value
     end)
 
     Folder.Slider("Distance Render Max Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
