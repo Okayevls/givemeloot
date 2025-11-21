@@ -25,6 +25,7 @@ local SETTINGS = {
 
 local espData = {}
 
+-- Скрываем оригинальные имена
 local function hideOriginalNames(character)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if humanoid then
@@ -32,10 +33,11 @@ local function hideOriginalNames(character)
     end
 end
 
+-- Создание ESP
 local function createESP(character, plrName)
     hideOriginalNames(character)
 
-    -- Дождаться HRP
+    -- Дожидаемся HRP
     local root = character:WaitForChild("HumanoidRootPart", 5)
     if not root then return end
 
@@ -71,12 +73,13 @@ local function createESP(character, plrName)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = plrName.."_Info"
     billboard.Adornee = head
-    billboard.Size = UDim2.fromOffset(Esp.DistanceMaxSize, Esp.DistanceMaxSize*0.2)
-    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.StudsOffset = Vector3.new(0,2,0)
     billboard.AlwaysOnTop = true
     billboard.Enabled = false
+    billboard.Size = UDim2.fromOffset(Esp.DistanceMaxSize, Esp.DistanceMaxSize*0.2)
     billboard.Parent = espFolder
 
+    -- TextLabel
     local nameLabel = Instance.new("TextLabel")
     nameLabel.Size = UDim2.new(1,0,1,0)
     nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
@@ -92,14 +95,17 @@ local function createESP(character, plrName)
     return {highlight, billboard, character, nameLabel}
 end
 
+-- Обновление ESP каждый кадр
 local function updateESP(data)
     if not Esp.Enabled then return end
 
     local highlight, billboard, character, nameLabel = data[1], data[2], data[3], data[4]
+    if not character or not character.Parent then return end
+
     local root = character:FindFirstChild("HumanoidRootPart")
     if not root then return end
 
-    -- Включение/отключение Highlight и Billboard
+    -- Включение/выключение
     highlight.Enabled = SETTINGS.ShowBox
     highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
 
@@ -107,18 +113,15 @@ local function updateESP(data)
     nameLabel.Visible = SETTINGS.ShowName
     nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
 
-    -- Динамический размер по расстоянию
+    -- Динамический размер по дистанции
     local distance = (Camera.CFrame.Position - root.Position).Magnitude
-
-    local minSize = Esp.DistanceMinSize or 10
-    local maxSize = Esp.DistanceMaxSize or 150
-
-    local sizeX = math.clamp(distance * 0.6, minSize, maxSize)
+    local sizeX = math.clamp(distance * 0.6, Esp.DistanceMinSize, Esp.DistanceMaxSize)
     local sizeY = sizeX * 0.2
     billboard.Size = UDim2.fromOffset(sizeX, sizeY)
+    nameLabel.TextSize = math.clamp(SETTINGS.TextSize * (sizeX / 120), 8, 32) -- масштаб текста
 end
 
-
+-- Настройка ESP на игрока
 local function setupESP(plr)
     plr.CharacterAdded:Connect(function(char)
         task.wait(0.5)
@@ -130,34 +133,35 @@ local function setupESP(plr)
     end
 end
 
+-- Первые игроки
 for _, plr in ipairs(Players:GetPlayers()) do
     if plr ~= LocalPlayer then
         setupESP(plr)
     end
 end
 
+-- Новые игроки
 Players.PlayerAdded:Connect(setupESP)
 
+-- Уходящие игроки
 Players.PlayerRemoving:Connect(function(plr)
     if espData[plr] then
         for _, v in ipairs(espData[plr]) do
-            if typeof(v) == "Instance" then
-                v:Destroy()
-            end
+            if typeof(v) == "Instance" then v:Destroy() end
         end
         espData[plr] = nil
     end
 end)
 
+-- Обновление каждый кадр
 RunService.RenderStepped:Connect(function()
     if not Esp.Enabled then return end
     for _, data in pairs(espData) do
-        if data[3] and data[3].Parent then
-            updateESP(data)
-        end
+        updateESP(data)
     end
 end)
 
+-- Включение/выключение ESP
 function Esp:Enable()
     if self.Enabled then return end
     self.Enabled = true
@@ -167,7 +171,7 @@ function Esp:Enable()
         local billboard = data[2]
         local nameLabel = data[4]
 
-        highlight.Enabled = true
+        highlight.Enabled = SETTINGS.ShowBox
         highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
 
         billboard.Enabled = SETTINGS.ShowName
@@ -189,6 +193,7 @@ function Esp:Disable()
     end
 end
 
+-- UI модуль
 function Esp:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("ESP", "[Info] Shows players with boxes")
 
@@ -204,37 +209,21 @@ function Esp:drawModule(MainTab, Notifier)
 
     Folder.Switch("Show Box", function(State)
         SETTINGS.ShowBox = State
-        if self.Enabled then
-            for _, data in pairs(espData) do
-                data[1].OutlineTransparency = State and 0 or 1
-            end
-        end
     end)
 
     Folder.Switch("Show Name", function(State)
         SETTINGS.ShowName = State
-        if self.Enabled then
-            for _, data in pairs(espData) do
-                data[4].Visible = State
-                data[2].Enabled = State
-            end
-        end
     end)
 
     Folder.Switch("Show Background", function(State)
         SETTINGS.ShowBackground = State
-        if self.Enabled then
-            for _, data in pairs(espData) do
-                data[4].BackgroundTransparency = State and 0.5 or 1
-            end
-        end
     end)
 
-    Folder.Slider("Distance Render Max Size", { Min = 50, Max = 5000, Default = 150, Step = 5 }, function(value)
+    Folder.Slider("Distance Render Max Size", { Min = 50, Max = 500, Default = 150, Step = 5 }, function(value)
         self.DistanceMaxSize = value
     end)
 
-    Folder.Slider("Distance Render Min Size", { Min = 5, Max = 5000, Default = 150, Step = 5 }, function(value)
+    Folder.Slider("Distance Render Min Size", { Min = 5, Max = 50, Default = 10, Step = 1 }, function(value)
         self.DistanceMinSize = value
     end)
 
