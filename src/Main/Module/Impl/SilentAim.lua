@@ -287,7 +287,6 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 function SilentAim:Enable()
-    if self.Enabled then return end
     self.Enabled = true
 end
 
@@ -298,7 +297,9 @@ function SilentAim:Disable()
     line = nil
     ProximityPromptService.Enabled = true
     self.Enabled = false
-    if self._StompSwitch then self._StompSwitch.Value = false end
+    if self._StompSwitch then
+        self._StompSwitch.Value = false
+    end
 end
 
 function SilentAim:drawModule(MainTab, Notifier)
@@ -306,10 +307,10 @@ function SilentAim:drawModule(MainTab, Notifier)
 
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
-            Notifier:Send("[Legacy.wip] SilentAim - Enable!",6)
+            Notifier:Send("[Legacy.wip] SilentAim - Enable!", 4)
             self:Enable()
         else
-            Notifier:Send("[Legacy.wip] SilentAim - Disable!",6)
+            Notifier:Send("[Legacy.wip] SilentAim - Disable!", 4)
             self:Disable()
         end
     end)
