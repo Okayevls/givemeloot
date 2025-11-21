@@ -5,6 +5,7 @@ SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
 SilentAim.TargetBind = nil
+SilentAim.WallCheck = true
 
 SilentAim._StompSwitch = nil
 
@@ -43,6 +44,22 @@ local function getEquippedWeapon()
     return nil
 end
 
+local function isVisible(origin, targetPos)
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Blacklist
+    params.FilterDescendantsInstances = {LocalPlayer.Character}
+
+    local dir = (targetPos - origin).Unit * 1000
+    local result = workspace:Raycast(origin, dir, params)
+
+    if not result then return true end
+    if result.Instance.Parent and result.Instance.Parent:FindFirstChild("Humanoid") then
+        return true
+    end
+
+    return false
+end
+
 local function findNearestToMouse()
     local mouseLocation = UserInputService:GetMouseLocation()
     local closestPlayer = nil
@@ -69,48 +86,64 @@ local function findNearestToMouse()
 end
 
 local function create3DTracer(fromAttachment, targetPosition)
-    -- создаём невидимую точку назначения для beam
-    local part = Instance.new("Part")
-    part.Size = Vector3.new(0.1, 0.1, 0.1)
-    part.Anchored = true
-    part.CanCollide = false
-    part.Transparency = 1
-    part.Position = targetPosition
-    part.Parent = workspace
+    local point = Instance.new("Part")
+    point.Size = Vector3.new(0.1, 0.1, 0.1)
+    point.Anchored = true
+    point.CanCollide = false
+    point.Transparency = 1
+    point.Position = targetPosition
+    point.Parent = workspace
 
     local attachEnd = Instance.new("Attachment")
-    attachEnd.Parent = part
+    attachEnd.Parent = point
 
-    -- создаём сам tracer
     local beam = Instance.new("Beam")
     beam.Attachment0 = fromAttachment
     beam.Attachment1 = attachEnd
-
     beam.FaceCamera = true
     beam.Width0 = 0.08
     beam.Width1 = 0.08
     beam.LightEmission = 1
-    beam.LightInfluence = 0
-    beam.TextureSpeed = 0
-    beam.Color = ColorSequence.new(Color3.fromRGB(255, 140, 0), Color3.fromRGB(255, 60, 0))
-
-    beam.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0),
-        NumberSequenceKeypoint.new(1, 1)
-    })
-
+    beam.Color = ColorSequence.new(Color3.fromRGB(255,140,0), Color3.fromRGB(255,60,0))
+    beam.Transparency = NumberSequence.new(0,1)
     beam.Parent = workspace
 
-    -- удаляем плавно
-    task.spawn(function()
-        for i = 1, 10 do
-            beam.Width0 = beam.Width0 - 0.005
-            beam.Width1 = beam.Width1 - 0.005
-            task.wait(0.02)
-        end
+    local heatPart = Instance.new("Part")
+    heatPart.Size = Vector3.new(0.2,0.2,0.2)
+    heatPart.Transparency = 1
+    heatPart.Anchored = true
+    heatPart.CanCollide = false
+    heatPart.Position = fromAttachment.WorldPosition
+    heatPart.Parent = workspace
 
+    local heat = Instance.new("ParticleEmitter")
+    heat.Texture = "rbxassetid://9150644694"
+    heat.Rate = 200
+    heat.Lifetime = NumberRange.new(0.15,0.2)
+    heat.Speed = NumberRange.new(2,4)
+    heat.Rotation = NumberRange.new(0,360)
+    heat.RotSpeed = NumberRange.new(80,140)
+    heat.Size = NumberSequence.new({
+        NumberSequenceKeypoint.new(0,0.25),
+        NumberSequenceKeypoint.new(1,0)
+    })
+    heat.Transparency = NumberSequence.new(0.3,1)
+    heat.Parent = heatPart
+
+    task.delay(0.5,function()
+        heat.Enabled = false
+        task.wait(0.3)
+        heatPart:Destroy()
+    end)
+
+    task.spawn(function()
+        for i = 1,12 do
+            beam.Width0 -= 0.006
+        beam.Width1 -= 0.006
+        task.wait(0.02)
+        end
         beam:Destroy()
-        part:Destroy()
+        point:Destroy()
     end)
 end
 
@@ -153,31 +186,33 @@ local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
-    local targetHead = targetPlayer.Character:FindFirstChild("Head")
-    local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not targetHead or not targetRoot then return end
+    local head = targetPlayer.Character:FindFirstChild("Head")
+    local root = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not head or not root then return end
 
-    local velocity = targetRoot.Velocity
-    local predictedPos = targetHead.Position + (velocity * 0.15)
+    local predicted = head.Position + root.Velocity * 0.15
 
-    local args = {
-        {
-            {    targetHead,    predictedPos,    CFrame.new()   }
-        },
-        {targetHead},
-        true
-    }
-
-    gun.Communication:FireServer(unpack(args))
-
-    local muzzle = nil
-
+    local muzzle
     if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
-        muzzle = gun.Main.Front  -- <-- Attachment
+        muzzle = gun.Main.Front
     end
 
+    local muzzlePos = muzzle and muzzle.WorldPosition or LocalPlayer.Character.Head.Position
+
+    if SilentAim.WallCheck and not isVisible(muzzlePos, predicted) then
+        return
+    end
+
+    gun.Communication:FireServer(
+            {
+                { head, predicted, CFrame.new() }
+            },
+            { head },
+            true
+    )
+
     if muzzle then
-        create3DTracer(muzzle, predictedPos)
+        create3DTracer(muzzle, predicted)
     end
 end
 
@@ -191,9 +226,9 @@ local function stomp(targetPlayer)
     if SilentAim._StompSwitch then SilentAim._StompSwitch.Value = false end
 end
 
-local function blockShoot(actionName, inputState, inputObject)
+local function blockShoot(_, state)
     if SilentAim.Enabled then
-        if inputState == Enum.UserInputState.Begin then
+        if state == Enum.UserInputState.Begin then
             if getEquippedWeapon() and selectedTarget then
                 isShooting = true
                 return Enum.ContextActionResult.Sink
@@ -309,6 +344,11 @@ function SilentAim:drawModule(MainTab, Notifier)
     Folder.SwitchAndBinding("AntiBuy", function(st)
         self.EnabledAntiBuy = st
     end)
+
+    Folder.SwitchAndBinding("WallCheck", function(st)
+        SilentAim.WallCheck = st
+    end)
+
 
     return self
 end
