@@ -15,7 +15,6 @@ local modules = {
     GuiInstance   = "src/Main/Gui/GuiInstance.lua",
     ModuleManager = "src/Main/Module/ModuleManager.lua",
     ModuleLoader  = "src/Main/Core/ModuleLoader.lua",
-    GuiSignal   = "src/Main/Gui/GuiRenderer.lua",
     EventLoader   = "src/Main/Core/EventLoader.lua"
 }
 
