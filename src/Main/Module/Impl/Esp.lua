@@ -99,16 +99,21 @@ local function updateESP(data)
     local root = character:FindFirstChild("HumanoidRootPart")
     if not root then return end
 
-    -- Включаем/выключаем Highlight и Billboard
-    highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
+    -- Включение/отключение Highlight и Billboard
     highlight.Enabled = SETTINGS.ShowBox
+    highlight.OutlineTransparency = SETTINGS.ShowBox and 0 or 1
+
     billboard.Enabled = SETTINGS.ShowName
     nameLabel.Visible = SETTINGS.ShowName
     nameLabel.BackgroundTransparency = SETTINGS.ShowBackground and 0.5 or 1
 
-    -- Динамический лимит размера по расстоянию
+    -- Динамический размер по расстоянию
     local distance = (Camera.CFrame.Position - root.Position).Magnitude
-    local sizeX = math.clamp(distance * 0.6, Esp.DistanceMinSize, Esp.DistanceMaxSize)
+
+    local minSize = Esp.DistanceMinSize or 10
+    local maxSize = Esp.DistanceMaxSize or 150
+
+    local sizeX = math.clamp(distance * 0.6, minSize, maxSize)
     local sizeY = sizeX * 0.2
     billboard.Size = UDim2.fromOffset(sizeX, sizeY)
 end
