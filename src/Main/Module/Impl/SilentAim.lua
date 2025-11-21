@@ -68,40 +68,49 @@ local function findNearestToMouse()
     return closestPlayer
 end
 
-local function createBulletTracer(fromPos, toPos)
-    local cam = workspace.CurrentCamera
-    local fromScreen, fromVisible = cam:WorldToViewportPoint(fromPos)
-    local toScreen, toVisible = cam:WorldToViewportPoint(toPos)
+local function create3DTracer(fromAttachment, targetPosition)
+    -- создаём невидимую точку назначения для beam
+    local part = Instance.new("Part")
+    part.Size = Vector3.new(0.1, 0.1, 0.1)
+    part.Anchored = true
+    part.CanCollide = false
+    part.Transparency = 1
+    part.Position = targetPosition
+    part.Parent = workspace
 
-    if not fromVisible or not toVisible then return end
+    local attachEnd = Instance.new("Attachment")
+    attachEnd.Parent = part
 
-    -- tracer
-    local tracer = Drawing.new("Line")
-    tracer.From = Vector2.new(fromScreen.X, fromScreen.Y)
-    tracer.To = Vector2.new(toScreen.X, toScreen.Y)
-    tracer.Color = Color3.fromRGB(255, 200, 80)
-    tracer.Thickness = 1.5
-    tracer.Transparency = 1
-    tracer.Visible = true
+    -- создаём сам tracer
+    local beam = Instance.new("Beam")
+    beam.Attachment0 = fromAttachment
+    beam.Attachment1 = attachEnd
 
-    -- glow
-    local glow = Drawing.new("Line")
-    glow.From = tracer.From
-    glow.To = tracer.To
-    glow.Color = Color3.fromRGB(255, 150, 0)
-    glow.Thickness = 6
-    glow.Transparency = 0.35
-    glow.Visible = true
+    beam.FaceCamera = true
+    beam.Width0 = 0.08
+    beam.Width1 = 0.08
+    beam.LightEmission = 1
+    beam.LightInfluence = 0
+    beam.TextureSpeed = 0
+    beam.Color = ColorSequence.new(Color3.fromRGB(255, 140, 0), Color3.fromRGB(255, 60, 0))
 
-    -- fade-out
+    beam.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(1, 1)
+    })
+
+    beam.Parent = workspace
+
+    -- удаляем плавно
     task.spawn(function()
-        for i = 1, 12 do
-            tracer.Transparency = tracer.Transparency - 0.08
-            glow.Transparency = glow.Transparency - 0.04
-            task.wait(0.016)
+        for i = 1, 10 do
+            beam.Width0 = beam.Width0 - 0.005
+            beam.Width1 = beam.Width1 - 0.005
+            task.wait(0.02)
         end
-        tracer:Remove()
-        glow:Remove()
+
+        beam:Destroy()
+        part:Destroy()
     end)
 end
 
@@ -164,12 +173,12 @@ local function smartShoot(targetPlayer)
     local muzzle = nil
 
     if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
-        muzzle = gun.Main.Front.Position   --> из дула
-    else
-        muzzle = LocalPlayer.Character.Head.Position --> запасной вариант
+        muzzle = gun.Main.Front  -- <-- Attachment
     end
 
-    createBulletTracer(muzzle, predictedPos)
+    if muzzle then
+        create3DTracer(muzzle, predictedPos)
+    end
 end
 
 local function stomp(targetPlayer)
@@ -241,7 +250,7 @@ RunService.RenderStepped:Connect(function()
             smartShoot(selectedTarget)
         end
         
-        ProximityPromptService.Enabled = SilentAim.EnabledAntiBuy
+        ProximityPromptService.Enabled = not SilentAim.EnabledAntiBuy
     end
 end)
 
