@@ -194,8 +194,8 @@ do
     Utility.AddDrawing = function(InstanceType, Properties, Location)
         local Instance = Drawing.new(InstanceType)
 
-        if not Instance then
-            warn("Failed to create Drawing:", InstanceType)
+        if not Instance or typeof(Instance) ~= "userdata" then
+            warn("Failed to create Drawing:", InstanceType, "Returned:", Instance)
             return
         end
 
@@ -205,10 +205,15 @@ do
             end)
         end
 
-        if Properties.ZIndex then
-            Instance.ZIndex = Properties.ZIndex + 20
+        -- Safe ZIndex assignment
+        if Instance.ZIndex ~= nil then
+            if Properties.ZIndex then
+                Instance.ZIndex = Properties.ZIndex + 20
+            else
+                Instance.ZIndex = 20
+            end
         else
-            Instance.ZIndex = 20
+            warn("Instance does not support ZIndex:", InstanceType)
         end
 
         Location = Location or Library.Drawings
@@ -216,6 +221,7 @@ do
 
         return Instance
     end
+
 
     --
     --Loni
