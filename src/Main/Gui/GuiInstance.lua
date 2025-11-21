@@ -6,8 +6,10 @@ GuiInstance.type = {}
 function GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
     local Window = GuiRenderer.new("Legacy.wip", "Version : d0.00094", 4370345701)
 
-    game:GetService("UserInputService").InputBegan:Connect(function(Input)
-        if Input.KeyCode == Enum.KeyCode.M then
+    local UserInputService = game:GetService("UserInputService")
+    UserInputService.InputBegan:Connect(function(Input, GameProcessed)
+        if GameProcessed then return end
+        if Input.KeyCode == Enum.KeyCode.RightShift then
             Window:Toggle()
         end
     end)
