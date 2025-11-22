@@ -177,6 +177,7 @@ local function smartShoot(targetPlayer)
     local predicted = head.Position + root.Velocity * 0.15
 
     local muzzle
+
     if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
         muzzle = gun.Main.Front
     end
@@ -253,7 +254,7 @@ UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-RunService.RenderStepped:Connect(function()
+connection = RunService.RenderStepped:Connect(function()
     print(SilentAim.Enabled)
     if SilentAim.Enabled then
         selectedTarget = findNearestToMouse()
