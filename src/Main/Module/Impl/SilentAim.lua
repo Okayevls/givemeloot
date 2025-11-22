@@ -254,6 +254,7 @@ UserInputService.InputEnded:Connect(function(input)
 end)
 
 RunService.RenderStepped:Connect(function()
+    print(SilentAim.Enabled)
     if SilentAim.Enabled then
         selectedTarget = findNearestToMouse()
 
