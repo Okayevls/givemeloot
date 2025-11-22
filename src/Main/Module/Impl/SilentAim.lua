@@ -225,7 +225,7 @@ c = RunService.RenderStepped:Connect(function()
     end
 end)
 
-c1 = ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
+ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
 
 c2 = UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
