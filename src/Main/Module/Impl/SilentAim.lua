@@ -13,7 +13,6 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local ContextActionService = game:GetService("ContextActionService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
-local CollectionService = game:GetService("CollectionService")
 
 local LocalPlayer = Players.LocalPlayer
 
@@ -21,8 +20,6 @@ local selectedTarget = nil
 local line = nil
 local isShooting = false
 
-local proximityEnabled = true
-local connection
 
 local SupportedWeapons = {
     ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
@@ -41,22 +38,6 @@ local function getEquippedWeapon()
     end
 
     return nil
-end
-
-local function isVisible(origin, targetPos)
-    local params = RaycastParams.new()
-    params.FilterType = Enum.RaycastFilterType.Blacklist
-    params.FilterDescendantsInstances = {LocalPlayer.Character}
-
-    local dir = (targetPos - origin).Unit * 1000
-    local result = workspace:Raycast(origin, dir, params)
-
-    if not result then return true end
-    if result.Instance.Parent and result.Instance.Parent:FindFirstChild("Humanoid") then
-        return true
-    end
-
-    return false
 end
 
 local function findNearestToMouse()
@@ -101,20 +82,18 @@ local function create3DTracer(fromAttachment, targetPosition)
     beam.Attachment1 = attachEnd
     beam.FaceCamera = true
 
-    -- мягкие astolfo цвета (розовый -> фиолетовый)
     beam.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 190, 255)), -- нежный розовый
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 140, 255))  -- мягкий фиолетовый
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 190, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 140, 255))
     })
 
     beam.Width0 = 0.1
     beam.Width1 = 0.1
     beam.LightEmission = 0.9
 
-    -- мягкая прозрачность
     beam.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 0),     -- начало видно
-        NumberSequenceKeypoint.new(1, 0.8)    -- мягкое исчезновение
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(1, 0.8)
     })
 
     beam.Parent = workspace
@@ -254,7 +233,6 @@ UserInputService.InputEnded:Connect(function(input)
 end)
 
 RunService.RenderStepped:Connect(function()
-    print(SilentAim.Enabled)
     if SilentAim.Enabled then
         selectedTarget = findNearestToMouse()
 
@@ -294,10 +272,15 @@ end
 function SilentAim:Disable()
     isShooting = false
     selectedTarget = nil
-    line:Remove()
-    line = nil
+
+    if line then     -- <-- ЗАЩИТА
+        line:Remove()
+        line = nil
+    end
+
     ProximityPromptService.Enabled = true
     self.Enabled = false
+
     if self._StompSwitch then
         self._StompSwitch.Value = false
     end
