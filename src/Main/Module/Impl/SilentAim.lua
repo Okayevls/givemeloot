@@ -217,7 +217,7 @@ local function blockShoot(_, state)
     return Enum.ContextActionResult.Pass
 end
 
-c = RunService.RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function()
     if SilentAim.EnabledAutoStomp and SilentAim.Enabled then
         if selectedTarget ~= nil then
             stomp(selectedTarget)
@@ -227,7 +227,7 @@ end)
 
 ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputType.MouseButton1)
 
-c2 = UserInputService.InputBegan:Connect(function(input, processed)
+UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if SilentAim.Enabled then
         --if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
@@ -246,7 +246,7 @@ c2 = UserInputService.InputBegan:Connect(function(input, processed)
     end
 end)
 
-c3 = UserInputService.InputEnded:Connect(function(input)
+UserInputService.InputEnded:Connect(function(input)
     if SilentAim.Enabled then
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isShooting = false
@@ -254,8 +254,7 @@ c3 = UserInputService.InputEnded:Connect(function(input)
     end
 end)
 
-c4 = RunService.RenderStepped:Connect(function()
-    print(SilentAim.Enabled)
+RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
         selectedTarget = findNearestToMouse()
 
@@ -272,14 +271,14 @@ c4 = RunService.RenderStepped:Connect(function()
     end
 end)
 
-c5 = LocalPlayer.CharacterAdded:Connect(function()
+LocalPlayer.CharacterAdded:Connect(function()
     if SilentAim.Enabled then
         selectedTarget = nil
         if line then line:Remove() line = nil end
     end
 end)
 
-c6 = Players.PlayerRemoving:Connect(function(player)
+Players.PlayerRemoving:Connect(function(player)
     if SilentAim.Enabled then
         if player == selectedTarget then
             selectedTarget = nil
