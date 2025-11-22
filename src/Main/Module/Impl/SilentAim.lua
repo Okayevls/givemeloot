@@ -22,7 +22,7 @@ local line = nil
 local isShooting = false
 
 local proximityEnabled = true
-local c,с1,c2,c3,c4,c5,c6,c7,c8
+local connection
 
 local SupportedWeapons = {
     ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
@@ -177,7 +177,6 @@ local function smartShoot(targetPlayer)
     local predicted = head.Position + root.Velocity * 0.15
 
     local muzzle
-
     if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
         muzzle = gun.Main.Front
     end
@@ -255,6 +254,7 @@ UserInputService.InputEnded:Connect(function(input)
 end)
 
 RunService.RenderStepped:Connect(function()
+    print(SilentAim.Enabled)
     if SilentAim.Enabled then
         selectedTarget = findNearestToMouse()
 
