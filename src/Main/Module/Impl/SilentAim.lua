@@ -149,17 +149,25 @@ local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
-    local head = targetPlayer.Character:FindFirstChild("Head")
-    local root = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local char = targetPlayer.Character
+    if not char then return end
+
+    local head = char:FindFirstChild("Head")
+    local root = char:FindFirstChild("HumanoidRootPart")
     if not head or not root then return end
 
+    -- Простое предсказание позиции цели
     local predicted = head.Position + root.Velocity * 0.15
 
+    -- Находим дуло/мушку
     local muzzle
     if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
         muzzle = gun.Main.Front
+    elseif gun:FindFirstChild("Muzzle") then
+        muzzle = gun.Muzzle
     end
 
+    -- Отправка пакета на сервер
     gun.Communication:FireServer(
             {
                 { head, predicted, CFrame.new() }
@@ -168,8 +176,19 @@ local function smartShoot(targetPlayer)
             true
     )
 
+    -- Сразу после успешной отправки создаём трейсер
     if muzzle then
-        create3DTracer(muzzle, predicted)
+        local attach = muzzle:FindFirstChildOfClass("Attachment")
+        if not attach then
+            attach = Instance.new("Attachment")
+            attach.Parent = muzzle
+            task.spawn(function()
+                task.wait(1.5)
+                if attach and attach.Parent then attach:Destroy() end
+            end)
+        end
+
+        create3DTracer(attach, predicted)
     end
 end
 
