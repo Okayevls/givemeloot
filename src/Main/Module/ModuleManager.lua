@@ -6,18 +6,14 @@ Notifications.__index = Notifications
 function Notifications:Init()
     self.queue = {}
     self.margin = 6
-    self.width = 200
-    self.height = 30
 end
 
-function Notifications:UpdatePositions()
-    local yOffset = 10
-    for _, frame in ipairs(self.queue) do
-        local targetPos = UDim2.new(1, -10 - self.width, 0, yOffset)
-        TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Position = targetPos
+function Notifications:RecalculatePositions()
+    for i, frame in ipairs(self.queue) do
+        local target = UDim2.new(1, -10 - frame.AbsoluteSize.X, 0, 10 + (i - 1) * (frame.AbsoluteSize.Y + self.margin))
+        TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {
+            Position = target
         }):Play()
-        yOffset = yOffset + self.height + self.margin
     end
 end
 
@@ -32,60 +28,63 @@ function Notifications:Send(message, duration)
     end
 
     local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(0, self.width, 0, self.height)
-    Frame.Position = UDim2.new(1, -10 - self.width, 0, -self.height)
     Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     Frame.BorderSizePixel = 0
-    Frame.AnchorPoint = Vector2.new(0,0)
-    Frame.Parent = ScreenGui
-    Frame.ClipsDescendants = true
-    Frame.ZIndex = 2
     Frame.BackgroundTransparency = 1
+    Frame.Parent = ScreenGui
+    Frame.Position = UDim2.new(1, 0, 0, -50)
+    Frame.ClipsDescendants = true
 
     local Text = Instance.new("TextLabel")
-    Text.Size = UDim2.new(1, 0, 1, 0)
-    Text.Position = UDim2.new(0,0,0,0)
     Text.BackgroundTransparency = 1
-    Text.Text = message
-    Text.TextColor3 = Color3.fromRGB(255,255,255)
-    Text.TextSize = 14
+    Text.TextColor3 = Color3.white
     Text.Font = Enum.Font.Gotham
-    Text.TextXAlignment = Enum.TextXAlignment.Center
-    Text.TextYAlignment = Enum.TextYAlignment.Center
-    Text.ZIndex = 3
+    Text.TextSize = 14
+    Text.TextWrapped = true
+    Text.Text = message
     Text.Parent = Frame
+    Text.Size = UDim2.new(1, -20, 1, -10)
+    Text.Position = UDim2.new(0, 10, 0, 5)
+
+    task.wait()
+
+    local bounds = Text.TextBounds
+    local paddingX = 20
+    local paddingY = 12
+
+    local w = math.clamp(bounds.X + paddingX * 2, 150, 400)
+    local h = math.max(bounds.Y + paddingY, 30)
+
+    Frame.Size = UDim2.new(0, w, 0, h)
 
     table.insert(self.queue, Frame)
-    self:UpdatePositions()
+    self:RecalculatePositions()
 
-    Frame.Position = UDim2.new(1, -10 - self.width, 0, -10)
-    local appearTween = TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Position = UDim2.new(1, -10 - self.width, 0, 10 + (#self.queue-1)*(self.height + self.margin)),
+    TweenService:Create(Frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         BackgroundTransparency = 0
-    })
-    appearTween:Play()
+    }):Play()
 
     task.delay(duration, function()
-        if Frame and Frame.Parent then
-            local hideTween = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                Position = UDim2.new(1, -10 - self.width, 0, -self.height),
-                BackgroundTransparency = 1
-            })
-            hideTween:Play()
-            hideTween.Completed:Wait()
+        if not Frame.Parent then return end
 
-            if Frame.Parent then
-                Frame:Destroy()
-            end
+        local hide = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Position = UDim2.new(1, w, 0, Frame.Position.Y.Offset),
+            BackgroundTransparency = 1
+        })
 
-            for i, f in ipairs(self.queue) do
-                if f == Frame then
-                    table.remove(self.queue, i)
-                    break
-                end
+        hide:Play()
+        hide.Completed:Wait()
+
+        Frame:Destroy()
+
+        for i, f in ipairs(self.queue) do
+            if f == Frame then
+                table.remove(self.queue, i)
+                break
             end
-            self:UpdatePositions()
         end
+
+        self:RecalculatePositions()
     end)
 end
 
@@ -125,7 +124,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
     local AutoRedeem = loader:Get("RedeemCode"):drawModule(OtherTab, Notifier)
 
-    print("Base ModuleManager Build | 0x000000000162")
+    Notifier:Send("Base ModuleManager Build | 0x000000000162", 6)
 end
 
 return ModuleManager, Notifier

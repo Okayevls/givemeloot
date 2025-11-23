@@ -73,7 +73,9 @@ local function createESP(character, plrName)
     local billboard = Instance.new("BillboardGui")
     billboard.Name = plrName.."_Info"
     billboard.Adornee = head
-    billboard.StudsOffset = Vector3.new(0,2,0)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    local headOffset = Vector3.new(0, humanoid and humanoid.HipHeight + 1.2 or 3, 0)
+    billboard.StudsOffset = headOffset
     billboard.AlwaysOnTop = true
     billboard.Enabled = false
     billboard.Size = UDim2.fromOffset(Esp.DistanceMaxSize, Esp.DistanceMaxSize*0.2)
