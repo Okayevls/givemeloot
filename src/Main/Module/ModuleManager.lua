@@ -121,6 +121,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
         RedeemCode = "src/Main/Module/Impl/RedeemCode.lua",
         Esp = "src/Main/Module/Impl/Esp.lua",
         AspectRatio = "src/Main/Module/Impl/AspectRatio.lua",
+        NoClip = "src/Main/Module/Impl/NoClip.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
 
@@ -138,10 +139,12 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local Esp = loader:Get("Esp"):drawModule(VisualTab, Notifier)
     local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab, Notifier)
 
+    local NoClip = loader:Get("NoClip"):drawModule(PlayerTab, Notifier)
+
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
     local AutoRedeem = loader:Get("RedeemCode"):drawModule(OtherTab, Notifier)
 
-    Notifier:Send("Base ModuleManager Build | 0x000000000163", 6)
+    Notifier:Send("Base ModuleManager Build | 0x000000000164", 6)
 end
 
 return ModuleManager, Notifier

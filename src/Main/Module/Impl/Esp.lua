@@ -2,7 +2,6 @@ local Esp = {}
 Esp.__index = Esp
 
 Esp.Enabled = false
-Esp.DistanceMinSize = 10
 Esp.DistanceMaxSize = 150
 
 local Players = game:GetService("Players")
@@ -117,7 +116,7 @@ local function updateESP(data)
 
     -- Динамический размер по дистанции
     local distance = (Camera.CFrame.Position - root.Position).Magnitude
-    local sizeX = math.clamp(distance * 0.6, Esp.DistanceMinSize, Esp.DistanceMaxSize)
+    local sizeX = math.clamp(distance * 0.6, Esp.DistanceMaxSize, Esp.DistanceMaxSize)
     local sizeY = sizeX * 0.2
     billboard.Size = UDim2.fromOffset(sizeX, sizeY)
     nameLabel.TextSize = math.clamp(SETTINGS.TextSize * (sizeX / 120), 8, 32) -- масштаб текста
@@ -221,12 +220,8 @@ function Esp:drawModule(MainTab, Notifier)
         SETTINGS.ShowBackground = State
     end)
 
-    Folder.Slider("Distance Render Max Size", { Min = 50, Max = 500, Default = 150, Step = 5 }, function(value)
+    Folder.Slider("Distance Render Max Size", { Min = 50, Max = 500, Default = 100, Step = 5 }, function(value)
         self.DistanceMaxSize = value
-    end)
-
-    Folder.Slider("Distance Render Min Size", { Min = 5, Max = 50, Default = 10, Step = 1 }, function(value)
-        self.DistanceMinSize = value
     end)
 
     return self
