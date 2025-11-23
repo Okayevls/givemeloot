@@ -66,19 +66,25 @@ local function findNearestToMouse()
 end
 
 local function create3DTracer(fromAttachment, targetPosition)
+    -- создаём невидимую точку в месте выстрела
     local point = Instance.new("Part")
     point.Size = Vector3.new(0.1, 0.1, 0.1)
     point.Anchored = true
     point.CanCollide = false
     point.Transparency = 1
-    point.Position = targetPosition
+    point.Position = fromAttachment.WorldPosition -- точка создаётся на дула
     point.Parent = workspace
 
+    local attachStart = Instance.new("Attachment")
+    attachStart.Position = Vector3.new(0,0,0)
+    attachStart.Parent = point
+
     local attachEnd = Instance.new("Attachment")
+    attachEnd.Position = point.Position:VectorToObjectSpace(targetPosition)
     attachEnd.Parent = point
 
     local beam = Instance.new("Beam")
-    beam.Attachment0 = fromAttachment
+    beam.Attachment0 = attachStart
     beam.Attachment1 = attachEnd
     beam.FaceCamera = true
 
@@ -87,8 +93,8 @@ local function create3DTracer(fromAttachment, targetPosition)
         ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 140, 255))
     })
 
-    beam.Width0 = 0.1
-    beam.Width1 = 0.1
+    beam.Width0 = 0.2
+    beam.Width1 = 0.2
     beam.LightEmission = 0.9
 
     beam.Transparency = NumberSequence.new({
@@ -98,15 +104,19 @@ local function create3DTracer(fromAttachment, targetPosition)
 
     beam.Parent = workspace
 
+    -- плавное исчезновение на месте
     task.spawn(function()
-        for i = 1, 20 do
-            beam.Width0 = beam.Width0 * 0.88
-            beam.Width1 = beam.Width1 * 0.88
-            task.wait(0.02)
+        local steps = 40
+        local delayPerStep = 0.025
+        for i = 1, steps do
+            local factor = 1 - (i / steps)
+            beam.Width0 = 0.2 * factor
+            beam.Width1 = 0.2 * factor
+            task.wait(delayPerStep)
         end
 
-        beam:Destroy()
-        point:Destroy()
+        if beam and beam.Parent then beam:Destroy() end
+        if point and point.Parent then point:Destroy() end
     end)
 end
 
