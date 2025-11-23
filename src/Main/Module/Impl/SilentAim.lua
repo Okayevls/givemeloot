@@ -4,7 +4,7 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
---SilentAim.TargetBind = nil
+SilentAim.TargetBind = nil
 
 SilentAim._StompSwitch = nil
 
@@ -16,10 +16,10 @@ local ProximityPromptService = game:GetService("ProximityPromptService")
 
 local LocalPlayer = Players.LocalPlayer
 
+local randomTarget = nil
 local selectedTarget = nil
 local line = nil
 local isShooting = false
-
 
 local SupportedWeapons = {
     ["AW1"] = true, ["Ak"] = true, ["Barrett"] = true, ["Deagle"] = true, ["Double Barrel"] = true, ["Draco"] = true,
@@ -186,7 +186,7 @@ end
 local function blockShoot(_, state)
     if SilentAim.Enabled then
         if state == Enum.UserInputState.Begin then
-            if getEquippedWeapon() and selectedTarget then
+            if getEquippedWeapon() and randomTarget or selectedTarget then
                 isShooting = true
                 return Enum.ContextActionResult.Sink
             end
@@ -196,9 +196,11 @@ local function blockShoot(_, state)
 end
 
 RunService.RenderStepped:Connect(function()
+    local target = selectedTarget ~= nil and selectedTarget or randomTarget
+
     if SilentAim.EnabledAutoStomp and SilentAim.Enabled then
-        if selectedTarget ~= nil then
-            stomp(selectedTarget)
+        if randomTarget ~= nil or selectedTarget ~= nil then
+            stomp(target)
         end
     end
 end)
@@ -208,19 +210,15 @@ ContextActionService:BindAction("BlockShoot", blockShoot, false, Enum.UserInputT
 UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
     if SilentAim.Enabled then
-        --if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
-        --    if selectedTarget then
-        --        selectedTarget = nil
-        --        if line then line:Remove() line = nil end
-        --    else
-        --        selectedTarget = findNearestToMouse()
-        --        if selectedTarget then
-        --            print("[Legacy.win] New Target:", selectedTarget.Name)
-        --        else
-        --            print("[Legacy.win] Target nil")
-        --        end
-        --    end
-        --end
+        if input.KeyCode == SilentAim.TargetBind and SilentAim.TargetBind ~= nil then
+            if selectedTarget then
+                selectedTarget = nil
+                if line then line:Remove() line = nil end
+            else
+                randomTarget = nil
+                selectedTarget = findNearestToMouse()
+            end
+        end
     end
 end)
 
@@ -234,16 +232,22 @@ end)
 
 RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
-        selectedTarget = findNearestToMouse()
+        if selectedTarget ~= nil then
+            updateLine()
+            randomTarget = nil
+        else
+            randomTarget = findNearestToMouse()
+        end
 
-        --updateLine()
+        local target = selectedTarget ~= nil and selectedTarget or randomTarget
 
-        if isShooting and selectedTarget then
-            smartShoot(selectedTarget)
+        if isShooting and randomTarget or selectedTarget then
+            smartShoot(target)
         end
 
         ProximityPromptService.Enabled = not SilentAim.EnabledAntiBuy
     else
+        randomTarget = nil
         selectedTarget = nil
         ProximityPromptService.Enabled = true
     end
@@ -271,9 +275,10 @@ end
 
 function SilentAim:Disable()
     isShooting = false
+    randomTarget = nil
     selectedTarget = nil
 
-    if line then     -- <-- ЗАЩИТА
+    if line then
         line:Remove()
         line = nil
     end
@@ -299,9 +304,9 @@ function SilentAim:drawModule(MainTab, Notifier)
         end
     end)
 
-    --local MyBind = Folder.Binding("Target Search", function(key)
-    --    self.TargetBind = key
-    --end)
+    local MyBind = Folder.Binding("Select Target", function(key)
+        self.TargetBind = key
+    end)
 
     self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
         self.EnabledAutoStomp = st
