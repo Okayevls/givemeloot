@@ -10,7 +10,13 @@ end
 
 function Notifications:RecalculatePositions()
     for i, frame in ipairs(self.queue) do
-        local target = UDim2.new(1, -10 - frame.AbsoluteSize.X, 0, 10 + (i - 1) * (frame.AbsoluteSize.Y + self.margin))
+        local target = UDim2.new(
+                1,
+                -10 - frame.AbsoluteSize.X,
+                0,
+                10 + (i - 1) * (frame.AbsoluteSize.Y + self.margin)
+        )
+
         TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {
             Position = target
         }):Play()
@@ -19,6 +25,16 @@ end
 
 function Notifications:Send(message, duration)
     duration = duration or 3
+
+    --------------------------------------------------------------------
+    -- FIX 1: Защита от nil / таблиц / чисел / всего чего угодно
+    --------------------------------------------------------------------
+    if message == nil then
+        message = "[nil]"
+    end
+    message = tostring(message)
+
+    --------------------------------------------------------------------
 
     local ScreenGui = game.CoreGui:FindFirstChild("NotificationsGUI")
     if not ScreenGui then
@@ -37,44 +53,56 @@ function Notifications:Send(message, duration)
 
     local Text = Instance.new("TextLabel")
     Text.BackgroundTransparency = 1
-    Text.TextColor3 = Color3.white
+    Text.TextColor3 = Color3.fromRGB(255,255,255)
     Text.Font = Enum.Font.Gotham
     Text.TextSize = 14
     Text.TextWrapped = true
     Text.Text = message
     Text.Parent = Frame
-    Text.Size = UDim2.new(1, -20, 1, -10)
     Text.Position = UDim2.new(0, 10, 0, 5)
+    Text.Size = UDim2.new(1, -20, 1, -10)
 
+    --------------------------------------------------------------------
+    -- Даем Roblox рассчитать размеры текста
+    --------------------------------------------------------------------
     task.wait()
 
     local bounds = Text.TextBounds
     local paddingX = 20
     local paddingY = 12
 
-    local w = math.clamp(bounds.X + paddingX * 2, 150, 400)
-    local h = math.max(bounds.Y + paddingY, 30)
+    local width = math.clamp(bounds.X + paddingX * 2, 150, 400)
+    local height = math.max(bounds.Y + paddingY, 30)
 
-    Frame.Size = UDim2.new(0, w, 0, h)
+    Frame.Size = UDim2.new(0, width, 0, height)
+
+    --------------------------------------------------------------------
 
     table.insert(self.queue, Frame)
     self:RecalculatePositions()
 
-    TweenService:Create(Frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    -- Плавное появление
+    TweenService:Create(Frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
         BackgroundTransparency = 0
     }):Play()
+
+    --------------------------------------------------------------------
 
     task.delay(duration, function()
         if not Frame.Parent then return end
 
-        local hide = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            Position = UDim2.new(1, w, 0, Frame.Position.Y.Offset),
+        -- Плавное исчезновение
+        local hide = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {
+            Position = UDim2.new(1, width, 0, Frame.Position.Y.Offset),
             BackgroundTransparency = 1
         })
 
         hide:Play()
         hide.Completed:Wait()
 
+        --------------------------------------------------------------------
+        -- Удаление
+        --------------------------------------------------------------------
         Frame:Destroy()
 
         for i, f in ipairs(self.queue) do
@@ -124,7 +152,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
     local AutoRedeem = loader:Get("RedeemCode"):drawModule(OtherTab, Notifier)
 
-    Notifier:Send("Base ModuleManager Build | 0x000000000162", 6)
+    Notifier:Send("Base ModuleManager Build | 0x000000000163", 6)
 end
 
 return ModuleManager, Notifier
