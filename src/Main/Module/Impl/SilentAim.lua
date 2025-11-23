@@ -162,40 +162,25 @@ local function updateLine()
     end
 end
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local backpack = player:WaitForChild("Backpack")
-
 local lastAmmo = nil
 
-local function getMyGun()
-    local tool = char:FindFirstChildWhichIsA("Tool") or backpack:FindFirstChildWhichIsA("Tool")
-    return tool
-end
-
 local function smartShoot(targetPlayer)
-    local gun = getMyGun()
+    local gun = getEquippedWeapon()
     if not gun then return end
 
-    local ammoObj = gun:FindFirstChild("Ammo")
-    if not ammoObj then return end
+    local ammo = gun:FindFirstChild("Ammo")
+    if not ammo then return end
 
     if lastAmmo == nil then
-        lastAmmo = ammoObj.Value
-    end
-
-    if ammoObj.Value == lastAmmo then
+        lastAmmo = ammo.Value
         return
     end
 
-    lastAmmo = ammoObj.Value
+    local char = targetPlayer.Character
+    if not char then return end
 
-    local targetChar = targetPlayer.Character
-    if not targetChar then return end
-
-    local head = targetChar:FindFirstChild("Head")
-    local root = targetChar:FindFirstChild("HumanoidRootPart")
+    local head = char:FindFirstChild("Head")
+    local root = char:FindFirstChild("HumanoidRootPart")
     if not head or not root then return end
 
     local predicted = head.Position + root.Velocity * 0.15
@@ -214,17 +199,21 @@ local function smartShoot(targetPlayer)
             { head },
             true
     )
+    
+    if ammo.Value == lastAmmo then
+        return
+    end
+
+    lastAmmo = ammo.Value
 
     if muzzle then
         local attach = muzzle:FindFirstChildOfClass("Attachment")
         if not attach then
             attach = Instance.new("Attachment")
             attach.Parent = muzzle
-
-            task.delay(1.5, function()
-                if attach and attach.Parent then
-                    attach:Destroy()
-                end
+            task.spawn(function()
+                task.wait(1.5)
+                if attach and attach.Parent then attach:Destroy() end
             end)
         end
 
