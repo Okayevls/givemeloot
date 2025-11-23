@@ -66,35 +66,41 @@ local function findNearestToMouse()
 end
 
 local function create3DTracer(fromAttachment, targetPosition)
-    -- создаём статичный Part в месте дула
-    local point = Instance.new("Part")
-    point.Size = Vector3.new(0.1, 0.1, 0.1)
-    point.Anchored = true
-    point.CanCollide = false
-    point.Transparency = 1
-    point.Position = fromAttachment.WorldPosition -- старт выстрела
-    point.Parent = workspace
+    -- Стартовая точка (дула)
+    local startPart = Instance.new("Part")
+    startPart.Size = Vector3.new(0.1, 0.1, 0.1)
+    startPart.Anchored = true
+    startPart.CanCollide = false
+    startPart.Transparency = 1
+    startPart.Position = fromAttachment.WorldPosition
+    startPart.Parent = workspace
 
-    -- Attachments
     local attachStart = Instance.new("Attachment")
-    attachStart.Position = Vector3.new(0, 0, 0)
-    attachStart.Parent = point
+    attachStart.Position = Vector3.new(0,0,0)
+    attachStart.Parent = startPart
+
+    -- Конечная точка (цель)
+    local endPart = Instance.new("Part")
+    endPart.Size = Vector3.new(0.1, 0.1, 0.1)
+    endPart.Anchored = true
+    endPart.CanCollide = false
+    endPart.Transparency = 1
+    endPart.Position = targetPosition
+    endPart.Parent = workspace
 
     local attachEnd = Instance.new("Attachment")
-    attachEnd.Position = point.CFrame:PointToObjectSpace(targetPosition) -- правильная локальная позиция цели
-    attachEnd.Parent = point
+    attachEnd.Position = Vector3.new(0,0,0)
+    attachEnd.Parent = endPart
 
     -- Beam
     local beam = Instance.new("Beam")
     beam.Attachment0 = attachStart
     beam.Attachment1 = attachEnd
     beam.FaceCamera = true
-
     beam.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 190, 255)),
         ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 140, 255))
     })
-
     beam.Width0 = 0.2
     beam.Width1 = 0.2
     beam.LightEmission = 0.9
@@ -104,7 +110,7 @@ local function create3DTracer(fromAttachment, targetPosition)
     })
     beam.Parent = workspace
 
-    -- плавное исчезновение
+    -- Плавное исчезновение
     task.spawn(function()
         local steps = 40
         local delayPerStep = 0.025
@@ -116,10 +122,10 @@ local function create3DTracer(fromAttachment, targetPosition)
         end
 
         if beam and beam.Parent then beam:Destroy() end
-        if point and point.Parent then point:Destroy() end
+        if startPart and startPart.Parent then startPart:Destroy() end
+        if endPart and endPart.Parent then endPart:Destroy() end
     end)
 end
-
 
 local function updateLine()
     if not selectedTarget or not selectedTarget.Character or not selectedTarget.Character:FindFirstChild("Head") then
