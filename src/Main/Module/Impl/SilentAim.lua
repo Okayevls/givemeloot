@@ -186,7 +186,7 @@ end
 local function blockShoot(_, state)
     if SilentAim.Enabled then
         if state == Enum.UserInputState.Begin then
-            if getEquippedWeapon() and randomTarget or selectedTarget then
+            if getEquippedWeapon() and (randomTarget or selectedTarget) then
                 isShooting = true
                 return Enum.ContextActionResult.Sink
             end
@@ -241,7 +241,7 @@ RunService.RenderStepped:Connect(function()
 
         local target = selectedTarget ~= nil and selectedTarget or randomTarget
 
-        if isShooting and randomTarget or selectedTarget then
+        if isShooting and (randomTarget or selectedTarget) then
             smartShoot(target)
         end
 
