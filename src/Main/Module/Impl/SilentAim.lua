@@ -66,25 +66,25 @@ local function findNearestToMouse()
 end
 
 local function create3DTracer(fromAttachment, targetPosition)
-    -- создаём статичный Part в месте дула (мгновенная точка выстрела)
+    -- создаём статичный Part в месте дула
     local point = Instance.new("Part")
     point.Size = Vector3.new(0.1, 0.1, 0.1)
     point.Anchored = true
     point.CanCollide = false
     point.Transparency = 1
-    point.Position = fromAttachment.WorldPosition -- место выстрела
+    point.Position = fromAttachment.WorldPosition -- старт выстрела
     point.Parent = workspace
 
-    -- создаём Attachments внутри этого Part
+    -- Attachments
     local attachStart = Instance.new("Attachment")
-    attachStart.Position = Vector3.new(0,0,0)
+    attachStart.Position = Vector3.new(0, 0, 0)
     attachStart.Parent = point
 
     local attachEnd = Instance.new("Attachment")
-    attachEnd.WorldPosition = targetPosition -- цель в момент выстрела
+    attachEnd.Position = point.CFrame:PointToObjectSpace(targetPosition) -- правильная локальная позиция цели
     attachEnd.Parent = point
 
-    -- создаём Beam между двумя Attachments
+    -- Beam
     local beam = Instance.new("Beam")
     beam.Attachment0 = attachStart
     beam.Attachment1 = attachEnd
@@ -104,7 +104,7 @@ local function create3DTracer(fromAttachment, targetPosition)
     })
     beam.Parent = workspace
 
-    -- плавное исчезновение (Beam и Part остаются статичными)
+    -- плавное исчезновение
     task.spawn(function()
         local steps = 40
         local delayPerStep = 0.025
@@ -119,6 +119,7 @@ local function create3DTracer(fromAttachment, targetPosition)
         if point and point.Parent then point:Destroy() end
     end)
 end
+
 
 local function updateLine()
     if not selectedTarget or not selectedTarget.Character or not selectedTarget.Character:FindFirstChild("Head") then
