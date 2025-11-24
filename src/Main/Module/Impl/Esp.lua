@@ -20,16 +20,23 @@ local SETTINGS = {
     ShowBox = false,
     ShowBackground = false,
     TextSize = 14,
+    HideNames = true,
 }
 
 local espData = {}
 
-local function hideOriginalNames(character)
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.DisplayDistanceType = Esp.Enabled
-                and Enum.HumanoidDisplayDistanceType.None
-                or Enum.HumanoidDisplayDistanceType.Viewer
+local function updateOriginalNames()
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character then
+            local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                if SETTINGS.HideNames then
+                    humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+                else
+                    humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
+                end
+            end
+        end
     end
 end
 
@@ -38,8 +45,6 @@ local function createESP(character, plrName)
     if not humanoid then
         return nil
     end
-
-    hideOriginalNames(character)
 
     local root = character:WaitForChild("HumanoidRootPart", 5)
     if not root then return nil end
@@ -166,6 +171,7 @@ end)
 function Esp:Enable()
     if self.Enabled then return end
     self.Enabled = true
+    updateOriginalNames()
 
     for _, data in pairs(espData) do
         if data[1] then data[1].Enabled = SETTINGS.ShowBox end
@@ -176,6 +182,7 @@ end
 
 function Esp:Disable()
     self.Enabled = false
+    updateOriginalNames()
 
     for _, data in pairs(espData) do
         if data[1] then data[1].Enabled = false end
@@ -207,6 +214,11 @@ function Esp:drawModule(MainTab, Notifier)
 
     Folder.Switch("Show Background", function(State)
         SETTINGS.ShowBackground = State
+    end)
+
+    Folder.Switch("Hide Original Names", function(State)
+        SETTINGS.HideNames = State
+        updateOriginalNames()
     end)
 
     Folder.Slider("Distance Render Max Size", { Min = 50, Max = 500, Default = 150, Step = 5 }, function(value)
