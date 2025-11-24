@@ -122,7 +122,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
         Esp = "src/Main/Module/Impl/Esp.lua",
         AspectRatio = "src/Main/Module/Impl/AspectRatio.lua",
         NoClip = "src/Main/Module/Impl/NoClip.lua",
-        NoInteract = "src/Main/Module/Impl/NoInteract.lua",
+        FastInteract = "src/Main/Module/Impl/FastInteract.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
 
@@ -141,7 +141,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab, Notifier)
 
     local NoClip = loader:Get("NoClip"):drawModule(PlayerTab, Notifier)
-    local NoInteract = loader:Get("NoInteract"):drawModule(PlayerTab, Notifier)
+    local FastInteract = loader:Get("FastInteract"):drawModule(PlayerTab, Notifier)
 
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
     local AutoRedeem = loader:Get("RedeemCode"):drawModule(OtherTab, Notifier)
