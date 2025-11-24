@@ -2,7 +2,7 @@ local Esp = {}
 Esp.__index = Esp
 
 Esp.Enabled = false
-Esp.DistanceMaxSize = 150
+Esp.DistanceMaxSize = 85
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
