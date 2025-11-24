@@ -8,9 +8,17 @@ NoClip.Enabled = false
 local player = Players.LocalPlayer
 local connection
 local character
+local originalCollisions = {}
 
 local function SetCharacter(char)
     character = char
+    originalCollisions = {}
+    
+    for _, part in ipairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            originalCollisions[part] = part.CanCollide
+        end
+    end
 end
 
 SetCharacter(player.Character or player.CharacterAdded:Wait())
@@ -21,8 +29,8 @@ local function StartLoop()
 
     connection = RunService.Stepped:Connect(function()
         if NoClip.Enabled and character then
-            for _, part in ipairs(character:GetDescendants()) do
-                if part:IsA("BasePart") then
+            for part, _ in pairs(originalCollisions) do
+                if part and part:IsA("BasePart") then
                     part.CanCollide = false
                 end
             end
@@ -36,11 +44,9 @@ local function StopLoop()
         connection = nil
     end
 
-    if character then
-        for _, part in ipairs(character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
-            end
+    for part, canCollide in pairs(originalCollisions) do
+        if part and part:IsA("BasePart") then
+            part.CanCollide = canCollide
         end
     end
 end
@@ -55,22 +61,6 @@ function NoClip:Disable()
     if not self.Enabled then return end
     self.Enabled = false
     StopLoop()
-end
-
-function NoClip:drawModule(MainTab, Notifier)
-    local Folder = MainTab.Folder("NoClip", "[Info] Disable walls collision")
-
-    Folder.SwitchAndBinding("Toggle", function(Status)
-        if Status then
-            Notifier:Send("[Legacy.wip] NoClip - Enable!", 4)
-            self:Enable()
-        else
-            Notifier:Send("[Legacy.wip] NoClip - Disable!", 4)
-            self:Disable()
-        end
-    end)
-
-    return self
 end
 
 return NoClip

@@ -28,7 +28,11 @@ local espData = {}
 local function hideOriginalNames(character)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if humanoid then
-        humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+        if Esp.Enabled then
+            humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+        else
+            humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
+        end
     end
 end
 
