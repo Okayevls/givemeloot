@@ -20,7 +20,7 @@ local SETTINGS = {
     ShowBox = false,
     ShowBackground = false,
     TextSize = 14,
-    HideNames = true,
+    HideNames = false,
 }
 
 local espData = {}
