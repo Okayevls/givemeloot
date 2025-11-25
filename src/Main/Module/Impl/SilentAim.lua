@@ -318,20 +318,8 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 
-function SilentAim:Run()
-    if not self.Enabled then return end
-
-    if self.EnabledTarget then
-        self.EnabledTarget:SetValue(false)
-    end
-end
-
-
 function SilentAim:Enable()
     self.Enabled = true
-    task.spawn(function()
-        self:Run()
-    end)
 end
 
 function SilentAim:Disable()
