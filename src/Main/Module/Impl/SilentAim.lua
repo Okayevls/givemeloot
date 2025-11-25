@@ -280,7 +280,7 @@ end)
 
 RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
-        print(self.TargetBind)
+        print(SilentAim.TargetBind)
         if selectedTarget ~= nil then
             updateLine()
             randomTarget = nil
