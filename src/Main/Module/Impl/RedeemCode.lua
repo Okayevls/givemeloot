@@ -76,7 +76,7 @@ function RedeemCode:Run()
     self.Enabled = false
 
     if self._Switch then
-        self._Switch.Value = false
+        self._Switch:SetValue(false)
     end
 
     print("[RedeemCode] Модуль отключён автоматически.")
@@ -109,11 +109,11 @@ function RedeemCode:drawModule(MainTab)
             end
         end
     })
-
-    Toggle:SetValue(self._Switch)
-
+    
+    self._Switch = Toggle
 
     return self
 end
+
 
 return RedeemCode
