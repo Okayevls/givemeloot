@@ -45,6 +45,24 @@ end
 function Speed:drawModule(MainTab)
     local Group = MainTab:AddLeftGroupbox('Speed')
 
+    Group:AddToggle("Toggle", {
+        Text = "Toggle",
+        Default = false,
+        Callback = function(Value)
+            if Value then
+                self:Enable()
+            else
+                self:Disable()
+            end
+        end
+    }):AddKeyPicker("Keybind", {
+        Default = "C",
+        NoUI = false,
+        Text = "Toggle",
+        Mode = "Toggle",
+        Callback = function()
+        end
+    })
 
    --local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
