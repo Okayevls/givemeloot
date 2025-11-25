@@ -45,8 +45,8 @@ end
 function Speed:drawModule(MainTab)
     local Group = MainTab:AddLeftGroupbox('Speed')
 
-    Group:AddToggle("Toggle", {
-        Text = "Toggle",
+    local Toggle = Group:AddToggle("SpeedToggle", {
+        Text = "Toggle Speed",
         Default = false,
         Callback = function(Value)
             if Value then
@@ -55,12 +55,15 @@ function Speed:drawModule(MainTab)
                 self:Disable()
             end
         end
-    }):AddKeyPicker("Keybind", {
+    })
+
+    Toggle:AddKeyPicker("SpeedBind", {
         Default = "C",
-        NoUI = false,
-        Text = "Toggle",
+        Text = "Speed Keybind",
         Mode = "Toggle",
+        NoUI = false,
         Callback = function()
+            Toggle:SetValue(not Toggle.Value)
         end
     })
 
