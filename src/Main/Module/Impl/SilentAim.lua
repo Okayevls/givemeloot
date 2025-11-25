@@ -377,12 +377,13 @@ function SilentAim:drawModule(MainTab)
         Text = "Select Target",
         Mode = "Toggle",
         NoUI = false,
-        Callback = function(key)
-            self.TargetBind = key
-            Toggle2:SetValue(true)
-            if Toggle2 then
-                Toggle2:SetValue(false)
-            end
+        Callback = function()
+            print(Toggle2.Value)
+           -- self.TargetBind = key
+            --Toggle2:SetValue(true)
+            --if Toggle2 then
+            --    Toggle2:SetValue(false)
+            --end
         end
     })
 
