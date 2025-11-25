@@ -387,11 +387,14 @@ function SilentAim:drawModule(MainTab)
         Text = "SelectTarget",
         Mode = "Toggle",
         NoUI = false,
-        Callback = function()
-            self.TargetBind = SelectTargetToggle.Value
+        Callback = function(key)
+            if key == "None" then
+                self.TargetBind = nil
+            else
+                self.TargetBind = Enum.KeyCode[key]
+            end
         end
     })
-
     self.EnabledTarget = SelectTargetToggle
 
     --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
