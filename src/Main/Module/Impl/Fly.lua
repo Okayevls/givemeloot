@@ -112,7 +112,7 @@ function Fly:drawModule(MainTab)
         Default = 1,
         Min = 0,
         Max = 5,
-        Rounding = 2,
+        Rounding = 2,   
         Callback = function(value)
             self.FlyMultiplier = value
         end
