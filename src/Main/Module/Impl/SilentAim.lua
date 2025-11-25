@@ -171,10 +171,8 @@ local function smartShoot(targetPlayer)
     local ammo = gun:FindFirstChild("Ammo")
     if not ammo then return end
 
-    -- если ещё нет значения для этой пачки патронов
     if lastAmmoPerAmmoObject[ammo] == nil then
         lastAmmoPerAmmoObject[ammo] = ammo.Value
-        -- не return, чтобы первый выстрел с новой пачкой сработал
     end
 
     local char = targetPlayer.Character
@@ -201,7 +199,6 @@ local function smartShoot(targetPlayer)
             true
     )
 
-    -- проверка изменений конкретного Ammo объекта
     if ammo.Value == lastAmmoPerAmmoObject[ammo] then
         return
     end
@@ -222,65 +219,6 @@ local function smartShoot(targetPlayer)
         create3DTracer(attach, predicted)
     end
 end
-
---local lastAmmo = nil
---
---local function smartShoot(targetPlayer)
---    local gun = getEquippedWeapon()
---    if not gun then return end
---
---    local ammo = gun:FindFirstChild("Ammo")
---    if not ammo then return end
---
---    if lastAmmo == nil then
---        lastAmmo = ammo.Value
---        return
---    end
---
---    local char = targetPlayer.Character
---    if not char then return end
---
---    local head = char:FindFirstChild("Head")
---    local root = char:FindFirstChild("HumanoidRootPart")
---    if not head or not root then return end
---
---    local predicted = head.Position + root.Velocity * 0.15
---
---    local muzzle
---    if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
---        muzzle = gun.Main.Front
---    elseif gun:FindFirstChild("Muzzle") then
---        muzzle = gun.Muzzle
---    end
---
---    gun.Communication:FireServer(
---            {
---                { head, predicted, CFrame.new() }
---            },
---            { head },
---            true
---    )
---
---    if ammo.Value == lastAmmo then
---        return
---    end
---
---    lastAmmo = ammo.Value
---
---    if muzzle then
---        local attach = muzzle:FindFirstChildOfClass("Attachment")
---        if not attach then
---            attach = Instance.new("Attachment")
---            attach.Parent = muzzle
---            task.spawn(function()
---                task.wait(1.5)
---                if attach and attach.Parent then attach:Destroy() end
---            end)
---        end
---
---        create3DTracer(attach, predicted)
---    end
---end
 
 local function stomp(targetPlayer)
     local args = { targetPlayer.Character }

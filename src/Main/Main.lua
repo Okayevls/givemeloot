@@ -15,6 +15,7 @@ local modules = {
     GuiInstance   = "src/Main/Gui/GuiInstance.lua",
     ModuleManager = "src/Main/Module/ModuleManager.lua",
     ModuleLoader  = "src/Main/Core/ModuleLoader.lua",
+    GuiInstance   = "src/Main/Gui/GuiPanel.lua",
     EventLoader   = "src/Main/Core/EventLoader.lua"
 }
 
@@ -37,8 +38,11 @@ local GuiInstance   = EventLoader:Get("GuiInstance")
 local ModuleManager = EventLoader:Get("ModuleManager")
 local ModuleLoader  = EventLoader:Get("ModuleLoader")
 
+local GuiPanel  = EventLoader:Get("GuiPanel")
+
 local updaterReconnect = Updater:new()
 
-GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
+--GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
+GuiInstance:drawGuiCore(ModuleLoader, GuiPanel, ModuleManager)
 Chat.chat.sendMessage("Created by gargon x prokosik")
 
