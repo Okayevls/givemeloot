@@ -372,20 +372,16 @@ function SilentAim:drawModule(MainTab)
             self.EnabledTarget = v
         end
     })
-    Toggle2:AddKeyPicker("SelectTargetBind", {
+    local ToggleBind2 = Toggle2:AddKeyPicker("SelectTargetBind", {
         Default = "None",
         Text = "Select Target",
         Mode = "Toggle",
         NoUI = false,
         Callback = function()
-            print(Toggle2.Value)
-           -- self.TargetBind = key
-            --Toggle2:SetValue(true)
-            --if Toggle2 then
-            --    Toggle2:SetValue(false)
-            --end
         end
     })
+
+    self.TargetBind = ToggleBind2.Value
 
     --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
