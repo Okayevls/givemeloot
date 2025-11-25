@@ -1,3 +1,2 @@
-[main 0107b0c] Auto-commit 25.11.2025  9:07:31,94
- 7 files changed, 3826 insertions(+), 216 deletions(-)
- create mode 100644 src/Main/Gui/GuiPanel.lua
+[main eec4e98] Auto-commit 25.11.2025  9:08:35,05
+ 2 files changed, 6 insertions(+), 5 deletions(-)
