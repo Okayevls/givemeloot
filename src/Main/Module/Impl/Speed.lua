@@ -56,7 +56,6 @@ function Speed:drawModule(MainTab)
             end
         end
     })
-
     Toggle:AddKeyPicker("SpeedBind", {
         Default = "C",
         Text = "Speed Keybind",
@@ -67,7 +66,19 @@ function Speed:drawModule(MainTab)
         end
     })
 
-   --local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
+    Group:AddSlider('Speed Value', {
+        Text = 'SpeedValue',
+        Default = 50,
+        Min = 10,
+        Max = 500,
+        Rounding = 0.1,
+        Callback = function(value)
+            self.SpeedMultiplier = value
+        end,
+    })
+
+
+    --local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
    --Folder.SwitchAndBinding("Toggle", function(Status)
    --    if Status then
