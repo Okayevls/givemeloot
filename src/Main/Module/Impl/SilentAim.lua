@@ -4,6 +4,7 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
+SilentAim.EnabledTarget = nil
 SilentAim.TargetBind = nil
 
 SilentAim._StompSwitch = nil
@@ -316,8 +317,21 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
+
+function SilentAim:Run()
+    if not self.Enabled then return end
+
+    if self.EnabledTarget then
+        self.EnabledTarget:SetValue(false)
+    end
+end
+
+
 function SilentAim:Enable()
     self.Enabled = true
+    task.spawn(function()
+        self:Run()
+    end)
 end
 
 function SilentAim:Disable()
@@ -366,12 +380,8 @@ function SilentAim:drawModule(MainTab)
         Text = "Select Target",
         Default = false,
         Callback = function(Value)
-            if Value then
-                self.SelectTargetEnabled = Value
-            end
         end
     })
-
     SelectTargetToggle:AddKeyPicker("BindSelectTarget", {
         Default = "None",
         Text = "SelectTarget",
@@ -381,6 +391,8 @@ function SilentAim:drawModule(MainTab)
             self.TargetBind = SelectTargetToggle.Value
         end
     })
+
+    self.EnabledTarget = SelectTargetToggle
 
     --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
