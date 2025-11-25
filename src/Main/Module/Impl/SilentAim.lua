@@ -362,38 +362,25 @@ function SilentAim:drawModule(MainTab)
         end
     })
 
-    local MyBind = Group:AddKeyPicker("BindSelectTarget", {
-        Default = "None",
+    local SelectTargetToggle = Group:AddToggle("SelectTarget", {
         Text = "Select Target",
-        Mode = "Toggle",
-        NoUI = false,
-        Callback = function()
+        Default = false,
+        Callback = function(Value)
+            if Value then
+                self.SelectTargetEnabled = Value
+            end
         end
     })
 
-    self.TargetBind = MyBind
-
-   --self._StompSwitch = Group:AddToggle("Stomp", {
-   --    Text = "Stomp",
-   --    Default = false,
-   --    Callback = function(Value)
-   --        if Value then
-   --            self:Enable()
-   --        else
-   --            self:Disable()
-   --        end
-   --    end
-   --}):AddKeyPicker("BindStomp", {
-   --    Default = "None",
-   --    Text = "Toggle Keybind",
-   --    Mode = "Toggle",
-   --    NoUI = false,
-   --    Callback = function()
-   --        Toggle1:SetValue(not Toggle1.Value)
-   --    end
-   --})
-
-
+    SelectTargetToggle:AddKeyPicker("BindSelectTarget", {
+        Default = "None",
+        Text = "SelectTarget",
+        Mode = "Toggle",
+        NoUI = false,
+        Callback = function()
+            self.TargetBind = SelectTargetToggle.Value
+        end
+    })
 
     --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
