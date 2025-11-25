@@ -347,7 +347,11 @@ function SilentAim:drawModule(MainTab)
         Text = "Toggle",
         Default = false,
         Callback = function(v)
-            if v then self:Enable() else self:Disable() end
+            if v then
+                self:Enable()
+            else
+                self:Disable()
+            end
         end
     })
     Toggle:AddKeyPicker("SilentAimBind", {
@@ -374,7 +378,7 @@ function SilentAim:drawModule(MainTab)
         Mode = "Toggle",
         NoUI = false,
         Callback = function(key)
-            self.EnabledAutoStomp = key
+            self.TargetBind = key
             Toggle2:SetValue(true)
             if Toggle2 then
                 Toggle2:SetValue(false)
