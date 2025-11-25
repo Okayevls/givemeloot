@@ -1256,25 +1256,34 @@ do
                     local Key;
 
                     if Input.UserInputType == Enum.UserInputType.Keyboard then
-                        Key = Input.KeyCode.Name;
+                        if Input.KeyCode == Enum.KeyCode.Delete then
+                            KeyPicker:SetValue({"None", KeyPicker.Mode})
+                            Break = true
+                            Picking = false
+                            Event:Disconnect()
+                            return
+                        end
+
+                        Key = Input.KeyCode.Name
+
                     elseif Input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        Key = 'MB1';
+                        Key = 'MB1'
                     elseif Input.UserInputType == Enum.UserInputType.MouseButton2 then
-                        Key = 'MB2';
-                    end;
+                        Key = 'MB2'
+                    end
 
-                    Break = true;
-                    Picking = false;
+                    Break = true
+                    Picking = false
 
-                    DisplayLabel.Text = Key;
-                    KeyPicker.Value = Key;
+                    DisplayLabel.Text = Key
+                    KeyPicker.Value = Key
 
                     Library:SafeCallback(KeyPicker.ChangedCallback, Input.KeyCode or Input.UserInputType)
                     Library:SafeCallback(KeyPicker.Changed, Input.KeyCode or Input.UserInputType)
 
-                    Library:AttemptSave();
+                    Library:AttemptSave()
 
-                    Event:Disconnect();
+                    Event:Disconnect()
                 end);
             elseif Input.UserInputType == Enum.UserInputType.MouseButton2 and not Library:MouseIsOverOpenedFrame() then
                 ModeSelectOuter.Visible = true;
