@@ -134,6 +134,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local UISettingsTab = Window:AddTab('UI Settings')
 
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
+    local Fly = loader:Get("Fly"):drawModule(CharacterTab)
 
     --local CombatTab = Window.Tab("Combat", 7485051733)
     --local CharacterTab = Window.Tab("Character", 16149111790)

@@ -84,20 +84,39 @@ function Fly:Destroy()
 end
 
 function Fly:drawModule(MainTab, Notifier)
-   local Folder = MainTab.Folder("Fly", "[Info] Allows the player to fly")
-   Folder.SwitchAndBinding("Toggle", function(Status)
-       if Status then
-           Notifier:Send("[Legacy.wip] Fly - Enable!",6)
-           self:Enable()
-       else
-           Notifier:Send("[Legacy.wip] Fly - Disable!",6)
-           self:Disable()
-       end
-   end)
+    local Group = MainTab:AddLeftGroupbox('Fly')
 
-   Folder.Slider("Fly Speed", { Min = 0, Max = 5, Default = 1, Step = 0.01 }, function(value)
-       Fly.FlyMultiplier = value
-   end)
+    local Toggle = Group:AddToggle("FlyToggle", {
+        Text = "Toggle",
+        Default = false,
+        Callback = function(Value)
+            if Value then
+                self:Enable()
+            else
+                self:Disable()
+            end
+        end
+    })
+    Toggle:AddKeyPicker("FlyBind", {
+        Default = "C",
+        Text = "Fly Keybind",
+        Mode = "Toggle",
+        NoUI = false,
+        Callback = function()
+            Toggle:SetValue(not Toggle.Value)
+        end
+    })
+
+    Group:AddSlider('Value', {
+        Text = 'Value',
+        Default = 1,
+        Min = 0,
+        Max = 5,
+        Rounding = 0.01,
+        Callback = function(value)
+            self.FlyMultiplier = value
+        end
+    })
 
    return self
 end
