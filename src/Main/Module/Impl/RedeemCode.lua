@@ -95,18 +95,20 @@ function RedeemCode:Disable()
     self.Enabled = false
 end
 
-function RedeemCode:drawModule(MainTab, Notifier)
-    local Folder = MainTab.Folder("RedeemCode", "[Info] Auto Redeem all game code")
+function RedeemCode:drawModule(MainTab)
+    local Group = MainTab:AddLeftGroupbox('Redeem Code')
 
-    self._Switch = Folder.SwitchAndBinding("Toggle", function(Status)
-        if Status then
-            Notifier:Send("[Legacy.wip] RedeemCode - Enable!",6)
-            self:Enable()
-        else
-            Notifier:Send("[Legacy.wip] RedeemCode - Disable!",6)
-            self:Disable()
+    self._Switch = Group:AddToggle("code", {
+        Text = "Activation",
+        Default = false,
+        Callback = function(Value)
+            if Value then
+                self:Enable()
+            else
+                self:Disable()
+            end
         end
-    end)
+    })
 
     return self
 end

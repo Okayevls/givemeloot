@@ -136,6 +136,8 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
     local Fly = loader:Get("Fly"):drawModule(CharacterTab)
 
+    local RedeemCode = loader:Get("RedeemCode"):drawModule(MiscTab)
+
     --local CombatTab = Window.Tab("Combat", 7485051733)
     --local CharacterTab = Window.Tab("Character", 16149111790)
     --local VisualTab = Window.Tab("Visuals", 16149111790)
@@ -143,9 +145,6 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     --local OtherTab = Window.Tab("Other", 16149111790)
 --
     --local SilentAim = loader:Get("SilentAim"):drawModule(CombatTab, Notifier)
---
-    --local Speed = loader:Get("Speed"):drawModule(CharacterTab, Notifier)
-    --local Fly = loader:Get("Fly"):drawModule(CharacterTab, Notifier)
 --
     --local Esp = loader:Get("Esp"):drawModule(VisualTab, Notifier)
     --local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab, Notifier)
