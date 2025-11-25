@@ -63,6 +63,12 @@ function RedeemCode:Run()
     if not RedeemRemote then
         if not findRemote() then
             warn("[RedeemCode] Не найден Remote — остановка.")
+
+            if self._Switch then
+                self._Switch:SetValue(false)
+            end
+
+            self.Enabled = false
             return
         end
     end
@@ -73,14 +79,13 @@ function RedeemCode:Run()
     end
 
     print("[RedeemCode] Все коды введены.")
-    self.Enabled = false
 
+    self.Enabled = false
     if self._Switch then
         self._Switch:SetValue(false)
     end
-
-    print("[RedeemCode] Модуль отключён автоматически.")
 end
+
 
 function RedeemCode:Enable()
     if self.Enabled then return end
@@ -109,11 +114,12 @@ function RedeemCode:drawModule(MainTab)
             end
         end
     })
-    
+
     self._Switch = Toggle
 
     return self
 end
+
 
 
 return RedeemCode
