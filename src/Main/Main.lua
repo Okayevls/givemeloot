@@ -11,10 +11,10 @@ local latestSHA = data["sha"]
 local modules = {
     Chat          = "src/Main/Util/Chat/UChat.lua",
     Updater       = "src/Main/Module/Update/Updater.lua",
+    GuiRenderer   = "src/Main/Gui/GuiRenderer.lua",
     GuiInstance   = "src/Main/Gui/GuiInstance.lua",
     ModuleManager = "src/Main/Module/ModuleManager.lua",
     ModuleLoader  = "src/Main/Core/ModuleLoader.lua",
-    GuiPanel   = "src/Main/Gui/GuiPanel.lua",
     EventLoader   = "src/Main/Core/EventLoader.lua"
 }
 
@@ -32,14 +32,13 @@ EventLoader:Init(modules)
 
 local Chat          = EventLoader:Get("Chat")
 local Updater       = EventLoader:Get("Updater")
+local GuiRenderer   = EventLoader:Get("GuiRenderer")
 local GuiInstance   = EventLoader:Get("GuiInstance")
 local ModuleManager = EventLoader:Get("ModuleManager")
 local ModuleLoader  = EventLoader:Get("ModuleLoader")
 
-local GuiPanel  = EventLoader:Get("GuiPanel")
-
 local updaterReconnect = Updater:new()
 
-GuiInstance:drawGuiCore(ModuleLoader, GuiPanel, ModuleManager)
+GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
 Chat.chat.sendMessage("Created by gargon x prokosik")
 
