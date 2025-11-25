@@ -83,7 +83,7 @@ function Fly:Destroy()
     self:Disable()
 end
 
-function Fly:drawModule(MainTab, Notifier)
+function Fly:drawModule(MainTab)
     local Group = MainTab:AddLeftGroupbox('Fly')
 
     local Toggle = Group:AddToggle("FlyToggle", {
