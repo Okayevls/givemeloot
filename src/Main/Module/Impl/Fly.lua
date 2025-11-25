@@ -98,7 +98,7 @@ function Fly:drawModule(MainTab)
         end
     })
     Toggle:AddKeyPicker("FlyBind", {
-        Default = "C",
+        Default = "None",
         Text = "Fly Keybind",
         Mode = "Toggle",
         NoUI = false,

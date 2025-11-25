@@ -133,6 +133,8 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local MiscTab = Window:AddTab('Misc')
     local UISettingsTab = Window:AddTab('UI Settings')
 
+    local SilentAim = loader:Get("SilentAim"):drawModule(CombatTab)
+
     local Speed = loader:Get("Speed"):drawModule(CharacterTab)
     local Fly = loader:Get("Fly"):drawModule(CharacterTab)
 

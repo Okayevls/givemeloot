@@ -338,30 +338,86 @@ function SilentAim:Disable()
     end
 end
 
-function SilentAim:drawModule(MainTab, Notifier)
-    local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
+function SilentAim:drawModule(MainTab)
+    local Group = MainTab:AddLeftGroupbox('SilentAim')
 
-    Folder.SwitchAndBinding("Toggle", function(Status)
-        if Status then
-            Notifier:Send("[Legacy.wip] SilentAim - Enable!", 4)
-            self:Enable()
-        else
-            Notifier:Send("[Legacy.wip] SilentAim - Disable!", 4)
-            self:Disable()
+    local Toggle = Group:AddToggle("Toggle", {
+        Text = "Toggle",
+        Default = false,
+        Callback = function(Value)
+            if Value then
+                self:Enable()
+            else
+                self:Disable()
+            end
         end
-    end)
+    })
+    Toggle:AddKeyPicker("Bind", {
+        Default = "None",
+        Text = "Toggle Keybind",
+        Mode = "Toggle",
+        NoUI = false,
+        Callback = function()
+            Toggle:SetValue(not Toggle.Value)
+        end
+    })
 
-    local MyBind = Folder.Binding("Select Target", function(key)
-        self.TargetBind = key
-    end)
+    local MyBind = Toggle:AddKeyPicker("BindSelectTarget", {
+        Default = "None",
+        Text = "Select Target",
+        Mode = "Toggle",
+        NoUI = false,
+        Callback = function()
+        end
+    })
 
-    self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
-        self.EnabledAutoStomp = st
-    end)
+    self.TargetBind = MyBind
 
-    Folder.SwitchAndBinding("AntiBuy", function(st)
-        self.EnabledAntiBuy = st
-    end)
+   --self._StompSwitch = Group:AddToggle("Stomp", {
+   --    Text = "Stomp",
+   --    Default = false,
+   --    Callback = function(Value)
+   --        if Value then
+   --            self:Enable()
+   --        else
+   --            self:Disable()
+   --        end
+   --    end
+   --}):AddKeyPicker("BindStomp", {
+   --    Default = "None",
+   --    Text = "Toggle Keybind",
+   --    Mode = "Toggle",
+   --    NoUI = false,
+   --    Callback = function()
+   --        Toggle1:SetValue(not Toggle1.Value)
+   --    end
+   --})
+
+
+
+    --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
+
+   --Folder.SwitchAndBinding("Toggle", function(Status)
+   --    if Status then
+   --        Notifier:Send("[Legacy.wip] SilentAim - Enable!", 4)
+   --        self:Enable()
+   --    else
+   --        Notifier:Send("[Legacy.wip] SilentAim - Disable!", 4)
+   --        self:Disable()
+   --    end
+   --end)
+
+   --local MyBind = Folder.Binding("Select Target", function(key)
+   --    self.TargetBind = key
+   --end)
+
+   --self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
+   --    self.EnabledAutoStomp = st
+   --end)
+
+   --Folder.SwitchAndBinding("AntiBuy", function(st)
+   --    self.EnabledAntiBuy = st
+   --end)
 
     return self
 end

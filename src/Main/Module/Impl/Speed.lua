@@ -57,7 +57,7 @@ function Speed:drawModule(MainTab)
         end
     })
     Toggle:AddKeyPicker("SpeedBind", {
-        Default = "C",
+        Default = "None",
         Text = "Speed Keybind",
         Mode = "Toggle",
         NoUI = false,
