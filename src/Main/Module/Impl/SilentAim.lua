@@ -373,8 +373,12 @@ function SilentAim:drawModule(MainTab)
         Text = "Select Target",
         Mode = "Toggle",
         NoUI = false,
-        Callback = function()
-            Toggle2:SetValue(not Toggle2.Value)
+        Callback = function(key)
+            self.EnabledAutoStomp = key
+            Toggle2:SetValue(true)
+            if Toggle2 then
+                Toggle2:SetValue(false)
+            end
         end
     })
 
