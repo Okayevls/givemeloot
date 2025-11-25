@@ -280,6 +280,7 @@ end)
 
 RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
+        print(self.TargetBind)
         if selectedTarget ~= nil then
             updateLine()
             randomTarget = nil
@@ -382,7 +383,6 @@ function SilentAim:drawModule(MainTab)
     })
 
     self.TargetBind = ToggleBind2.Value
-    print(ToggleBind2.Value)
 
     --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
