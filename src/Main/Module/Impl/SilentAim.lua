@@ -361,20 +361,20 @@ function SilentAim:drawModule(MainTab)
     })
 
 
-    local SelectTargetToggle = Group:AddToggle("SelectTargetToggle", {
+    local Toggle2 = Group:AddToggle("SelectTargetToggle", {
         Text = "Select Target",
         Default = false,
         Callback = function(v)
             self.EnabledTarget = v
         end
     })
-    SelectTargetToggle:AddKeyPicker("SelectTargetBind", {
+    Toggle2:AddKeyPicker("SelectTargetBind", {
         Default = "None",
-        Text = "Select Target Key",
+        Text = "Select Target",
         Mode = "Toggle",
         NoUI = false,
         Callback = function()
-            SelectTargetToggle:SetValue(not SelectTargetToggle.Value)
+            Toggle2:SetValue(not Toggle2.Value)
         end
     })
 
