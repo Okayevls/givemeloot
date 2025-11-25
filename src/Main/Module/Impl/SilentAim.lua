@@ -382,6 +382,7 @@ function SilentAim:drawModule(MainTab)
     })
 
     self.TargetBind = ToggleBind2.Value
+    print(ToggleBind2.Value)
 
     --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
