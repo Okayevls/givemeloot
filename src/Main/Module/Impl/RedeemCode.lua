@@ -98,7 +98,7 @@ end
 function RedeemCode:drawModule(MainTab)
     local Group = MainTab:AddLeftGroupbox('Redeem Code')
 
-    self._Switch = Group:AddToggle("code", {
+    local Toggle = Group:AddToggle("code", {
         Text = "Activation",
         Default = false,
         Callback = function(Value)
@@ -109,6 +109,9 @@ function RedeemCode:drawModule(MainTab)
             end
         end
     })
+
+    Toggle:SetValue(self._Switch)
+
 
     return self
 end
