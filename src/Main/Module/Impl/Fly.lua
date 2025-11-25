@@ -2,7 +2,7 @@ local Fly = {}
 Fly.__index = Fly
 
 Fly.Enabled = false
-Fly.FlyMultiplier = 1.2
+Fly.FlyMultiplier = 1.5
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -22,19 +22,19 @@ setupCharacter()
 player.CharacterAdded:Connect(setupCharacter)
 
 function Fly:Enable()
-   if self.Enabled then return end
-   self.Enabled = true
+    if self.Enabled then return end
+    self.Enabled = true
 
-   if hum then
-       hum:ChangeState(Enum.HumanoidStateType.Physics)
-   end
+    if hum then
+        hum:ChangeState(Enum.HumanoidStateType.Physics)
+    end
 end
 
 function Fly:Disable()
-   self.Enabled = false
-   if hum then
-       hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-   end
+    self.Enabled = false
+    if hum then
+        hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+    end
 end
 
 connection = RunService.RenderStepped:Connect(function()
@@ -56,13 +56,13 @@ end)
 local UserInputService = game:GetService("UserInputService")
 UserInputService.InputBegan:Connect(function(input, processed)
     local kc = input.KeyCode
-        if kc == Enum.KeyCode.W then keys.W = true
-        elseif kc == Enum.KeyCode.A then keys.A = true
-        elseif kc == Enum.KeyCode.S then keys.S = true
-        elseif kc == Enum.KeyCode.D then keys.D = true
-        elseif kc == Enum.KeyCode.Space then keys.Space = true
-        elseif kc == Enum.KeyCode.LeftControl then keys.LeftControl = true
-        end
+    if kc == Enum.KeyCode.W then keys.W = true
+    elseif kc == Enum.KeyCode.A then keys.A = true
+    elseif kc == Enum.KeyCode.S then keys.S = true
+    elseif kc == Enum.KeyCode.D then keys.D = true
+    elseif kc == Enum.KeyCode.Space then keys.Space = true
+    elseif kc == Enum.KeyCode.LeftControl then keys.LeftControl = true
+    end
 end)
 
 UserInputService.InputEnded:Connect(function(input)
@@ -77,48 +77,29 @@ end)
 
 function Fly:Destroy()
     if connection then
-       connection:Disconnect()
+        connection:Disconnect()
     end
 
     self:Disable()
 end
 
-function Fly:drawModule(MainTab)
-    local Group = MainTab:AddRightGroupbox('Fly')
-
-    local Toggle = Group:AddToggle("FlyToggle", {
-        Text = "Toggle",
-        Default = false,
-        Callback = function(Value)
-            if Value then
-                self:Enable()
-            else
-                self:Disable()
-            end
+function Fly:drawModule(MainTab, Notifier)
+    local Folder = MainTab.Folder("Fly", "[Info] Allows the player to fly")
+    Folder.SwitchAndBinding("Toggle", function(Status)
+        if Status then
+            Notifier:Send("[Legacy.wip] Fly - Enable!",6)
+            self:Enable()
+        else
+            Notifier:Send("[Legacy.wip] Fly - Disable!",6)
+            self:Disable()
         end
-    })
-    Toggle:AddKeyPicker("FlyBind", {
-        Default = "None",
-        Text = "Fly Keybind",
-        Mode = "Toggle",
-        NoUI = false,
-        Callback = function()
-            Toggle:SetValue(not Toggle.Value)
-        end
-    })
+    end)
 
-    Group:AddSlider('Value', {
-        Text = 'Value',
-        Default = 1,
-        Min = 0,
-        Max = 5,
-        Rounding = 2,
-        Callback = function(value)
-            self.FlyMultiplier = value
-        end
-    })
+    Folder.Slider("Fly Speed", { Min = 0, Max = 5, Default = 1, Step = 0.01 }, function(value)
+        Fly.FlyMultiplier = value
+    end)
 
-   return self
+    return self
 end
 
 return Fly

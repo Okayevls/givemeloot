@@ -63,12 +63,11 @@ function RedeemCode:Run()
     if not RedeemRemote then
         if not findRemote() then
             warn("[RedeemCode] Не найден Remote — остановка.")
+            self.Enabled = false
 
             if self._Switch then
-                self._Switch:SetValue(false)
+                self._Switch.Value = false
             end
-
-            self.Enabled = false
             return
         end
     end
@@ -79,13 +78,14 @@ function RedeemCode:Run()
     end
 
     print("[RedeemCode] Все коды введены.")
-
     self.Enabled = false
-    if self._Switch then
-        self._Switch:SetValue(false)
-    end
-end
 
+    if self._Switch then
+        self._Switch.Value = false
+    end
+
+    print("[RedeemCode] Модуль отключён автоматически.")
+end
 
 function RedeemCode:Enable()
     if self.Enabled then return end
@@ -100,26 +100,20 @@ function RedeemCode:Disable()
     self.Enabled = false
 end
 
-function RedeemCode:drawModule(MainTab)
-    local Group = MainTab:AddLeftGroupbox('Redeem Code')
+function RedeemCode:drawModule(MainTab, Notifier)
+    local Folder = MainTab.Folder("RedeemCode", "[Info] Auto Redeem all game code")
 
-    local Toggle = Group:AddToggle("code", {
-        Text = "Activation",
-        Default = false,
-        Callback = function(Value)
-            if Value then
-                self:Enable()
-            else
-                self:Disable()
-            end
+    self._Switch = Folder.SwitchAndBinding("Toggle", function(Status)
+        if Status then
+            Notifier:Send("[Legacy.wip] RedeemCode - Enable!",6)
+            self:Enable()
+        else
+            Notifier:Send("[Legacy.wip] RedeemCode - Disable!",6)
+            self:Disable()
         end
-    })
-
-    self._Switch = Toggle
+    end)
 
     return self
 end
-
-
 
 return RedeemCode

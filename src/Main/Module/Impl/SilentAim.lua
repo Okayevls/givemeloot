@@ -4,7 +4,6 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
-SilentAim.EnabledTarget = nil
 SilentAim.TargetBind = nil
 
 SilentAim._StompSwitch = nil
@@ -67,7 +66,6 @@ local function findNearestToMouse()
 end
 
 local function create3DTracer(fromAttachment, targetPosition)
-    -- Стартовая точка (дула)
     local startPart = Instance.new("Part")
     startPart.Size = Vector3.new(0.1, 0.1, 0.1)
     startPart.Anchored = true
@@ -80,7 +78,6 @@ local function create3DTracer(fromAttachment, targetPosition)
     attachStart.Position = Vector3.new(0,0,0)
     attachStart.Parent = startPart
 
-    -- Конечная точка (цель)
     local endPart = Instance.new("Part")
     endPart.Size = Vector3.new(0.1, 0.1, 0.1)
     endPart.Anchored = true
@@ -93,7 +90,6 @@ local function create3DTracer(fromAttachment, targetPosition)
     attachEnd.Position = Vector3.new(0,0,0)
     attachEnd.Parent = endPart
 
-    -- Beam
     local beam = Instance.new("Beam")
     beam.Attachment0 = attachStart
     beam.Attachment1 = attachEnd
@@ -111,7 +107,6 @@ local function create3DTracer(fromAttachment, targetPosition)
     })
     beam.Parent = workspace
 
-    -- Плавное исчезновение
     task.spawn(function()
         local steps = 40
         local delayPerStep = 0.025
@@ -280,7 +275,6 @@ end)
 
 RunService.RenderStepped:Connect(function()
     if SilentAim.Enabled then
-        print(SilentAim.TargetBind)
         if selectedTarget ~= nil then
             updateLine()
             randomTarget = nil
@@ -318,7 +312,6 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
-
 function SilentAim:Enable()
     self.Enabled = true
 end
@@ -341,72 +334,30 @@ function SilentAim:Disable()
     end
 end
 
-function SilentAim:drawModule(MainTab)
-    local Group = MainTab:AddLeftGroupbox('SilentAim')
+function SilentAim:drawModule(MainTab, Notifier)
+    local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
 
-    local Toggle = Group:AddToggle("SilentAimToggle", {
-        Text = "Toggle",
-        Default = false,
-        Callback = function(v)
-            if v then
-                self:Enable()
-            else
-                self:Disable()
-            end
+    Folder.SwitchAndBinding("Toggle", function(Status)
+        if Status then
+            Notifier:Send("[Legacy.wip] SilentAim - Enable!", 4)
+            self:Enable()
+        else
+            Notifier:Send("[Legacy.wip] SilentAim - Disable!", 4)
+            self:Disable()
         end
-    })
-    Toggle:AddKeyPicker("SilentAimBind", {
-        Default = "None",
-        Text = "Toggle Keybind",
-        Mode = "Toggle",
-        NoUI = false,
-        Callback = function()
-            Toggle:SetValue(not Toggle.Value)
-        end
-    })
+    end)
 
+    local MyBind = Folder.Binding("Select Target", function(key)
+        self.TargetBind = key
+    end)
 
-    local Toggle2 = Group:AddToggle("SelectTargetToggle", {
-        Text = "Select Target",
-        Default = false,
-        Callback = function(v)
-            self.EnabledTarget = v
-        end
-    })
-    local ToggleBind2 = Toggle2:AddKeyPicker("SelectTargetBind", {
-        Default = "None",
-        Text = "Select Target",
-        Mode = "Toggle",
-        NoUI = false,
-        Callback = function()
-        end
-    })
+    self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
+        self.EnabledAutoStomp = st
+    end)
 
-    self.TargetBind = ToggleBind2.Value
-
-    --local Folder = MainTab.Folder("SilentAim", "[Info] Automatically finds the target and destroys it")
-
-   --Folder.SwitchAndBinding("Toggle", function(Status)
-   --    if Status then
-   --        Notifier:Send("[Legacy.wip] SilentAim - Enable!", 4)
-   --        self:Enable()
-   --    else
-   --        Notifier:Send("[Legacy.wip] SilentAim - Disable!", 4)
-   --        self:Disable()
-   --    end
-   --end)
-
-   --local MyBind = Folder.Binding("Select Target", function(key)
-   --    self.TargetBind = key
-   --end)
-
-   --self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
-   --    self.EnabledAutoStomp = st
-   --end)
-
-   --Folder.SwitchAndBinding("AntiBuy", function(st)
-   --    self.EnabledAntiBuy = st
-   --end)
+    Folder.SwitchAndBinding("AntiBuy", function(st)
+        self.EnabledAntiBuy = st
+    end)
 
     return self
 end

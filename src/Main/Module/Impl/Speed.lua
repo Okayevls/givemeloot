@@ -42,40 +42,22 @@ function Speed:Disable()
     self.Enabled = false
 end
 
-function Speed:drawModule(MainTab)
-    local Group = MainTab:AddLeftGroupbox('Speed')
+function Speed:drawModule(MainTab, Notifier)
+    local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
-    local Toggle = Group:AddToggle("SpeedToggle", {
-        Text = "Toggle",
-        Default = false,
-        Callback = function(Value)
-            if Value then
-                self:Enable()
-            else
-                self:Disable()
-            end
+    Folder.SwitchAndBinding("Toggle", function(Status)
+        if Status then
+            Notifier:Send("[Legacy.wip] Speed - Enable!", 6)
+            self:Enable()
+        else
+            Notifier:Send("[Legacy.wip] Speed - Disable!", 6)
+            self:Disable()
         end
-    })
-    Toggle:AddKeyPicker("SpeedBind", {
-        Default = "None",
-        Text = "Speed Keybind",
-        Mode = "Toggle",
-        NoUI = false,
-        Callback = function()
-            Toggle:SetValue(not Toggle.Value)
-        end
-    })
+    end)
 
-    Group:AddSlider('Speed Value', {
-        Text = 'Value',
-        Default = 50,
-        Min = 10,
-        Max = 500,
-        Rounding = 0,
-        Callback = function(value)
-            self.SpeedMultiplier = value
-        end
-    })
+    Folder.Slider("Boost Multiple", { Min = 10, Max = 500, Default = 50, Step = 0.1 }, function(value)
+        self.SpeedMultiplier = value
+    end)
 
     return self
 end
