@@ -362,7 +362,7 @@ function SilentAim:drawModule(MainTab)
         end
     })
 
-    local MyBind = Toggle:AddKeyPicker("BindSelectTarget", {
+    local MyBind = Group:AddKeyPicker("BindSelectTarget", {
         Default = "None",
         Text = "Select Target",
         Mode = "Toggle",
