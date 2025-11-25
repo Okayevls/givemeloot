@@ -71,7 +71,7 @@ function Speed:drawModule(MainTab)
         Default = 50,
         Min = 10,
         Max = 500,
-        Rounding = 0.1,
+        Rounding = 0,
         Callback = function(value)
             self.SpeedMultiplier = value
         end,
