@@ -74,7 +74,7 @@ function Speed:drawModule(MainTab)
         Rounding = 0,
         Callback = function(value)
             self.SpeedMultiplier = value
-        end,
+        end
     })
 
 
