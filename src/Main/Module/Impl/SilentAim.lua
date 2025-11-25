@@ -383,14 +383,10 @@ function SilentAim:drawModule(MainTab)
     SelectTargetToggle:AddKeyPicker("SelectTargetBind", {
         Default = "None",
         Text = "Select Target Key",
-        Mode = "Always",
+        Mode = "Toggle",
         NoUI = false,
-        Callback = function(key)
-            if key == "None" then
-                self.TargetBind = nil
-            else
-                self.TargetBind = Enum.KeyCode[key]
-            end
+        Callback = function()
+            SelectTargetToggle:SetValue(not SelectTargetToggle.Value)
         end
     })
 
