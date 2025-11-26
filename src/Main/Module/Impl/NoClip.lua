@@ -29,8 +29,8 @@ local function StartLoop()
 
     connection = RunService.Stepped:Connect(function()
         if NoClip.Enabled and character then
-            for part, _ in pairs(originalCollisions) do
-                if part and part:IsA("BasePart") then
+            for _, part in ipairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
                     part.CanCollide = false
                 end
             end

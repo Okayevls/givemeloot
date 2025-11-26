@@ -1,5 +1,2 @@
-[main e0e5570] Auto-commit 26.11.2025  1:55:10,89
- 10 files changed, 2024 insertions(+), 4150 deletions(-)
- delete mode 100644 src/Main/Gui/GuiPanel.lua
- create mode 100644 src/Main/Gui/GuiRenderer.lua
- delete mode 100644 src/Main/Module/ModuleManager.lua~
+[main 29c0767] Auto-commit 26.11.2025  1:56:44,74
+ 2 files changed, 8 insertions(+), 6 deletions(-)

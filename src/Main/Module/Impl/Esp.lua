@@ -30,21 +30,28 @@ local function updateOriginalNames()
         if plr ~= LocalPlayer and plr.Character then
             local humanoid = plr.Character:FindFirstChildOfClass("Humanoid")
             if humanoid then
-                if SETTINGS.HideNames then
-                    humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-                else
-                    humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
-                end
+                humanoid.DisplayDistanceType = SETTINGS.HideNames and Enum.HumanoidDisplayDistanceType.None
+                        or Enum.HumanoidDisplayDistanceType.Viewer
             end
         end
     end
 end
 
+local function setupOriginalName(plr)
+    plr.CharacterAdded:Connect(function(char)
+        task.wait(0.1)
+        updateOriginalNames()
+    end)
+end
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    setupOriginalName(plr)
+end
+Players.PlayerAdded:Connect(setupOriginalName)
+
 local function createESP(character, plrName)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then
-        return nil
-    end
+    if not humanoid then return nil end
 
     local root = character:WaitForChild("HumanoidRootPart", 5)
     if not root then return nil end
@@ -128,17 +135,14 @@ local function setupESP(plr)
 
     plr.CharacterAdded:Connect(function(char)
         task.wait(0.3)
-
         if espData[plr] then
             for _, v in ipairs(espData[plr]) do
-                if typeof(v) == "Instance" then
-                    v:Destroy()
-                end
+                if typeof(v) == "Instance" then v:Destroy() end
             end
             espData[plr] = nil
         end
-
         espData[plr] = createESP(char, plr.Name)
+        updateOriginalNames()
     end)
 
     if plr.Character then
@@ -149,9 +153,7 @@ end
 for _, plr in ipairs(Players:GetPlayers()) do
     setupESP(plr)
 end
-
 Players.PlayerAdded:Connect(setupESP)
-
 Players.PlayerRemoving:Connect(function(plr)
     if espData[plr] then
         for _, v in ipairs(espData[plr]) do
@@ -172,7 +174,6 @@ function Esp:Enable()
     if self.Enabled then return end
     self.Enabled = true
     updateOriginalNames()
-
     for _, data in pairs(espData) do
         if data[1] then data[1].Enabled = SETTINGS.ShowBox end
         if data[2] then data[2].Enabled = SETTINGS.ShowName end
@@ -183,7 +184,6 @@ end
 function Esp:Disable()
     self.Enabled = false
     updateOriginalNames()
-
     for _, data in pairs(espData) do
         if data[1] then data[1].Enabled = false end
         if data[2] then data[2].Enabled = false end

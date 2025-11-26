@@ -1,43 +1,14 @@
---[[
-     _              _             _ _
-    | |  _  _ _ __ (_)_ _  ___ __(_) |_ _  _
-    | |_| || | '  \| | ' \/ _ (_-< |  _| || |
-    |____\_,_|_|_|_|_|_||_\___/__/_|\__|\_, |
-                                        |__/
-	Source:
-        https://raw.githubusercontent.com/icuck/GenesisStudioLibraries/main/Elerium%20Interface%20Library.lua
-
-	Version:
-        0.0.1
-
-	Date:
-        October 19th, 2020
-
-	Author:
-        OminousVibes @ v3rmillion.net / OminousVibes#1234 @ discord.gg
-
-    Credits:
-        (None Yet)
-
-]]
-
--- [ Initialize ] --
--- Destroy Previous UI's --
 if _G.Luminosity_Loaded and _G.MyGui then
     _G.MyGui:Destroy()
 end
 
--- Set Globals --
 _G.Luminosity_Loaded = true
 _G.MyGui = nil
 
--- [ Yield ] --
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
--- // CONSTANTS \\ --
--- [ Services ] --
 local Services = setmetatable({}, {__index = function(Self, Index)
     local NewService = game:GetService(Index)
     if NewService then
@@ -46,23 +17,12 @@ local Services = setmetatable({}, {__index = function(Self, Index)
     return NewService
 end})
 
--- [ LocalPlayer ] --
 local LocalPlayer = Services.Players.LocalPlayer
 
--- // Variables \\ --
--- [ Colors ] --
 local Objects = {}
-
--- [ Other ] --
 local Binds = {}
-
--- // Functions \\ --
 local Utility = {}
 
---[[
-Utility.new(Class: string, Properties: Dictionary, Children: Array)
-    Creates a new object with the Properties
-]]
 function Utility.new(Class, Properties, Children)
     local NewInstance = Instance.new(Class)
     for i,v in pairs(Properties or {}) do
@@ -80,18 +40,10 @@ function Utility.new(Class, Properties, Children)
     return NewInstance
 end
 
---[[
-Utility.Tween(Object: Instance, TweenInformation: TweenInfo, Goal: Dictionary)
-    Creates a tween
-]]
 function Utility.Tween(Object, TweenInformation, Goal)
-    -- [ Tween ] --
     local Tween = Services.TweenService:Create(Object, TweenInformation, Goal)
-
-    -- [ Info ] --
     local Info = {}
 
-    -- Yield --
     function Info:Yield()
         Tween:Play()
         Tween.Completed:Wait(10)
@@ -105,10 +57,6 @@ function Utility.Tween(Object, TweenInformation, Goal)
     end})
 end
 
---[[
-Utility:Wait()
-    Yields for a short period of time.
-]]
 function Utility.Wait(Seconds)
     if Seconds then
         local StartTime = time()
@@ -120,22 +68,13 @@ function Utility.Wait(Seconds)
     end
 end
 
---[[
-Utility.BindKey(Key: KeyCode, Callback: Function, ID: string)
-    Binds a key
-]]
 function Utility.BindKey(Key, Callback, ID)
     local BindID = ID or Services.HttpService:GenerateGUID(true)
     Services.ContextActionService:BindAction(BindID, Callback, false, Key)
     return BindID
 end
 
---[[
-Utility:DraggingEnabled()
-    Allows Dragging for the Frame Provided
-]]
 function Utility.CreateDrag(Frame, Parent, Settings)
-    -- Main --
     local DragPro = {
         DragEnabled = true;
         Dragging = false;
@@ -145,7 +84,6 @@ function Utility.CreateDrag(Frame, Parent, Settings)
         }
     }
 
-    -- Info --
     local DragInfo = {
         Parent = Parent or Frame;
         DragInput = nil;
@@ -153,7 +91,6 @@ function Utility.CreateDrag(Frame, Parent, Settings)
         FramePosition = nil;
     }
 
-    -- Script --
     local Connections = {}
 
     function DragPro:Initialize()
@@ -190,7 +127,6 @@ function Utility.CreateDrag(Frame, Parent, Settings)
         )
     end
 
-    -- Functions --
     function DragPro:Destroy()
         for i,v in ipairs(Connections) do
             v:Disconnect()
@@ -199,12 +135,9 @@ function Utility.CreateDrag(Frame, Parent, Settings)
 
     DragPro:Initialize()
 
-    -- Return --
     return DragPro
 end
 
--- // Main Module \\ --
--- [ MyGui ] --
 local MyGui = {
     ScreenGui = Utility.new("ScreenGui", {
         DisplayOrder = 5,
@@ -229,7 +162,6 @@ for i,v in pairs({Name = "Template", Debug = false}) do
     end
 end
 
--- Intro --
 function MyGui.LoadingScreen()
     coroutine.wrap(function()
         local LoadingScreen = Utility.new("Frame", {
@@ -257,18 +189,15 @@ function MyGui.LoadingScreen()
         })
         Utility.Tween(LoadingScreen, TweenInfo.new(1), {BackgroundTransparency = 0}):Yield()
 
-        -- Loading --    
         if not LoadingScreen.LoadingVideo.IsLoaded then
             LoadingScreen.LoadingVideo.Loaded:Wait(10)
         end
         LoadingScreen.LoadingVideo.Visible = true
 
-        -- Wait for all assets to load --
         Utility.Wait(2.5)
         Services.ContentProvider:PreloadAsync({MyGui.ScreenGui})
         Utility.Wait(0.25)
 
-        -- Destroy Screen --
         LoadingScreen.LoadingVideo.Visible = false
         Utility.Tween(LoadingScreen, TweenInfo.new(1), {BackgroundTransparency = 1}):Yield()
         LoadingScreen:Destroy()
@@ -276,7 +205,6 @@ function MyGui.LoadingScreen()
     Utility.Wait(1)
 end
 
--- [ Options ] --
 local function CreateOptions(Frame)
     local Options = {}
 
