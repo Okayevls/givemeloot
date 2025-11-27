@@ -2,7 +2,7 @@ local Speed = {}
 Speed.__index = Speed
 
 Speed.Enabled = false
-Speed.SpeedMultiplier = 50
+Speed.SpeedMultiplier = 145
 
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")

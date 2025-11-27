@@ -6,7 +6,8 @@ RedeemCode._Switch = nil
 
 local CODES = {
     "20MVISITS",
-    "20KLIKES"
+    "20KLIKES",
+    "StarCity"
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
