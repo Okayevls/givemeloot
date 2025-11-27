@@ -1,2 +1,3 @@
-[main 7f26176] Auto-commit 26.11.2025  2:25:04,74
- 4 files changed, 22 insertions(+), 97 deletions(-)
+[main 029a896] Auto-commit 27.11.2025 11:02:14,71
+ 4 files changed, 102 insertions(+), 4 deletions(-)
+ create mode 100644 src/Main/Module/Impl/JumpCircle.lua
