@@ -178,7 +178,7 @@ local function smartShoot(targetPlayer)
     local root = char:FindFirstChild("HumanoidRootPart")
     if not head or not root then return end
 
-    local predicted = head.Position + root.Velocity * 0.15
+    local predicted = head.Position
 
     local muzzle
     if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
