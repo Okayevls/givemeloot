@@ -2,6 +2,10 @@ local JumpCircle = {}
 JumpCircle.__index = JumpCircle
 
 JumpCircle.Enabled = false
+JumpCircle.START_RADIUS = 1
+JumpCircle.END_RADIUS = 8
+JumpCircle.FADE_TIME = 0.52
+JumpCircle.HEIGHT = 0.05
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -55,7 +59,6 @@ local function createCircle()
             local radius = START_RADIUS + (END_RADIUS - START_RADIUS) * t
             part.Size = Vector3.new(radius*2, HEIGHT, radius*2)
             image.ImageTransparency = t
-            print(t)
         end
     end)
 end
@@ -89,6 +92,22 @@ function JumpCircle:drawModule(MainTab, Notifier)
             Notifier:Send("[Legacy.wip] JumpCircle - Disable!", 4)
             self:Disable()
         end
+    end)
+
+    Folder.Slider("Start Radius", { Min = 0.01, Max = 1, Default = 1, Step = 0.01 }, function(value)
+        JumpCircle.START_RADIUS = value
+    end)
+
+    Folder.Slider("End Radius", { Min = 1, Max = 8, Default = 1, Step = 0.25 }, function(value)
+        JumpCircle.END_RADIUS = value
+    end)
+
+    Folder.Slider("Fade Time", { Min = 0.01, Max = 1, Default = 0.52, Step = 0.01 }, function(value)
+        JumpCircle.FADE_TIME = value
+    end)
+
+    Folder.Slider("Height", { Min = 0.01, Max = 1, Default = 0.05, Step = 0.01 }, function(value)
+        JumpCircle.HEIGHT = value
     end)
 
     return self
