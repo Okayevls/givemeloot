@@ -95,7 +95,7 @@ function Fly:drawModule(MainTab, Notifier)
         end
     end)
 
-    Folder.Slider("Fly Speed", { Min = 0, Max = 500, Default = 1, Step = 0.01 }, function(value)
+    Folder.Slider("Fly Speed", { Min = 0, Max = 50, Default = 1.5, Step = 0.05 }, function(value)
         Fly.FlyMultiplier = value
     end)
 

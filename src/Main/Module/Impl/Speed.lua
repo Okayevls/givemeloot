@@ -2,6 +2,7 @@ local Speed = {}
 Speed.__index = Speed
 
 Speed.Enabled = false
+Speed.RagdollEnabled = false
 Speed.SpeedMultiplier = 145
 
 local RunService = game:GetService("RunService")
@@ -30,6 +31,19 @@ connection = RunService.Heartbeat:Connect(function()
                     dir.Z * Speed.SpeedMultiplier
             )
         end
+    else
+        if Speed.RagdollEnabled then
+            if character:GetAttribute("Ragdoll") then
+                local dir = hum.MoveDirection
+                if dir.Magnitude > 0 then
+                    hrp.Velocity = Vector3.new(
+                            dir.X * 100,
+                            hrp.Velocity.Y * 0.9,
+                            dir.Z * 100
+                    )
+                end
+            end
+        end
     end
 end)
 
@@ -55,8 +69,12 @@ function Speed:drawModule(MainTab, Notifier)
         end
     end)
 
-    Folder.Slider("Boost Multiple", { Min = 10, Max = 500, Default = 50, Step = 0.1 }, function(value)
+    Folder.Slider("Boost Multiple", { Min = 10, Max = 500, Default = 145, Step = 0.1 }, function(value)
         self.SpeedMultiplier = value
+    end)
+
+    Folder.Switch("Ragdoll Enabled", function(State)
+        self.RagdollEnabled = State
     end)
 
     return self
