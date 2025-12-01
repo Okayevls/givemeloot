@@ -5,13 +5,6 @@ SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
 
-SilentAim.a = 4
-SilentAim.aa = 4
-SilentAim.aaa = 0
-SilentAim.aaaa = 0
-SilentAim.aaaaa = false
-SilentAim.aaaaaa = false
-
 SilentAim.TargetBind = nil
 
 SilentAim._StompSwitch = nil
@@ -242,14 +235,13 @@ local function teleportWallbangShoot(targetPlayer)
     lastPosition = hrp.Position
     lastCFrame = hrp.CFrame
 
-    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -SilentAim.a
-    local teleportPos = targetHead.Position + behindOffset + Vector3.new(SilentAim.aaa, SilentAim.aa, SilentAim.aaaa)
+    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -3.6
+    local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
 
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
 
-    if SilentAim.aaaaa then
-        task.wait()
-    end
+    task.wait()
+    task.wait()
 
     gun.Communication:FireServer(
             { { targetHead, targetHead.Position, CFrame.new() } },
@@ -258,9 +250,7 @@ local function teleportWallbangShoot(targetPlayer)
     )
 
     task.spawn(function()
-        if SilentAim.aaaaaa then
-            task.wait()
-        end
+        task.wait()
         if hrp and hrp.Parent then
             hrp.CFrame = lastCFrame
         end
@@ -424,25 +414,6 @@ function SilentAim:drawModule(MainTab, Notifier)
 
     self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
         self.EnabledAutoStomp = st
-    end)
-
-    Folder.Slider("a1", { Min = 0.1, Max = 20, Default = 4, Step = 0.1 }, function(value)
-        self.a = value
-    end)
-    Folder.Slider("a2", { Min = 0.1, Max = 20, Default = 4, Step = 0.1 }, function(value)
-        self.aa = value
-    end)
-    Folder.Slider("a3", { Min = 0.1, Max = 20, Default = 0, Step = 0.1 }, function(value)
-        self.aaa = value
-    end)
-    Folder.Slider("a4", { Min = 0.1, Max = 20, Default = 0, Step = 0.1 }, function(value)
-        self.aaaa = value
-    end)
-    Folder.SwitchAndBinding("a5", function(st)
-        self.aaaaa = st
-    end)
-    Folder.SwitchAndBinding("a6", function(st)
-        self.aaaaaa = st
     end)
 
     return self
