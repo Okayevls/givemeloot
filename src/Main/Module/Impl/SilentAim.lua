@@ -241,15 +241,14 @@ local function teleportWallbangShoot(targetPlayer)
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
 
     task.wait()
-    task.wait()
-
-    gun.Communication:FireServer(
-            { { targetHead, targetHead.Position, CFrame.new() } },
-            { targetHead },
-            true
-    )
 
     task.spawn(function()
+        gun.Communication:FireServer(
+                { { targetHead, targetHead.Position, CFrame.new() } },
+                { targetHead },
+                true
+        )
+        task.wait()
         task.wait()
         if hrp and hrp.Parent then
             hrp.CFrame = lastCFrame
@@ -414,6 +413,10 @@ function SilentAim:drawModule(MainTab, Notifier)
 
     self._StompSwitch = Folder.SwitchAndBinding("Stomp", function(st)
         self.EnabledAutoStomp = st
+    end)
+
+    Folder.SwitchAndBinding("AntiBuy", function(st)
+        self.EnabledAntiBuy = st
     end)
 
     return self
