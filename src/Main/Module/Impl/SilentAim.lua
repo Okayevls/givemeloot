@@ -234,7 +234,7 @@ local function teleportWallbangShoot(targetPlayer)
     lastPosition = hrp.Position
     lastCFrame = hrp.CFrame
 
-    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector
+    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -4
     local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 0, 0)
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
 
