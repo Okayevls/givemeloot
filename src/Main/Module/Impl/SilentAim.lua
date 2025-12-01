@@ -160,6 +160,110 @@ end
 
 local lastAmmoPerAmmoObject = {}
 
+--local function smartShoot(targetPlayer)
+--    local gun = getEquippedWeapon()
+--    if not gun then return end
+--
+--    local ammo = gun:FindFirstChild("Ammo")
+--    if not ammo then return end
+--
+--    if lastAmmoPerAmmoObject[ammo] == nil then
+--        lastAmmoPerAmmoObject[ammo] = ammo.Value
+--    end
+--
+--    local char = targetPlayer.Character
+--    if not char then return end
+--
+--    local head = char:FindFirstChild("Head")
+--    local root = char:FindFirstChild("HumanoidRootPart")
+--    if not head or not root then return end
+--
+--    local predicted = head.Position
+--
+--    local muzzle
+--    if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
+--        muzzle = gun.Main.Front
+--    elseif gun:FindFirstChild("Muzzle") then
+--        muzzle = gun.Muzzle
+--    end
+--
+--    gun.Communication:FireServer(
+--            {
+--                { head, predicted, CFrame.new() }
+--            },
+--            { head },
+--            true
+--    )
+--
+--    if ammo.Value == lastAmmoPerAmmoObject[ammo] then
+--        return
+--    end
+--
+--    lastAmmoPerAmmoObject[ammo] = ammo.Value
+--
+--    if muzzle then
+--        local attach = muzzle:FindFirstChildOfClass("Attachment")
+--        if not attach then
+--            attach = Instance.new("Attachment")
+--            attach.Parent = muzzle
+--            task.spawn(function()
+--                task.wait(1.5)
+--                if attach and attach.Parent then attach:Destroy() end
+--            end)
+--        end
+--
+--        create3DTracer(attach, predicted)
+--    end
+--end
+local lastPosition = nil
+local lastCFrame = nil
+
+local function teleportWallbangShoot(targetPlayer)
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") or not character:FindFirstChild("Head") then return end
+
+    local hrp = character.HumanoidRootPart
+    local head = character.Head
+    local targetChar = targetPlayer.Character
+    if not targetChar or not targetChar:FindFirstChild("Head") then return end
+
+    local targetHead = targetChar.Head
+    local gun = getEquippedWeapon()
+    if not gun then return end
+
+    -- Сохраняем текущее состояние
+    lastPosition = hrp.Position
+    lastCFrame = hrp.CFrame
+
+    -- Позиция за спиной цели (чтобы пуля прошла сквозь стену)
+    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -4
+    local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 3, 0) -- чуть выше
+
+    -- Мгновенно телепортируемся
+    hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
+
+    -- Ждём 1 кадр, чтобы сервер принял позицию
+    task.wait()
+
+    -- Стреляем точно в голову
+    gun.Communication:FireServer(
+            { { targetHead, targetHead.Position, CFrame.new() } },
+            { targetHead },
+            true
+    )
+
+    -- МГНОВЕННО возвращаемся (на следующем кадре)
+    task.spawn(function()
+        task.wait() -- 1 тик, чтобы выстрел ушёл
+        if hrp and hrp.Parent then
+            hrp.CFrame = lastCFrame -- полное восстановление позиции + поворота
+            -- Восстанавливаем скорость (на случай если античит следит)
+            if hrp:FindFirstChild("BodyVelocity") then hrp.BodyVelocity.Velocity = Vector3.new(0,0,0) end
+            if hrp:FindFirstChild("BodyGyro") then hrp.BodyGyro.CFrame = lastCFrame end
+        end
+    end)
+end
+
 local function smartShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
@@ -171,48 +275,14 @@ local function smartShoot(targetPlayer)
         lastAmmoPerAmmoObject[ammo] = ammo.Value
     end
 
-    local char = targetPlayer.Character
-    if not char then return end
+    if ammo.Value <= 0 then return end
 
-    local head = char:FindFirstChild("Head")
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not head or not root then return end
+    -- Вот здесь магия: вместо обычного выстрела — телепорт-выстрел
+    teleportWallbangShoot(targetPlayer)
 
-    local predicted = head.Position
-
-    local muzzle
-    if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
-        muzzle = gun.Main.Front
-    elseif gun:FindFirstChild("Muzzle") then
-        muzzle = gun.Muzzle
-    end
-
-    gun.Communication:FireServer(
-            {
-                { head, predicted, CFrame.new() }
-            },
-            { head },
-            true
-    )
-
-    if ammo.Value == lastAmmoPerAmmoObject[ammo] then
-        return
-    end
-
-    lastAmmoPerAmmoObject[ammo] = ammo.Value
-
-    if muzzle then
-        local attach = muzzle:FindFirstChildOfClass("Attachment")
-        if not attach then
-            attach = Instance.new("Attachment")
-            attach.Parent = muzzle
-            task.spawn(function()
-                task.wait(1.5)
-                if attach and attach.Parent then attach:Destroy() end
-            end)
-        end
-
-        create3DTracer(attach, predicted)
+    -- Эмулируем расход патронов локально
+    if ammo.Value > 0 then
+        lastAmmoPerAmmoObject[ammo] = ammo.Value - 1
     end
 end
 
