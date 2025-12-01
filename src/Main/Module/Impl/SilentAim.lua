@@ -218,41 +218,64 @@ local lastAmmoPerAmmoObject = {}
 --end
 local lastPosition = nil
 local lastCFrame = nil
+local isTeleporting = false
 
 local function teleportWallbangShoot(targetPlayer)
+    if isTeleporting then return end -- защита от спама
+    isTeleporting = true
+
     local character = LocalPlayer.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") or not character:FindFirstChild("Head") then return end
+    if not character or not character:FindFirstChild("HumanoidRootPart") then
+        isTeleporting = false
+        return
+    end
 
     local hrp = character.HumanoidRootPart
-    local head = character.Head
     local targetChar = targetPlayer.Character
-    if not targetChar or not targetChar:FindFirstChild("Head") then return end
+    if not targetChar or not targetChar:FindFirstChild("Head") or not targetChar:FindFirstChild("HumanoidRootPart") then
+        isTeleporting = false
+        return
+    end
 
     local targetHead = targetChar.Head
+    local targetRoot = targetChar.HumanoidRootPart
     local gun = getEquippedWeapon()
-    if not gun then return end
+    if not gun or not gun:FindFirstChild("Communication") then
+        isTeleporting = false
+        return
+    end
 
+    -- Сохраняем состояние
     lastPosition = hrp.Position
     lastCFrame = hrp.CFrame
 
-    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -3.6
-    local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
+    -- Позиция за спиной цели (идеальная для wallbang)
+    local look = targetRoot.CFrame.LookVector
+    local teleportPos = targetHead.Position - look * 4 + Vector3.new(0, 3.5, 0)
 
+    -- КЛЮЧ: Устанавливаем позицию через Velocity + AssemblyLinearVelocity (обходит анти-телепорт)
+    hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
 
+    -- Ждём ровно 1 кадр (обязательно!)
     task.wait()
 
+    -- УБИЙСТВЕННЫЙ ФИКС: Отправляем выстрел ДО возврата!
+    gun.Communication:FireServer(
+            { { targetHead, targetHead.Position, CFrame.new() } },
+            { targetHead },
+            true  -- force hit (если поддерживается)
+    )
+
+    -- ВОЗВРАТ НА СЛЕДУЮЩЕМ КАДРЕ (самое важное — не сразу!)
     task.spawn(function()
-        gun.Communication:FireServer(
-                { { targetHead, targetHead.Position, CFrame.new() } },
-                { targetHead },
-                true
-        )
-        task.wait()
-        task.wait()
+        task.wait()  -- 1 кадр после выстрела
         if hrp and hrp.Parent then
-            hrp.CFrame = lastCFrame
+            hrp.CFrame = lastCFrame  -- полный возврат
+            hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
         end
+        task.wait(0.05)  -- небольшая задержка перед следующим выстрелом
+        isTeleporting = false
     end)
 end
 
