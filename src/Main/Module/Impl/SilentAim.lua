@@ -4,6 +4,16 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
+
+SilentAim.a = false
+SilentAim.aa = false
+SilentAim.aaa = false
+SilentAim.aaaa = false
+SilentAim.aaaaa = false
+SilentAim.aaaaaa = false
+SilentAim.aaaaaaa = false
+SilentAim.aaaaaaaa = false
+
 SilentAim.TargetBind = nil
 
 SilentAim._StompSwitch = nil
@@ -234,20 +244,25 @@ local function teleportWallbangShoot(targetPlayer)
     lastPosition = hrp.Position
     lastCFrame = hrp.CFrame
 
-    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector-- * -4
-    local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
+    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -SilentAim.a
+    local teleportPos = targetHead.Position + behindOffset + Vector3.new(SilentAim.aaa, SilentAim.aa, SilentAim.aaaa)
 
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
 
-    task.wait()
+    if SilentAim.aaaaa then
+        task.wait()
+    end
+
+    gun.Communication:FireServer(
+            { { targetHead, targetHead.Position, CFrame.new() } },
+            { targetHead },
+            true
+    )
 
     task.spawn(function()
-        gun.Communication:FireServer(
-                { { targetHead, targetHead.Position, CFrame.new() } },
-                { targetHead },
-                true
-        )
-        task.wait()
+        if SilentAim.aaaaaa then
+            task.wait()
+        end
         if hrp and hrp.Parent then
             hrp.CFrame = lastCFrame
         end
@@ -413,8 +428,26 @@ function SilentAim:drawModule(MainTab, Notifier)
         self.EnabledAutoStomp = st
     end)
 
-    Folder.SwitchAndBinding("AntiBuy", function(st)
-        self.EnabledAntiBuy = st
+    Folder.Slider("a1", { Min = 0.1, Max = 20, Default = 4, Step = 0.1 }, function(value)
+        self.a = value
+    end)
+    Folder.Slider("a2", { Min = 0.1, Max = 20, Default = 4, Step = 0.1 }, function(value)
+        self.aa = value
+    end)
+    Folder.Slider("a3", { Min = 0.1, Max = 20, Default = 0, Step = 0.1 }, function(value)
+        self.aaa = value
+    end)
+    Folder.Slider("a4", { Min = 0.1, Max = 20, Default = 0, Step = 0.1 }, function(value)
+        self.aaaa = value
+    end)
+    Folder.SwitchAndBinding("a5", function(st)
+        self.aaaaa = st
+    end)
+    Folder.SwitchAndBinding("a6", function(st)
+        self.aaaaaa = st
+    end)
+    Folder.SwitchAndBinding("a7", function(st)
+        self.aaaaaaa = st
     end)
 
     return self
