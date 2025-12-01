@@ -11,8 +11,6 @@ SilentAim.aaa = 0
 SilentAim.aaaa = 0
 SilentAim.aaaaa = false
 SilentAim.aaaaaa = false
-SilentAim.aaaaaaa = false
-SilentAim.aaaaaaaa = false
 
 SilentAim.TargetBind = nil
 
@@ -445,9 +443,6 @@ function SilentAim:drawModule(MainTab, Notifier)
     end)
     Folder.SwitchAndBinding("a6", function(st)
         self.aaaaaa = st
-    end)
-    Folder.SwitchAndBinding("a7", function(st)
-        self.aaaaaaa = st
     end)
 
     return self
