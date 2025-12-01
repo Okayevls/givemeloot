@@ -4,6 +4,7 @@ SilentAim.__index = SilentAim
 SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
+SilentAim.WallbangBeta = false
 
 SilentAim.TargetBind = nil
 
@@ -161,61 +162,62 @@ end
 
 local lastAmmoPerAmmoObject = {}
 
---local function smartShoot(targetPlayer)
---    local gun = getEquippedWeapon()
---    if not gun then return end
---
---    local ammo = gun:FindFirstChild("Ammo")
---    if not ammo then return end
---
---    if lastAmmoPerAmmoObject[ammo] == nil then
---        lastAmmoPerAmmoObject[ammo] = ammo.Value
---    end
---
---    local char = targetPlayer.Character
---    if not char then return end
---
---    local head = char:FindFirstChild("Head")
---    local root = char:FindFirstChild("HumanoidRootPart")
---    if not head or not root then return end
---
---    local predicted = head.Position
---
---    local muzzle
---    if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
---        muzzle = gun.Main.Front
---    elseif gun:FindFirstChild("Muzzle") then
---        muzzle = gun.Muzzle
---    end
---
---    gun.Communication:FireServer(
---            {
---                { head, predicted, CFrame.new() }
---            },
---            { head },
---            true
---    )
---
---    if ammo.Value == lastAmmoPerAmmoObject[ammo] then
---        return
---    end
---
---    lastAmmoPerAmmoObject[ammo] = ammo.Value
---
---    if muzzle then
---        local attach = muzzle:FindFirstChildOfClass("Attachment")
---        if not attach then
---            attach = Instance.new("Attachment")
---            attach.Parent = muzzle
---            task.spawn(function()
---                task.wait(1.5)
---                if attach and attach.Parent then attach:Destroy() end
---            end)
---        end
---
---        create3DTracer(attach, predicted)
---    end
---end
+local function smartShootDefault(targetPlayer)
+    local gun = getEquippedWeapon()
+    if not gun then return end
+
+    local ammo = gun:FindFirstChild("Ammo")
+    if not ammo then return end
+
+    if lastAmmoPerAmmoObject[ammo] == nil then
+        lastAmmoPerAmmoObject[ammo] = ammo.Value
+    end
+
+    local char = targetPlayer.Character
+    if not char then return end
+
+    local head = char:FindFirstChild("Head")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not head or not root then return end
+
+    local predicted = head.Position
+
+    local muzzle
+    if gun:FindFirstChild("Main") and gun.Main:FindFirstChild("Front") then
+        muzzle = gun.Main.Front
+    elseif gun:FindFirstChild("Muzzle") then
+        muzzle = gun.Muzzle
+    end
+
+    gun.Communication:FireServer(
+            {
+                { head, predicted, CFrame.new() }
+            },
+            { head },
+            true
+    )
+
+    if ammo.Value == lastAmmoPerAmmoObject[ammo] then
+        return
+    end
+
+    lastAmmoPerAmmoObject[ammo] = ammo.Value
+
+    if muzzle then
+        local attach = muzzle:FindFirstChildOfClass("Attachment")
+        if not attach then
+            attach = Instance.new("Attachment")
+            attach.Parent = muzzle
+            task.spawn(function()
+                task.wait(1.5)
+                if attach and attach.Parent then attach:Destroy() end
+            end)
+        end
+
+        create3DTracer(attach, predicted)
+    end
+end
+
 local lastPosition = nil
 local lastCFrame = nil
 
@@ -235,31 +237,25 @@ local function teleportWallbangShoot(targetPlayer)
     lastPosition = hrp.Position
     lastCFrame = hrp.CFrame
 
-    --local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -3.6
-    --local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
---
-    --hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
---
-    --task.wait()
+    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -3.6
+    local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
 
-    local fakeHitPosition = head.Position + Vector3.new(
-            math.random(-3, 3)/10,
-            math.random(-2, 4)/10,
-            math.random(-3, 3)/10
-    )
+    hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
+
+    task.wait()
 
     gun.Communication:FireServer(
-            { { targetHead, targetHead.Position, CFrame.new(fakeHitPosition) } },
+            { { targetHead, targetHead.Position, CFrame.new() } },
             { targetHead },
             true
     )
 
-    --task.spawn(function()
-    --    task.wait()
-    --    if hrp and hrp.Parent then
-    --        hrp.CFrame = lastCFrame
-    --    end
-    --end)
+    task.spawn(function()
+        task.wait()
+        if hrp and hrp.Parent then
+            hrp.CFrame = lastCFrame
+        end
+    end)
 end
 
 local function smartShoot(targetPlayer)
@@ -351,7 +347,11 @@ RunService.RenderStepped:Connect(function()
         local target = selectedTarget ~= nil and selectedTarget or randomTarget
 
         if isShooting and (randomTarget or selectedTarget) then
-            smartShoot(target)
+            if SilentAim.WallbangBeta then
+                smartShoot(target)
+            else
+                smartShootDefault(target)
+            end
         end
 
         ProximityPromptService.Enabled = not SilentAim.EnabledAntiBuy
@@ -423,6 +423,10 @@ function SilentAim:drawModule(MainTab, Notifier)
 
     Folder.SwitchAndBinding("AntiBuy", function(st)
         self.EnabledAntiBuy = st
+    end)
+
+    Folder.SwitchAndBinding("WallBang - Beta", function(st)
+        self.WallbangBeta = st
     end)
 
     return self
