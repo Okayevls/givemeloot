@@ -241,14 +241,12 @@ local function teleportWallbangShoot(targetPlayer)
     local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
 
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
-
-    task.wait()
-
     gun.Communication:FireServer(
-            { { targetHead, targetHead.Position, CFrame.new() } },
+            { { targetHead, targetHead.Position, CFrame.new(teleportPos, targetHead.Position) } },
             { targetHead },
             true
     )
+    hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
 
     --task.spawn(function()
     --    task.wait()
