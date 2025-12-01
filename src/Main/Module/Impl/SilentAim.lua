@@ -5,10 +5,10 @@ SilentAim.Enabled = false
 SilentAim.EnabledAutoStomp = false
 SilentAim.EnabledAntiBuy = false
 
-SilentAim.a = false
-SilentAim.aa = false
-SilentAim.aaa = false
-SilentAim.aaaa = false
+SilentAim.a = 4
+SilentAim.aa = 4
+SilentAim.aaa = 0
+SilentAim.aaaa = 0
 SilentAim.aaaaa = false
 SilentAim.aaaaaa = false
 SilentAim.aaaaaaa = false
