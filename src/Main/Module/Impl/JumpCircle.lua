@@ -94,7 +94,7 @@ function JumpCircle:drawModule(MainTab, Notifier)
         self.START_RADIUS = value
     end)
 
-    Folder.Slider("End Radius", { Min = 1, Max = 8, Default = 1, Step = 0.25 }, function(value)
+    Folder.Slider("End Radius", { Min = 1, Max = 25, Default = 1, Step = 0.5 }, function(value)
         self.END_RADIUS = value
     end)
 
