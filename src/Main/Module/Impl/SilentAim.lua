@@ -250,12 +250,12 @@ local function teleportWallbangShoot(targetPlayer)
             true
     )
 
-    task.spawn(function()
-        task.wait()
-        if hrp and hrp.Parent then
-            hrp.CFrame = lastCFrame
-        end
-    end)
+    --task.spawn(function()
+    --    task.wait()
+    --    if hrp and hrp.Parent then
+    --        hrp.CFrame = lastCFrame
+    --    end
+    --end)
 end
 
 local function smartShoot(targetPlayer)
