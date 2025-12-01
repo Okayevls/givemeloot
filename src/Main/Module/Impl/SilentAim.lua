@@ -231,11 +231,10 @@ local function teleportWallbangShoot(targetPlayer)
     local gun = getEquippedWeapon()
     if not gun then return end
 
-    -- Сохраняем текущее состояние
     lastPosition = hrp.Position
     lastCFrame = hrp.CFrame
 
-    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -4
+    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector-- * -4
     local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
 
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
@@ -248,12 +247,9 @@ local function teleportWallbangShoot(targetPlayer)
                 { targetHead },
                 true
         )
-        task.wait() -- 1 тик, чтобы выстрел ушёл
+        task.wait()
         if hrp and hrp.Parent then
-            hrp.CFrame = lastCFrame -- полное восстановление позиции + поворота
-            -- Восстанавливаем скорость (на случай если античит следит)
-            --if hrp:FindFirstChild("BodyVelocity") then hrp.BodyVelocity.Velocity = Vector3.new(0,0,0) end
-            --if hrp:FindFirstChild("BodyGyro") then hrp.BodyGyro.CFrame = lastCFrame end
+            hrp.CFrame = lastCFrame
         end
     end)
 end
