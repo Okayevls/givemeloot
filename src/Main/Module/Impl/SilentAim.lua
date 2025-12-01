@@ -242,21 +242,18 @@ local function teleportWallbangShoot(targetPlayer)
 
     task.wait()
 
-    -- Стреляем точно в голову
-    gun.Communication:FireServer(
-            { { targetHead, targetHead.Position, CFrame.new() } },
-            { targetHead },
-            true
-    )
-
-    -- МГНОВЕННО возвращаемся (на следующем кадре)
     task.spawn(function()
+        gun.Communication:FireServer(
+                { { targetHead, targetHead.Position, CFrame.new() } },
+                { targetHead },
+                true
+        )
         task.wait() -- 1 тик, чтобы выстрел ушёл
         if hrp and hrp.Parent then
             hrp.CFrame = lastCFrame -- полное восстановление позиции + поворота
             -- Восстанавливаем скорость (на случай если античит следит)
-            if hrp:FindFirstChild("BodyVelocity") then hrp.BodyVelocity.Velocity = Vector3.new(0,0,0) end
-            if hrp:FindFirstChild("BodyGyro") then hrp.BodyGyro.CFrame = lastCFrame end
+            --if hrp:FindFirstChild("BodyVelocity") then hrp.BodyVelocity.Velocity = Vector3.new(0,0,0) end
+            --if hrp:FindFirstChild("BodyGyro") then hrp.BodyGyro.CFrame = lastCFrame end
         end
     end)
 end
@@ -275,7 +272,7 @@ local function smartShoot(targetPlayer)
     if ammo.Value <= 0 then return end
 
     teleportWallbangShoot(targetPlayer)
-    
+
     if ammo.Value > 0 then
         lastAmmoPerAmmoObject[ammo] = ammo.Value - 1
     end
