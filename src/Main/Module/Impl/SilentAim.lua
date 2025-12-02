@@ -226,7 +226,6 @@ local function teleportWallbangShoot(targetPlayer)
     if not character or not character:FindFirstChild("HumanoidRootPart") or not character:FindFirstChild("Head") then return end
 
     local hrp = character.HumanoidRootPart
-    local head = character.Head
     local targetChar = targetPlayer.Character
     if not targetChar or not targetChar:FindFirstChild("Head") then return end
 
@@ -242,18 +241,11 @@ local function teleportWallbangShoot(targetPlayer)
 
     hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
     gun.Communication:FireServer(
-            { { targetHead, targetHead.Position, CFrame.new(teleportPos, targetHead.Position) } },
+            { { targetHead, targetHead.Position, CFrame.new() } },
             { targetHead },
             true
     )
-    hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
-
-    --task.spawn(function()
-    --    task.wait()
-    --    if hrp and hrp.Parent then
-    --        hrp.CFrame = lastCFrame
-    --    end
-    --end)
+    hrp.CFrame = lastCFrame
 end
 
 local function smartShoot(targetPlayer)
