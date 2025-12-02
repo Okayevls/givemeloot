@@ -223,29 +223,40 @@ local lastCFrame = nil
 
 local function teleportWallbangShoot(targetPlayer)
     local character = LocalPlayer.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") or not character:FindFirstChild("Head") then return end
+    if not character or not character:FindFirstChild("HumanoidRootPart") or not character:FindFirstChild("Head") then
+        return
+    end
 
     local hrp = character.HumanoidRootPart
     local targetChar = targetPlayer.Character
-    if not targetChar or not targetChar:FindFirstChild("Head") then return end
+    if not targetChar or not targetChar:FindFirstChild("HumanoidRootPart") or not targetChar:FindFirstChild("Head") then
+        return
+    end
 
     local targetHead = targetChar.Head
+    local targetHrp = targetChar.HumanoidRootPart
     local gun = getEquippedWeapon()
     if not gun then return end
 
-    lastPosition = hrp.Position
     lastCFrame = hrp.CFrame
+    lastPosition = hrp.Position
 
-    local behindOffset = targetChar.HumanoidRootPart.CFrame.LookVector * -3.6
+    local behindOffset = targetHrp.CFrame.LookVector * -3.6
     local teleportPos = targetHead.Position + behindOffset + Vector3.new(0, 4, 0)
 
-    hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
-    gun.Communication:FireServer(
-            { { targetHead, targetHead.Position, CFrame.new() } },
-            { targetHead },
-            true
-    )
-    hrp.CFrame = lastCFrame
+    local connection
+    connection = game:GetService("RunService").Heartbeat:Connect(function()
+        connection:Disconnect()
+        hrp.CFrame = CFrame.new(teleportPos, targetHead.Position)
+        task.wait(0.0001)
+        gun.Communication:FireServer(
+                { { targetHead, targetHead.Position, CFrame.new() } },
+                { targetHead },
+                true
+        )
+        task.wait(0.0001)
+        hrp.CFrame = lastCFrame
+    end)
 end
 
 local function smartShoot(targetPlayer)
