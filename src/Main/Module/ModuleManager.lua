@@ -114,6 +114,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
         NoClip = "src/Main/Module/Impl/NoClip.lua",
         JumpCircle = "src/Main/Module/Impl/JumpCircle.lua",
         FastInteract = "src/Main/Module/Impl/FastInteract.lua",
+        StaffList = "src/Main/Module/Impl/StaffList.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
 
@@ -131,6 +132,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader)
     local Esp = loader:Get("Esp"):drawModule(VisualTab, Notifier)
     local AspectRatio = loader:Get("AspectRatio"):drawModule(VisualTab, Notifier)
     local JumpCircle = loader:Get("JumpCircle"):drawModule(VisualTab, Notifier)
+    local StaffList = loader:Get("StaffList"):drawModule(VisualTab, Notifier)
 
     local NoClip = loader:Get("NoClip"):drawModule(PlayerTab, Notifier)
     local FastInteract = loader:Get("FastInteract"):drawModule(PlayerTab, Notifier)
