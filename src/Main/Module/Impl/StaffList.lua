@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local StaffList = {}
 StaffList.__index = StaffList
@@ -17,7 +19,7 @@ function StaffList:CreateGui()
     self.Gui = screenGui
 
     local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 300, 0, 100) -- начальная высота
+    mainFrame.Size = UDim2.new(0, 300, 0, 100) -- временная высота
     mainFrame.Position = UDim2.new(0.5, -150, 0.2, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     mainFrame.BackgroundTransparency = 0.1
@@ -42,7 +44,7 @@ function StaffList:CreateGui()
     title.Parent = mainFrame
     self.Title = title
 
-    -- Разделитель (сделаем более прозрачным)
+    -- Разделитель
     local separator = Instance.new("Frame")
     separator.Size = UDim2.new(1, -20, 0, 2)
     separator.Position = UDim2.new(0, 10, 0, 45)
@@ -53,7 +55,7 @@ function StaffList:CreateGui()
 
     -- Контейнер для списка
     local staffContainer = Instance.new("Frame")
-    staffContainer.Size = UDim2.new(1, 0, 0, 0) -- будет динамическая высота
+    staffContainer.Size = UDim2.new(1, 0, 0, 0) -- динамическая высота
     staffContainer.Position = UDim2.new(0, 0, 0, 50)
     staffContainer.BackgroundTransparency = 1
     staffContainer.Parent = mainFrame
@@ -101,18 +103,22 @@ function StaffList:CreateGui()
     end)
 end
 
--- Обновление списка
-function StaffList:UpdateList()
-    if not self.Gui or not self.Enabled then return end
+-- Обновление списка на основе данных с сервера
+function StaffList:UpdateListWithData(moderators)
     local staffContainer = self.StaffContainer
     staffContainer:ClearAllChildren()
 
-    local hasModerator = false
-
-    for _, player in pairs(Players:GetPlayers()) do
-        if player:FindFirstChild("PlayerData") and player.PlayerData:FindFirstChild("IsModerator") and player.PlayerData.IsModerator.Value then
-            hasModerator = true
-
+    if #moderators == 0 then
+        local emptyLabel = Instance.new("TextLabel")
+        emptyLabel.Size = UDim2.new(1, 0, 0, 30)
+        emptyLabel.BackgroundTransparency = 1
+        emptyLabel.Text = "IsEmpty :)"
+        emptyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        emptyLabel.Font = Enum.Font.GothamItalic
+        emptyLabel.TextSize = 18
+        emptyLabel.Parent = staffContainer
+    else
+        for _, name in ipairs(moderators) do
             local staffEntry = Instance.new("Frame")
             staffEntry.Size = UDim2.new(1, -20, 0, 30)
             staffEntry.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -124,7 +130,7 @@ function StaffList:UpdateList()
             nameLabel.Size = UDim2.new(0.6, 0, 1, 0)
             nameLabel.Position = UDim2.new(0, 10, 0, 0)
             nameLabel.BackgroundTransparency = 1
-            nameLabel.Text = player.Name
+            nameLabel.Text = name
             nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             nameLabel.Font = Enum.Font.Gotham
             nameLabel.TextSize = 18
@@ -144,18 +150,8 @@ function StaffList:UpdateList()
         end
     end
 
-    if not hasModerator then
-        local emptyLabel = Instance.new("TextLabel")
-        emptyLabel.Size = UDim2.new(1, 0, 0, 30)
-        emptyLabel.BackgroundTransparency = 1
-        emptyLabel.Text = "IsEmpty :)"
-        emptyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        emptyLabel.Font = Enum.Font.GothamItalic
-        emptyLabel.TextSize = 18
-        emptyLabel.Parent = staffContainer
-    end
-
-    -- Подстраиваем высоту mainFrame под количество модераторов
+    -- Обновляем высоту после RenderStepped, чтобы AbsoluteContentSize точно обновился
+    RunService.RenderStepped:Wait()
     local totalHeight = 50 + self.ListLayout.AbsoluteContentSize.Y + 10
     self.Gui.StaffList.Size = UDim2.new(0, 300, 0, totalHeight)
 end
@@ -164,17 +160,14 @@ function StaffList:Enable()
     if self.Enabled then return end
     self.Enabled = true
     self:CreateGui()
-    self:UpdateList()
 
-    -- Подписка на игроков
-    if not self.PlayerAddedConnection then
-        self.PlayerAddedConnection = Players.PlayerAdded:Connect(function()
-            self:UpdateList()
-        end)
-    end
-    if not self.PlayerRemovingConnection then
-        self.PlayerRemovingConnection = Players.PlayerRemoving:Connect(function()
-            self:UpdateList()
+    -- Подписка на RemoteEvent с сервера
+    local StaffEvent = ReplicatedStorage:WaitForChild("StaffListUpdate")
+    if not self.RemoteConnection then
+        self.RemoteConnection = StaffEvent.OnClientEvent:Connect(function(moderators)
+            if self.Enabled then
+                self:UpdateListWithData(moderators)
+            end
         end)
     end
 end
@@ -184,6 +177,10 @@ function StaffList:Disable()
     if self.Gui then
         self.Gui:Destroy()
         self.Gui = nil
+    end
+    if self.RemoteConnection then
+        self.RemoteConnection:Disconnect()
+        self.RemoteConnection = nil
     end
 end
 
