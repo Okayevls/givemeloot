@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
 local StaffList = {}
 StaffList.__index = StaffList
@@ -16,10 +17,10 @@ function StaffList:CreateGui()
     self.Gui = screenGui
 
     local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 300, 0, 400)
+    mainFrame.Size = UDim2.new(0, 300, 0, 100) -- начальная высота
     mainFrame.Position = UDim2.new(0.5, -150, 0.2, 0)
     mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    mainFrame.BackgroundTransparency = 0.2
+    mainFrame.BackgroundTransparency = 0.1
     mainFrame.BorderSizePixel = 0
     mainFrame.AnchorPoint = Vector2.new(0.5, 0)
     mainFrame.Parent = screenGui
@@ -39,17 +40,20 @@ function StaffList:CreateGui()
     title.TextSize = 22
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.Parent = mainFrame
+    self.Title = title
 
-    -- Разделитель
+    -- Разделитель (сделаем более прозрачным)
     local separator = Instance.new("Frame")
     separator.Size = UDim2.new(1, -20, 0, 2)
     separator.Position = UDim2.new(0, 10, 0, 45)
-    separator.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    separator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    separator.BackgroundTransparency = 0.8
     separator.Parent = mainFrame
+    self.Separator = separator
 
     -- Контейнер для списка
     local staffContainer = Instance.new("Frame")
-    staffContainer.Size = UDim2.new(1, 0, 1, -50)
+    staffContainer.Size = UDim2.new(1, 0, 0, 0) -- будет динамическая высота
     staffContainer.Position = UDim2.new(0, 0, 0, 50)
     staffContainer.BackgroundTransparency = 1
     staffContainer.Parent = mainFrame
@@ -60,6 +64,41 @@ function StaffList:CreateGui()
     uiListLayout.FillDirection = Enum.FillDirection.Vertical
     uiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     uiListLayout.Parent = staffContainer
+    self.ListLayout = uiListLayout
+
+    -- Движение окна мышкой
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    local function updatePosition(input)
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    title.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = mainFrame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    title.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updatePosition(input)
+        end
+    end)
 end
 
 -- Обновление списка
@@ -77,7 +116,7 @@ function StaffList:UpdateList()
             local staffEntry = Instance.new("Frame")
             staffEntry.Size = UDim2.new(1, -20, 0, 30)
             staffEntry.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-            staffEntry.BackgroundTransparency = 0.1
+            staffEntry.BackgroundTransparency = 0.15
             staffEntry.BorderSizePixel = 0
             staffEntry.Parent = staffContainer
 
@@ -115,6 +154,10 @@ function StaffList:UpdateList()
         emptyLabel.TextSize = 18
         emptyLabel.Parent = staffContainer
     end
+
+    -- Подстраиваем высоту mainFrame под количество модераторов
+    local totalHeight = 50 + self.ListLayout.AbsoluteContentSize.Y + 10
+    self.Gui.StaffList.Size = UDim2.new(0, 300, 0, totalHeight)
 end
 
 function StaffList:Enable()
