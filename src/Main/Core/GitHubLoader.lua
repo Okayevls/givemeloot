@@ -23,6 +23,29 @@ function GitHubLoader:Raw(path)
     return "https://raw.githubusercontent.com/"..self.user.."/"..self.repo.."/"..self.sha.."/"..path.."?v="..os.time()
 end
 
+function GitHubLoader:LoadJSON(path)
+    local url = self:Raw(path)
+    local success, code = pcall(function()
+        return game:HttpGet(url)
+    end)
+
+    if not success or not code then
+        warn("[GitHubLoader] Failed to fetch JSON:", path)
+        return nil
+    end
+
+    local ok, data = pcall(function()
+        return HttpService:JSONDecode(code)
+    end)
+
+    if not ok then
+        warn("[GitHubLoader] JSON decode failed:", path, data)
+        return nil
+    end
+
+    return data
+end
+
 function GitHubLoader:Load(path)
     if self.cache[path] then
         return self.cache[path]
