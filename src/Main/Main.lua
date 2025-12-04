@@ -15,5 +15,5 @@ local Notifier = loader:Load(manifest.Notifier)
 
 Updater:new()
 GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager, Notifier)
-print("[Dev] - Created by gargon x prokosik")
+print("[Dev] Created by gargon x prokosik")
 

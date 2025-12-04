@@ -1,6 +1,7 @@
 local UserInputService = game:GetService("UserInputService")
 local TeleportService = game:GetService("TeleportService")
 local Players = game:GetService("Players")
+local COREGUI = game:GetService("CoreGui")
 
 local Updater = {}
 Updater.__index = Updater
@@ -21,8 +22,23 @@ function Updater:_initKeybind()
 end
 
 function Updater:TeleportToSameServer()
-    local player = Players.LocalPlayer
-    TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+
+    local Dir = COREGUI:FindFirstChild("RobloxPromptGui"):FindFirstChild("promptOverlay")
+    Dir.DescendantAdded:Connect(function(Err)
+        if Err.Name == "ErrorTitle" then
+            Err:GetPropertyChangedSignal("Text"):Connect(function()
+                if Err.Text:sub(0, 12) == "Disconnected" then
+                    if #Players:GetPlayers() <= 1 then
+                        Players.LocalPlayer:Kick("\nRejoining...")
+                        wait()
+                        TeleportService:Teleport(PlaceId, Players.LocalPlayer)
+                    else
+                        TeleportService:TeleportToPlaceInstance(PlaceId, JobId, Players.LocalPlayer)
+                    end
+                end
+            end)
+        end
+    end)
     print("[Updater] 🔁 Rejoin to the same server...")
 end
 

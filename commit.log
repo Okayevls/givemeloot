@@ -1,8 +1,3 @@
-[main af7bae6] Auto-commit 04.12.2025 18:27:13,22
- 8 files changed, 63 insertions(+), 182 deletions(-)
- delete mode 100644 src/Main/Core/EventLoader.lua
- create mode 100644 src/Main/Core/GitHubLoader.lua
- delete mode 100644 src/Main/Core/ModuleLoader.lua
- delete mode 100644 src/Main/Gui/ExampleGui.txt
- delete mode 100644 src/Main/Util/Chat/UChat.lua
- create mode 100644 src/resources/devoops/manifest.json
+[main 1fc4c84] Auto-commit 04.12.2025 18:37:09,04
+ 6 files changed, 128 insertions(+), 158 deletions(-)
+ create mode 100644 src/Main/Module/Notifications.lua
