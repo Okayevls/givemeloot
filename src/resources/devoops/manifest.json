@@ -1,5 +1,4 @@
 {
-  "EventLoader": "src/Main/Core/EventLoader.lua",
   "GuiRenderer": "src/Main/Gui/GuiRenderer.lua",
   "GuiInstance": "src/Main/Gui/GuiInstance.lua",
   "ModuleManager": "src/Main/Module/ModuleManager.lua",

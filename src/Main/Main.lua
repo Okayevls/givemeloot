@@ -5,7 +5,6 @@ loader:GetLatestSHA()
 
 local manifest = loader:Load("src/resources/devoops/manifest.json")
 
-local EventLoader = loader:Load(manifest.EventLoader)
 local ModuleLoader = loader:Load(manifest.ModuleLoader)
 local GuiRenderer = loader:Load(manifest.GuiRenderer)
 local GuiInstance = loader:Load(manifest.GuiInstance)
