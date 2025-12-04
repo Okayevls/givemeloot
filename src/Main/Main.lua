@@ -1,3 +1,4 @@
+print("111111")
 local GitHubLoader = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/refs/heads/main/src/Main/Core/GitHubLoader.lua"))()
 
 local loader = GitHubLoader.new("Okayevls", "givemeloot", "main")
