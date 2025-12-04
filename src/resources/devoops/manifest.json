@@ -2,7 +2,7 @@
   "GuiRenderer": "src/Main/Gui/GuiRenderer.lua",
   "GuiInstance": "src/Main/Gui/GuiInstance.lua",
   "ModuleManager": "src/Main/Module/ModuleManager.lua",
-  "ModuleLoader": "src/Main/Core/ModuleLoader.lua",
+  "ModuleLoader": "src/Main/Module/ModuleLoader.lua",
   "Notifier": "src/Main/Module/Notifications.lua",
   "Updater": "src/Main/Module/Update/Updater.lua"
 }
