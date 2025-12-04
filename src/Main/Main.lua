@@ -9,7 +9,6 @@ local data = HttpService:JSONDecode(game:HttpGet(apiUrl))
 local latestSHA = data["sha"]
 
 local modules = {
-    Chat          = "src/Main/Util/Chat/UChat.lua",
     Updater       = "src/Main/Module/Update/Updater.lua",
     GuiRenderer   = "src/Main/Gui/GuiRenderer.lua",
     GuiInstance   = "src/Main/Gui/GuiInstance.lua",
@@ -22,6 +21,8 @@ local function getRawURL(path)
     return "https://raw.githubusercontent.com/"..repoUser.."/"..repoName.."/"..latestSHA.."/"..path.."?v="..os.time()
 end
 
+local GitHubLoader = loadstring(game:HttpGet("https://raw.githubusercontent.com/.../GitHubLoader.lua"))()
+
 local EventLoader = loadstring(game:HttpGet(getRawURL(modules.EventLoader)))()
 
 for key, path in pairs(modules) do
@@ -30,7 +31,6 @@ end
 
 EventLoader:Init(modules)
 
-local Chat          = EventLoader:Get("Chat")
 local Updater       = EventLoader:Get("Updater")
 local GuiRenderer   = EventLoader:Get("GuiRenderer")
 local GuiInstance   = EventLoader:Get("GuiInstance")
