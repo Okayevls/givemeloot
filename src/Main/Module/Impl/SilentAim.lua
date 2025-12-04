@@ -218,6 +218,7 @@ local function smartShootDefault(targetPlayer)
     end
 end
 
+local lastPosition = nil
 local lastCFrame = nil
 
 local function teleportWallbangShoot(targetPlayer)
