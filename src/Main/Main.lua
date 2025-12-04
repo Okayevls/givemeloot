@@ -7,7 +7,7 @@ local GitHubLoader = loadstring(game:HttpGet(rawUrl))()
 local loader = GitHubLoader.new("Okayevls", "givemeloot", "main")
 loader:GetLatestSHA()
 
-local manifest = loader:Load("src/resources/devoops/manifest.json")
+local manifest = loader:LoadJSON("src/resources/devoops/manifest.json")
 
 local ModuleLoader = loader:Load(manifest.ModuleLoader)
 local GuiRenderer = loader:Load(manifest.GuiRenderer)
