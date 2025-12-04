@@ -8,7 +8,6 @@ function GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager, Notif
 
     local UserInputService = game:GetService("UserInputService")
     UserInputService.InputBegan:Connect(function(Input, GameProcessed)
-        if GameProcessed then return end
         if Input.KeyCode == Enum.KeyCode.RightShift then
             Window:Toggle()
         end
