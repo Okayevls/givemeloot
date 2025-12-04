@@ -3,7 +3,7 @@ GuiInstance.__index = GuiInstance
 
 GuiInstance.type = {}
 
-function GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
+function GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager, Notifier)
     local Window = GuiRenderer.new("Legacy.wip", "Version : d0.00095", 4370345701)
 
     local UserInputService = game:GetService("UserInputService")
@@ -14,7 +14,7 @@ function GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
         end
     end)
 
-    ModuleManager:drawCategory(Window, ModuleLoader)
+    ModuleManager:drawCategory(Window, ModuleLoader, Notifier)
 end
 
 return GuiInstance
