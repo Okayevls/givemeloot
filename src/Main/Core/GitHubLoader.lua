@@ -28,9 +28,23 @@ function GitHubLoader:Load(path)
         return self.cache[path]
     end
 
-    local code = game:HttpGet(self:Raw(path))
-    local module = loadstring(code)()
+    local url = self:Raw(path)
+    local success, code = pcall(function()
+        return game:HttpGet(url)
+    end)
 
+    if not success or not code or code == "" then
+        warn("[GitHubLoader] ❌ Failed to fetch module:", path, url)
+        return nil
+    end
+
+    local func, err = loadstring(code)
+    if not func then
+        warn("[GitHubLoader] ❌ loadstring failed for:", path, err)
+        return nil
+    end
+
+    local module = func()
     self.cache[path] = module
     return module
 end
