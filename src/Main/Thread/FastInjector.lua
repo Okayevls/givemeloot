@@ -1,3 +1,5 @@
+print("111111")
+
 local apiUrl = "https://api.github.com/repos/Okayevls/givemeloot/commits/main"
 local data = game:GetService("HttpService"):JSONDecode(game:HttpGet(apiUrl))
 local latestSHA = data["sha"]
