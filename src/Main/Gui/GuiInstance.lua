@@ -4,7 +4,7 @@ GuiInstance.__index = GuiInstance
 GuiInstance.type = {}
 
 function GuiInstance:drawGuiCore(ModuleLoader, GuiRenderer, ModuleManager)
-    local Window = GuiRenderer.new("Legacy.wip", "Version : d0.00094", 4370345701)
+    local Window = GuiRenderer.new("Legacy.wip", "Version : d0.00095", 4370345701)
 
     local UserInputService = game:GetService("UserInputService")
     UserInputService.InputBegan:Connect(function(Input, GameProcessed)

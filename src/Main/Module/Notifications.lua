@@ -1,0 +1,101 @@
+local TweenService = game:GetService("TweenService")
+
+local Notifications = {}
+Notifications.__index = Notifications
+
+function Notifications:Init()
+    self.queue = {}
+    self.margin = 6
+end
+
+function Notifications:RecalculatePositions()
+    for i, frame in ipairs(self.queue) do
+        local target = UDim2.new(
+                1, -10 - frame.AbsoluteSize.X,
+                0, 10 + (i - 1) * (frame.AbsoluteSize.Y + self.margin)
+        )
+
+        TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {
+            Position = target
+        }):Play()
+    end
+end
+
+function Notifications:Send(message, duration)
+    duration = duration or 3
+
+    local ScreenGui = game.CoreGui:FindFirstChild("NotificationsGUI")
+    if not ScreenGui then
+        ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "NotificationsGUI"
+        ScreenGui.Parent = game.CoreGui
+    end
+
+    local Frame = Instance.new("Frame")
+    Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    Frame.BorderSizePixel = 0
+    Frame.BackgroundTransparency = 1
+    Frame.Parent = ScreenGui
+    Frame.Position = UDim2.new(1, 0, 0, -50)
+    Frame.ClipsDescendants = true
+
+    local Text = Instance.new("TextLabel")
+    Text.BackgroundTransparency = 1
+    Text.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Text.Font = Enum.Font.Gotham
+    Text.TextSize = 14
+    Text.TextWrapped = true
+    Text.Text = message
+    Text.Parent = Frame
+
+    Text.Size = UDim2.new(0, 1000, 0, 1000)
+    task.wait()
+
+    local bounds = Text.TextBounds
+    local paddingX = 20
+    local paddingY = 12
+
+    local width = math.clamp(bounds.X + paddingX * 2, 150, 400)
+    local height = math.max(bounds.Y + paddingY, 30)
+
+    Frame.Size = UDim2.new(0, width, 0, height)
+    Text.Size = UDim2.new(1, -20, 1, -10)
+    Text.Position = UDim2.new(0, 10, 0, 5)
+
+    table.insert(self.queue, Frame)
+    self:RecalculatePositions()
+
+    TweenService:Create(Frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+        BackgroundTransparency = 0
+    }):Play()
+
+    task.delay(duration, function()
+        if not Frame.Parent then return end
+
+        local hide = TweenService:Create(Frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {
+            Position = UDim2.new(1, width, 0, Frame.Position.Y.Offset),
+            BackgroundTransparency = 1
+        })
+
+        hide:Play()
+        hide.Completed:Wait()
+
+        if Frame.Parent then
+            Frame:Destroy()
+        end
+
+        for i, f in ipairs(self.queue) do
+            if f == Frame then
+                table.remove(self.queue, i)
+                break
+            end
+        end
+
+        self:RecalculatePositions()
+    end)
+end
+
+local Notifier = setmetatable({}, Notifications)
+Notifier:Init()
+
+return Notifier

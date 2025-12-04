@@ -4,18 +4,6 @@
   "GuiInstance": "src/Main/Gui/GuiInstance.lua",
   "ModuleManager": "src/Main/Module/ModuleManager.lua",
   "ModuleLoader": "src/Main/Core/ModuleLoader.lua",
-
-  "Modules": {
-    "SilentAim": "src/Main/Module/Impl/SilentAim.lua",
-    "Fly": "src/Main/Module/Impl/Fly.lua",
-    "ChatSpy": "src/Main/Module/Impl/ChatSpy.lua",
-    "RedeemCode": "src/Main/Module/Impl/RedeemCode.lua",
-    "Esp": "src/Main/Module/Impl/Esp.lua",
-    "AspectRatio": "src/Main/Module/Impl/AspectRatio.lua",
-    "NoClip": "src/Main/Module/Impl/NoClip.lua",
-    "JumpCircle": "src/Main/Module/Impl/JumpCircle.lua",
-    "FastInteract": "src/Main/Module/Impl/FastInteract.lua",
-    "StaffList": "src/Main/Module/Impl/StaffList.lua",
-    "Speed": "src/Main/Module/Impl/Speed.lua"
-  }
+  "Notifier": "src/Main/Module/Notifications.lua",
+  "Updater": "src/Main/Module/Update/Updater.lua"
 }
