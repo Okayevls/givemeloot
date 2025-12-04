@@ -101,7 +101,6 @@ function StaffList:CreateGui()
     end)
 end
 
--- Обновление списка модераторов
 function StaffList:UpdateList()
     if not self.Enabled or not self.Gui then return end
     local staffContainer = self.StaffContainer
@@ -159,7 +158,6 @@ function StaffList:UpdateList()
         end
     end
 
-    -- Обновляем высоту mainFrame после RenderStepped
     RunService.RenderStepped:Wait()
     local totalHeight = 50 + self.ListLayout.AbsoluteContentSize.Y + 10
     self.Gui.StaffList.Size = UDim2.new(0, 300, 0, totalHeight)
@@ -171,7 +169,6 @@ function StaffList:Enable()
     self:CreateGui()
     self:UpdateList()
 
-    -- Подписка на игроков для динамического обновления
     if not self.PlayerAddedConnection then
         self.PlayerAddedConnection = Players.PlayerAdded:Connect(function()
             self:UpdateList()
@@ -183,7 +180,6 @@ function StaffList:Enable()
         end)
     end
 
-    -- Подписка на изменения IsModerator
     for _, player in pairs(Players:GetPlayers()) do
         if player:FindFirstChild("PlayerData") and player.PlayerData:FindFirstChild("IsModerator") then
             player.PlayerData.IsModerator:GetPropertyChangedSignal("Value"):Connect(function()
@@ -199,6 +195,22 @@ function StaffList:Disable()
         self.Gui:Destroy()
         self.Gui = nil
     end
+end
+
+function StaffList:drawModule(MainTab, Notifier)
+    local Folder = MainTab.Folder("StaffList", "[Info] displays active moderators")
+
+    Folder.SwitchAndBinding("Toggle", function(Status)
+        if Status then
+            Notifier:Send("[Legacy.wip] StaffList - Enable!", 4)
+            self:Enable()
+        else
+            Notifier:Send("[Legacy.wip] StaffList - Disable!", 4)
+            self:Disable()
+        end
+    end)
+
+    return self
 end
 
 return StaffList
