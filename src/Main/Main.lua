@@ -1,7 +1,7 @@
-local apiUrl = "https://api.github.com/repos/Okayevls/repoName/commits/main"
+local apiUrl = "https://api.github.com/repos/Okayevls/givemeloot/commits/main"
 local data = game:GetService("HttpService"):JSONDecode(game:HttpGet(apiUrl))
 local latestSHA = data["sha"]
-local rawUrl = "https://raw.githubusercontent.com/Okayevls/repoName/"..latestSHA.."/src/Main/Core/GitHubLoader.lua?v="..os.time()
+local rawUrl = "https://raw.githubusercontent.com/Okayevls/givemeloot/"..latestSHA.."/src/Main/Core/GitHubLoader.lua?v="..os.time()
 local GitHubLoader = loadstring(game:HttpGet(rawUrl))()
 
 local loader = GitHubLoader.new("Okayevls", "givemeloot", "main")
