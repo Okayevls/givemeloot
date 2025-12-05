@@ -54,9 +54,4 @@ function Speed:Disable()
     ModuleBase.Disable(self)
 end
 
-function Speed:drawModule(MainTab, Notifier)
-    self:drawModule(MainTab)
-    return self
-end
-
 return Speed
