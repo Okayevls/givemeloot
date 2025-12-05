@@ -1,5 +1,7 @@
 local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/"..game:GetService("HttpService"):JSONDecode(game:HttpGet("https://api.github.com/repos/Okayevls/givemeloot/commits/main"))["sha"].."/src/Main/Module/Core/ModuleBase.lua?v="..os.time()))()
-local Speed = ModuleBase.new("Speed")
+require(ModuleBase)
+
+local Speed = new("Speed")
 
 Speed.RagdollEnabled = false
 Speed.SpeedMultiplier = 145
