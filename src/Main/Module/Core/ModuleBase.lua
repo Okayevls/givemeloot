@@ -8,7 +8,8 @@ function ModuleBase.new(name)
     return setmetatable({
         Name = name,
         Enabled = false,
-        Connections = {}
+        Connections = {},
+        UI = {}
     }, ModuleBase)
 end
 
@@ -42,6 +43,23 @@ function ModuleBase:Enable()
     self:AddConnection(UserInputService.InputEnded:Connect(function(input, gp)
         if self.EKeyUnInput then self:EKeyUnInput(input, gp) end
     end))
+end
+
+function ModuleBase:DrawUI(MainTab, Notifier)
+    if not self.UI then return end
+        local Folder = MainTab.Folder(self.Name, "[Info] Module controls")
+
+    for _, item in ipairs(self.UI) do
+        if item.type == "Switch" then
+            Folder.SwitchAndBinding(item.name, function(state)
+                self[item.prop] = state
+            end)
+        elseif item.type == "Slider" then
+            Folder.Slider(item.name, {Min = item.min, Max = item.max, Default = item.default, Step = item.step or 1}, function(value)
+                self[item.prop] = value
+            end)
+        end
+    end
 end
 
 function ModuleBase:Disable()

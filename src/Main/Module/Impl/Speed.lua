@@ -39,12 +39,11 @@ end
 
 
 function Speed:Enable()
-    if self.Enabled then return end
-    self.Enabled = true
+    ModuleBase.Enable(self)
 end
 
 function Speed:Disable()
-    self.Enabled = false
+    ModuleBase.Disable(self)
 end
 
 function Speed:drawModule(MainTab, Notifier)
