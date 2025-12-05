@@ -28,7 +28,7 @@ function ModuleBase:Enable()
     self.Enabled = true
 
     self:AddConnection(RunService.RenderStepped:Connect(function(dt)
-        if self.ERender then self:_onRender(dt) end
+        if self.ERender then self:ERender(dt) end
     end))
 
     self:AddConnection(RunService.Heartbeat:Connect(function()
