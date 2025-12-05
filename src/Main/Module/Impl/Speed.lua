@@ -1,12 +1,13 @@
 local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/"..game:GetService("HttpService"):JSONDecode(game:HttpGet("https://api.github.com/repos/Okayevls/givemeloot/commits/main"))["sha"].."/src/Main/Module/Core/ModuleBase.lua?v="..os.time()))()
 local Speed = ModuleBase.new("Speed", "Acceleration of player movement")
 
-Speed.RagdollEnabled = false
-Speed.SpeedMultiplier = 145
+--Speed.RagdollEnabled = false
+--Speed.SpeedMultiplier = 145
 
 Speed.Settings = {
+    Enabled  = {Type = "SwitchB", Default = false},
     SpeedMultiplier = {Type = "Slider", Min = 10, Max = 500, Default = 145, Step = 0.1},
-    RagdollEnabled  = {Type = "Switch", Default = false},
+    RagdollEnabled  = {Type = "SwitchA", Default = false},
 }
 
 local Players = game:GetService("Players")
