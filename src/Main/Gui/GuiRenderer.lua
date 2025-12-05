@@ -821,7 +821,6 @@ local function CreateOptions(Frame)
         })
     end
 
-
     function Options.Binding(Title, Callback)
         local Properties = {
             Title = Title and tostring(Title) or "Bind",

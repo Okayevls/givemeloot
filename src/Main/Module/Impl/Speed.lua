@@ -62,8 +62,7 @@ function Speed:drawModule(MainTab, Notifier)
             Speed.SpeedMultiplier = 500
         end
     end)
-
-
+    
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then self:Enable() Notifier:Send("[Legacy.wip] Speed - Enable!", 6) else self:Disable() Notifier:Send("[Legacy.wip] Speed - Disable!", 6) end
     end)
