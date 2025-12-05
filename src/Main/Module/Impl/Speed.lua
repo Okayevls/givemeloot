@@ -1,9 +1,4 @@
-local apiUrl = "https://api.github.com/repos/Okayevls/givemeloot/commits/main"
-local data = game:GetService("HttpService"):JSONDecode(game:HttpGet(apiUrl))
-local latestSHA = data["sha"]
-local rawUrl = "https://raw.githubusercontent.com/Okayevls/givemeloot/"..latestSHA.."/src/Main/Module/Core/ModuleBase.lua?v="..os.time()
-local ModuleBase = loadstring(game:HttpGet(rawUrl))()
-
+local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/"..game:GetService("HttpService"):JSONDecode(game:HttpGet("https://api.github.com/repos/Okayevls/givemeloot/commits/main"))["sha"].."/src/Main/Module/Core/ModuleBase.lua?v="..os.time()))()
 local Speed = ModuleBase.new("Speed")
 
 Speed.RagdollEnabled = false
