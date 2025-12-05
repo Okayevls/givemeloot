@@ -739,11 +739,11 @@ local function CreateOptions(Frame)
             Function = Callback or function(Selected) end
         }
 
-        local Container = Utility.new("Frame", {
+        local Container = Utility.new("ImageButton", {
             Name = "ModeContainer",
             Parent = typeof(Frame) == "Instance" and Frame or Frame(),
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 25),
+            Size = UDim2.new(1, 0, 0, 55),
         })
 
         -- Заголовок
@@ -757,11 +757,11 @@ local function CreateOptions(Frame)
             Text = Properties.Title,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 14,
+            TextTransparency = 0.3,
             TextXAlignment = Enum.TextXAlignment.Left
         })
         TitleLabel.Parent = Container
 
-        -- Кнопка Dropdown
         local DropdownButton = Utility.new("TextButton", {
             Name = "DropdownButton",
             Parent = Container,
@@ -771,60 +771,63 @@ local function CreateOptions(Frame)
             Text = Properties.Selected,
             Font = Enum.Font.Gotham,
             TextSize = 9,
-            TextColor3 = Color3.fromRGB(255, 255, 255)
-        }, {Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})})
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextWrapped = false,
+            ClipsDescendants = true
+        }, {
+            Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)}),
+            Utility.new("UIPadding", {PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2)})
+        })
 
         local DropdownOpen = false
-
-        -- Контейнер списка
         local ListContainer = Utility.new("Frame", {
             Name = "DropdownList",
             Parent = Container,
             BackgroundColor3 = Color3.fromRGB(40, 40, 45),
-            Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 0, 0), -- изначально 0, будет расширяться
+            Position = UDim2.new(1, -70, 1, 0),
+            Size = UDim2.new(0, 70, 0, #Properties.Options * 18),
+            Visible = false,
             ClipsDescendants = true
-        }, {Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})})
+        }, {
+            Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
+        })
 
-        local optionHeight = 18
-
-        -- Добавляем кнопки вариантов
         for i, option in ipairs(Properties.Options) do
             local OptionButton = Utility.new("TextButton", {
                 Name = "Option_" .. option,
                 Parent = ListContainer,
                 BackgroundColor3 = Color3.fromRGB(50, 55, 60),
-                Size = UDim2.new(1, 0, 0, optionHeight),
-                Position = UDim2.new(0, 0, 0, (i-1)*optionHeight),
+                Size = UDim2.new(1, 0, 0, 18),
+                Position = UDim2.new(0, 0, 0, (i-1)*18),
                 Text = option,
                 Font = Enum.Font.Gotham,
                 TextSize = 9,
                 TextColor3 = Color3.fromRGB(255, 255, 255)
-            }, {Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})})
+            }, {
+                Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
+            })
 
             OptionButton.MouseButton1Click:Connect(function()
                 Properties.Selected = option
                 DropdownButton.Text = option
+                ListContainer.Visible = false
+                DropdownOpen = false
                 local Success, Error = pcall(Properties.Function, option)
                 assert(MyGui.Settings.Debug == false or Success, Error)
-                -- Закрываем список
-                DropdownOpen = false
-                ListContainer.Size = UDim2.new(1, 0, 0, 0)
             end)
         end
 
-        -- Логика открытия/закрытия Dropdown
+        -- Логика открытия/закрытия
         DropdownButton.MouseButton1Click:Connect(function()
             DropdownOpen = not DropdownOpen
-            if DropdownOpen then
-                ListContainer.Size = UDim2.new(1, 0, 0, #Properties.Options * optionHeight)
-            else
-                ListContainer.Size = UDim2.new(1, 0, 0, 0)
-            end
+            ListContainer.Visible = DropdownOpen
         end)
 
+        -- Метатаблица для удобного доступа
         return setmetatable({}, {
-            __index = function(_, Index) return Properties[Index] end,
+            __index = function(_, Index)
+                return Properties[Index]
+            end,
             __newindex = function(_, Index, Value)
                 if Index == "Selected" then
                     Properties.Selected = Value
@@ -833,12 +836,13 @@ local function CreateOptions(Frame)
                     assert(MyGui.Settings.Debug == false or Success, Error)
                 elseif Index == "Options" then
                     Properties.Options = Value
-                    -- Обновляем GUI, если нужно
+                    -- Можно добавить обновление GUI, если нужно
                 end
                 Properties[Index] = Value
             end
         })
     end
+
 
     function Options.Binding(Title, Callback)
         local Properties = {
