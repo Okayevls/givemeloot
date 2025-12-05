@@ -25,6 +25,7 @@ function Speed:ELocalPlayerSpawned()
 end
 
 function Speed:EUpdate()
+    print(self.Enabled)
     if not character then return end
     local currentHrp = character:FindFirstChild("HumanoidRootPart")
     local humanoid = character:FindFirstChild("Humanoid")

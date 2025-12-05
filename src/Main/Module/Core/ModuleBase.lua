@@ -36,7 +36,6 @@ end
 function ModuleBase:Enable()
     if self.Enabled then return end
     self.Enabled = true
-    --Notifier:Send("[Legacy.wip]"..self.name.." - Enable!", 6)
     self:AddConnection(RunService.RenderStepped:Connect(function(dt)
         if self.ERender then self:ERender(dt) end
     end))
@@ -60,7 +59,6 @@ end
 
 function ModuleBase:Disable()
     self.Enabled = false
-    --Notifier:Send("[Legacy.wip]"..self.name.." - Disable!", 6)
     self:DisconnectAll()
 end
 
