@@ -52,8 +52,9 @@ end
 function Speed:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
-    Folder.ModeSettingCycle("Speed Mode", {"Normal", "Fast", "Ultra"}, function(selected)
+    Folder.ModeSetting("Speed Mode", {"Normal", "Fast", "Ultra"}, function(selected)
         print("Выбран режим: " .. selected)
+
         if selected == "Normal" then
             Speed.SpeedMultiplier = 100
         elseif selected == "Fast" then
@@ -62,7 +63,7 @@ function Speed:drawModule(MainTab, Notifier)
             Speed.SpeedMultiplier = 500
         end
     end)
-    
+
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then self:Enable() Notifier:Send("[Legacy.wip] Speed - Enable!", 6) else self:Disable() Notifier:Send("[Legacy.wip] Speed - Disable!", 6) end
     end)
