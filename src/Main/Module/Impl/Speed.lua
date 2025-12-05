@@ -7,7 +7,7 @@ local Speed = ModuleBase.new("Speed", "Acceleration of player movement")
 Speed.Settings = {
     Enabled  = {Type = "SwitchB", Default = false},
     SpeedMultiplier = {Type = "Slider", Min = 10, Max = 500, Default = 145, Step = 0.1},
-    RagdollEnabled  = {Type = "SwitchA", Default = false},
+    RagdollEnabled  = {Type = "SwitchA", Default = false}
 }
 
 local Players = game:GetService("Players")
