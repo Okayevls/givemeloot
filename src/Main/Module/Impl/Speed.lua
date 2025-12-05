@@ -54,7 +54,7 @@ function Speed:drawModule(MainTab, Notifier)
 
     Folder.ModeSetting("Speed Mode", {"Normal", "Fast", "Ultra"}, function(selected)
         print("Выбран режим: " .. selected)
-        
+
         if selected == "Normal" then
             Speed.SpeedMultiplier = 100
         elseif selected == "Fast" then

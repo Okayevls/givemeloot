@@ -731,16 +731,17 @@ local function CreateOptions(Frame)
         })
     end
 
-    function Options.ModeSetting(Title, OptionsList, Callback)
+    function Options.ModeSettingCycle(Title, OptionsList, Callback)
         local Properties = {
             Title = Title or "Mode",
             Options = OptionsList or {"Option1", "Option2"},
+            Index = 1,
             Selected = OptionsList[1],
-            Function = Callback or function(Selected) end
+            Function = Callback or function(selected) end
         }
 
         local Container = Utility.new("ImageButton", {
-            Name = "ModeContainer",
+            Name = "ModeCycleContainer",
             Parent = typeof(Frame) == "Instance" and Frame or Frame(),
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 25),
@@ -763,8 +764,8 @@ local function CreateOptions(Frame)
         TitleLabel.Parent = Container
 
         -- Кнопка выбора
-        local DropdownButton = Utility.new("TextButton", {
-            Name = "DropdownButton",
+        local ModeButton = Utility.new("TextButton", {
+            Name = "ModeButton",
             Parent = Container,
             BackgroundColor3 = Color3.fromRGB(50, 55, 60),
             Size = UDim2.new(0, 70, 0, 18),
@@ -773,72 +774,47 @@ local function CreateOptions(Frame)
             Font = Enum.Font.Gotham,
             TextSize = 9,
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextWrapped = false,
-            ClipsDescendants = true
-        }, {
-            Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)}),
-            Utility.new("UIPadding", {PaddingLeft = UDim.new(0, 2), PaddingRight = UDim.new(0, 2)})
-        })
-
-        local DropdownOpen = false
-        local ListContainer = Utility.new("Frame", {
-            Name = "DropdownList",
-            Parent = Container,
-            BackgroundColor3 = Color3.fromRGB(40, 40, 45),
-            Position = UDim2.new(1, -70, 1, 0),
-            Size = UDim2.new(0, 70, 0, #Properties.Options * 18),
-            Visible = false,
-            ClipsDescendants = true
+            TextWrapped = false
         }, {
             Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
         })
 
-        -- Добавляем элементы списка
-        for i, option in ipairs(Properties.Options) do
-            local OptionButton = Utility.new("TextButton", {
-                Name = "Option_" .. option,
-                Parent = ListContainer,
-                BackgroundColor3 = Color3.fromRGB(50, 55, 60),
-                Size = UDim2.new(1, 0, 0, 18),
-                Position = UDim2.new(0, 0, 0, (i-1)*18),
-                Text = option,
-                Font = Enum.Font.Gotham,
-                TextSize = 9,
-                TextColor3 = Color3.fromRGB(255, 255, 255)
-            }, {
-                Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
-            })
-
-            OptionButton.MouseButton1Click:Connect(function()
-                Properties.Selected = option
-                DropdownButton.Text = option
-                ListContainer.Visible = false
-                DropdownOpen = false
-                local Success, Error = pcall(Properties.Function, option)
-                assert(MyGui.Settings.Debug == false or Success, Error)
-            end)
+        -- Логика циклического выбора
+        local function NextOption()
+            Properties.Index = Properties.Index + 1
+            if Properties.Index > #Properties.Options then
+                Properties.Index = 1
+            end
+            Properties.Selected = Properties.Options[Properties.Index]
+            ModeButton.Text = Properties.Selected
+            local Success, Error = pcall(Properties.Function, Properties.Selected)
+            assert(MyGui.Settings.Debug == false or Success, Error)
         end
 
-        -- Логика открытия/закрытия
-        DropdownButton.MouseButton1Click:Connect(function()
-            DropdownOpen = not DropdownOpen
-            ListContainer.Visible = DropdownOpen
-        end)
+        ModeButton.MouseButton1Click:Connect(NextOption)
 
-        -- Метатаблица для удобного доступа
         return setmetatable({}, {
             __index = function(_, Index)
                 return Properties[Index]
             end,
             __newindex = function(_, Index, Value)
                 if Index == "Selected" then
+                    for i, option in ipairs(Properties.Options) do
+                        if option == Value then
+                            Properties.Index = i
+                            break
+                        end
+                    end
                     Properties.Selected = Value
-                    DropdownButton.Text = Value
+                    ModeButton.Text = Value
                     local Success, Error = pcall(Properties.Function, Value)
                     assert(MyGui.Settings.Debug == false or Success, Error)
                 elseif Index == "Options" then
                     Properties.Options = Value
-                    -- Можно добавить обновление GUI, если нужно
+                    -- Можно сбросить индекс, если нужно
+                    Properties.Index = 1
+                    Properties.Selected = Value[1]
+                    ModeButton.Text = Properties.Selected
                 end
                 Properties[Index] = Value
             end
