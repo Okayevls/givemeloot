@@ -759,7 +759,7 @@ local function CreateOptions(Frame)
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 25),
             Position = UDim2.new(0, 0, 0, yOffset),  -- Автоматическое позиционирование
-            ZIndex = 1  -- Устанавливаем базовый ZIndex
+            ZIndex = 1
         })
 
         -- Заголовок
@@ -800,18 +800,17 @@ local function CreateOptions(Frame)
         local DropdownOpen = false
         local ListContainer = Utility.new("Frame", {
             Name = "DropdownList",
-            Parent = ParentContainer,  -- Родитель - главный контейнер, а не Container
+            Parent = ParentContainer,  -- Родитель - главный контейнер
             BackgroundColor3 = Color3.fromRGB(40, 40, 45),
-            Position = UDim2.new(0, Container.AbsolutePosition.X + Container.AbsoluteSize.X - 70, 0, Container.AbsolutePosition.Y + 25),  -- Позиция под кнопкой
             Size = UDim2.new(0, 70, 0, #Properties.Options * 18),
             Visible = false,
             ClipsDescendants = true,
-            ZIndex = 10  -- Высокий ZIndex, чтобы был поверх других элементов
+            ZIndex = 100  -- Очень высокий ZIndex, чтобы был поверх ВСЕГО
         }, {
             Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)}),
             Utility.new("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 2)
+                Padding = UDim.new(0, 1)
             })
         })
 
@@ -820,15 +819,20 @@ local function CreateOptions(Frame)
                 Name = "Option_" .. option,
                 Parent = ListContainer,
                 BackgroundColor3 = Color3.fromRGB(50, 55, 60),
-                Size = UDim2.new(1, 0, 0, 18),
+                Size = UDim2.new(1, -2, 0, 18),
                 LayoutOrder = i,
+                Position = UDim2.new(0, 1, 0, (i-1)*19),  -- Небольшие отступы
                 Text = option,
                 Font = Enum.Font.Gotham,
                 TextSize = 9,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
-                ZIndex = 11
+                ZIndex = 101
             }, {
-                Utility.new("UICorner", {CornerRadius = UDim.new(0, 4)})
+                Utility.new("UICorner", {CornerRadius = UDim.new(0, 3)}),
+                Utility.new("UIPadding", {
+                    PaddingLeft = UDim.new(0, 3),
+                    PaddingRight = UDim.new(0, 3)
+                })
             })
 
             OptionButton.MouseButton1Click:Connect(function()
@@ -843,10 +847,26 @@ local function CreateOptions(Frame)
 
         -- Функция для обновления позиции выпадающего списка
         local function updateDropdownPosition()
+            local containerPos = Container.AbsolutePosition
+            local containerSize = Container.AbsoluteSize
+
+            -- Позиционируем выпадающий список под кнопкой
             ListContainer.Position = UDim2.new(
-                    0, Container.AbsolutePosition.X + Container.AbsoluteSize.X - 70,
-                    0, Container.AbsolutePosition.Y + 25
+                    0, containerPos.X + containerSize.X - 70,
+                    0, containerPos.Y + 25
             )
+
+            -- Проверяем, не выходит ли список за пределы экрана
+            local screenSize = workspace.CurrentCamera.ViewportSize
+            local listBottom = containerPos.Y + 25 + (#Properties.Options * 18)
+
+            -- Если список выходит за нижнюю границу экрана, показываем его сверху
+            if listBottom > screenSize.Y then
+                ListContainer.Position = UDim2.new(
+                        0, containerPos.X + containerSize.X - 70,
+                        0, containerPos.Y - (#Properties.Options * 18)
+                )
+            end
         end
 
         -- Обновляем позицию при изменении позиции контейнера
@@ -856,11 +876,11 @@ local function CreateOptions(Frame)
         -- Логика открытия/закрытия
         DropdownButton.MouseButton1Click:Connect(function()
             DropdownOpen = not DropdownOpen
-            ListContainer.Visible = DropdownOpen
-
-            -- Обновляем позицию перед открытием
             if DropdownOpen then
                 updateDropdownPosition()
+                ListContainer.Visible = true
+            else
+                ListContainer.Visible = false
             end
         end)
 
@@ -885,9 +905,34 @@ local function CreateOptions(Frame)
         end
 
         -- Подключаем события клика
-        game:GetService("UserInputService").InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                closeDropdown(input)
+        local inputService = game:GetService("UserInputService")
+        local closeConnection
+
+        DropdownButton.MouseButton1Click:Connect(function()
+            DropdownOpen = not DropdownOpen
+            ListContainer.Visible = DropdownOpen
+
+            if DropdownOpen then
+                updateDropdownPosition()
+                -- При открытии подписываемся на клик вне области
+                closeConnection = inputService.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        closeDropdown(input)
+                    end
+                end)
+            else
+                -- При закрытии отписываемся
+                if closeConnection then
+                    closeConnection:Disconnect()
+                    closeConnection = nil
+                end
+            end
+        end)
+
+        -- Очистка соединения при уничтожении
+        Container.AncestryChanged:Connect(function()
+            if not Container.Parent and closeConnection then
+                closeConnection:Disconnect()
             end
         end)
 
@@ -909,8 +954,8 @@ local function CreateOptions(Frame)
                     assert(MyGui.Settings.Debug == false or Success, Error)
                 elseif Index == "Options" then
                     Properties.Options = Value
-                    -- Обновляем размер выпадающего списка
                     ListContainer.Size = UDim2.new(0, 70, 0, #Value * 18)
+                    updateDropdownPosition()
                 end
                 Properties[Index] = Value
             end
