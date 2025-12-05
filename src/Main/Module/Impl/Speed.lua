@@ -22,25 +22,17 @@ end
 setupCharacter()
 player.CharacterAdded:Connect(setupCharacter)
 
-function Speed:ERender()
+function Speed:EUpdate()
     if not hum or not hrp then return end
 
     local dir = hum.MoveDirection
     if self.Enabled then
         if dir.Magnitude > 0 then
-            hrp.Velocity = Vector3.new(
-                    dir.X * self.SpeedMultiplier,
-                    hrp.Velocity.Y * 0.9,
-                    dir.Z * self.SpeedMultiplier
-            )
+            hrp.Velocity = Vector3.new(dir.X * self.SpeedMultiplier, hrp.Velocity.Y * 0.9, dir.Z * self.SpeedMultiplier)
         end
     elseif self.RagdollEnabled and character:GetAttribute("Ragdoll") then
         if dir.Magnitude > 0 then
-            hrp.Velocity = Vector3.new(
-                    dir.X * 100,
-                    hrp.Velocity.Y * 0.9,
-                    dir.Z * 100
-            )
+            hrp.Velocity = Vector3.new(dir.X * 100, hrp.Velocity.Y * 0.9, dir.Z * 100)
         end
     end
 end

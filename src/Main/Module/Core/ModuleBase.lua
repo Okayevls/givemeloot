@@ -31,6 +31,10 @@ function ModuleBase:Enable()
         if self.ERender then self:_onRender(dt) end
     end))
 
+    self:AddConnection(RunService.Heartbeat:Connect(function()
+        if self.EUpdate then self:EUpdate() end
+    end))
+
     self:AddConnection(UserInputService.InputBegan:Connect(function(input, gp)
         if self.EKeyInput then self:EKeyInput(input, gp) end
     end))
