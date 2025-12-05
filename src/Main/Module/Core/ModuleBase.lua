@@ -5,12 +5,21 @@ local Players = game:GetService("Players")
 local ModuleBase = {}
 ModuleBase.__index = ModuleBase
 
-function ModuleBase.new(name)
+function ModuleBase.new(name, description)
     return setmetatable({
         Name = name,
         Enabled = false,
+        Description = description or "none description",
+        Settings = {},
         Connections = {}
     }, ModuleBase)
+end
+
+function ModuleBase:LoadSettings()
+    if not self.Settings then return end
+    for key, data in pairs(self.Settings) do
+        self[key] = data.Default
+    end
 end
 
 function ModuleBase:AddConnection(conn)
@@ -52,6 +61,32 @@ end
 function ModuleBase:Disable()
     self.Enabled = false
     self:DisconnectAll()
+end
+
+function ModuleBase:drawModule(MainTab)
+    local Folder = MainTab.Folder(self.Name, "[Info] "..(self.Description or "No description"))
+    self:BuildUI(Folder)
+    return self
+end
+
+function ModuleBase:BuildUI(Folder)
+    for name, data in pairs(self.Settings) do
+        if data.Type == "Switch" then
+            Folder.Switch(name, function(state)
+                self[name] = state
+            end)
+
+        elseif data.Type == "Slider" then
+            Folder.Slider(name, {
+                Min = data.Min,
+                Max = data.Max,
+                Default = data.Default,
+                Step = data.Step or 1,
+            }, function(val)
+                self[name] = val
+            end)
+        end
+    end
 end
 
 return ModuleBase

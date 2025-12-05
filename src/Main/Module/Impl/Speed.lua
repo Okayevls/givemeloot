@@ -1,10 +1,13 @@
 local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/"..game:GetService("HttpService"):JSONDecode(game:HttpGet("https://api.github.com/repos/Okayevls/givemeloot/commits/main"))["sha"].."/src/Main/Module/Core/ModuleBase.lua?v="..os.time()))()
-require(ModuleBase)
-
-local Speed = new("Speed")
+local Speed = ModuleBase.new("Speed", "Acceleration of player movement")
 
 Speed.RagdollEnabled = false
 Speed.SpeedMultiplier = 145
+
+Speed.Settings = {
+    SpeedMultiplier = {Type = "Slider", Min = 10, Max = 500, Default = 145, Step = 0.1},
+    RagdollEnabled  = {Type = "Switch", Default = false},
+}
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -52,26 +55,7 @@ function Speed:Disable()
 end
 
 function Speed:drawModule(MainTab, Notifier)
-    local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
-
-    Folder.SwitchAndBinding("Toggle", function(Status)
-        if Status then
-            Notifier:Send("[Legacy.wip] Speed - Enable!", 6)
-            self:Enable()
-        else
-            Notifier:Send("[Legacy.wip] Speed - Disable!", 6)
-            self:Disable()
-        end
-    end)
-
-    Folder.Slider("Boost Multiple", { Min = 10, Max = 500, Default = 145, Step = 0.1 }, function(value)
-        self.SpeedMultiplier = value
-    end)
-
-    Folder.Switch("Ragdoll Enabled", function(State)
-        self.RagdollEnabled = State
-    end)
-
+    self:drawModule(MainTab)
     return self
 end
 
