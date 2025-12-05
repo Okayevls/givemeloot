@@ -1,5 +1,6 @@
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
 
 local ModuleBase = {}
 ModuleBase.__index = ModuleBase
@@ -33,6 +34,10 @@ function ModuleBase:Enable()
 
     self:AddConnection(RunService.Heartbeat:Connect(function()
         if self.EUpdate then self:EUpdate() end
+    end))
+
+    self:AddConnection(Players.LocalPlayer.CharacterAdded:Connect(function()
+        if self.ELocalPlayerSpawned then self:ELocalPlayerSpawned() end
     end))
 
     self:AddConnection(UserInputService.InputBegan:Connect(function(input, gp)

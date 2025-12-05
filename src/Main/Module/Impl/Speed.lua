@@ -5,22 +5,31 @@ Speed.RagdollEnabled = false
 Speed.SpeedMultiplier = 145
 
 local Players = game:GetService("Players")
-local character, hum, hrp
 local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp
 
 local function setupCharacter()
     character = player.Character or player.CharacterAdded:Wait()
-    hum = character:WaitForChild("Humanoid")
     hrp = character:WaitForChild("HumanoidRootPart")
 end
 
 setupCharacter()
-player.CharacterAdded:Connect(setupCharacter)
+
+function Speed:ELocalPlayerSpawned()
+    setupCharacter()
+end
 
 function Speed:EUpdate()
-    if not hum or not hrp then return end
+    if not character then return end
+    local currentHrp = character:FindFirstChild("HumanoidRootPart")
+    local humanoid = character:FindFirstChild("Humanoid")
 
-    local dir = hum.MoveDirection
+    if not currentHrp or not humanoid then return end
+    hrp = currentHrp
+
+    local dir = humanoid.MoveDirection
+
     if self.Enabled then
         if dir.Magnitude > 0 then
             hrp.Velocity = Vector3.new(dir.X * self.SpeedMultiplier, hrp.Velocity.Y * 0.9, dir.Z * self.SpeedMultiplier)
@@ -31,7 +40,6 @@ function Speed:EUpdate()
         end
     end
 end
-
 
 function Speed:Enable()
     ModuleBase.Enable(self)
