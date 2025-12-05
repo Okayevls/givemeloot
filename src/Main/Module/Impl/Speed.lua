@@ -1,51 +1,50 @@
-local Speed = {}
-Speed.__index = Speed
+local apiUrl = "https://api.github.com/repos/Okayevls/givemeloot/commits/main"
+local data = game:GetService("HttpService"):JSONDecode(game:HttpGet(apiUrl))
+local latestSHA = data["sha"]
+local rawUrl = "https://raw.githubusercontent.com/Okayevls/givemeloot/"..latestSHA.."/src/Main/Module/Core/ModuleBase.lua?v="..os.time()
+local ModuleBase = loadstring(game:HttpGet(rawUrl))()
 
-Speed.Enabled = false
+local Speed = ModuleBase.new("Speed")
+
 Speed.RagdollEnabled = false
 Speed.SpeedMultiplier = 145
 
-local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local character, hum, hrp
 local player = Players.LocalPlayer
-
-local connection
 
 local function setupCharacter()
     character = player.Character or player.CharacterAdded:Wait()
     hum = character:WaitForChild("Humanoid")
     hrp = character:WaitForChild("HumanoidRootPart")
 end
-setupCharacter()
 
+setupCharacter()
 player.CharacterAdded:Connect(setupCharacter)
 
-connection = RunService.Heartbeat:Connect(function()
-    if Speed.Enabled then
-        local dir = hum.MoveDirection
+function Speed:ERender()
+    if not hum or not hrp then return end
+
+    local dir = hum.MoveDirection
+    if self.Enabled then
         if dir.Magnitude > 0 then
             hrp.Velocity = Vector3.new(
-                    dir.X * Speed.SpeedMultiplier,
+                    dir.X * self.SpeedMultiplier,
                     hrp.Velocity.Y * 0.9,
-                    dir.Z * Speed.SpeedMultiplier
+                    dir.Z * self.SpeedMultiplier
             )
         end
-    else
-        if Speed.RagdollEnabled then
-            if character:GetAttribute("Ragdoll") then
-                local dir = hum.MoveDirection
-                if dir.Magnitude > 0 then
-                    hrp.Velocity = Vector3.new(
-                            dir.X * 100,
-                            hrp.Velocity.Y * 0.9,
-                            dir.Z * 100
-                    )
-                end
-            end
+    elseif self.RagdollEnabled and character:GetAttribute("Ragdoll") then
+        if dir.Magnitude > 0 then
+            hrp.Velocity = Vector3.new(
+                    dir.X * 100,
+                    hrp.Velocity.Y * 0.9,
+                    dir.Z * 100
+            )
         end
     end
-end)
+end
+
 
 function Speed:Enable()
     if self.Enabled then return end
