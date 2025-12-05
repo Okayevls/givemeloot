@@ -757,8 +757,8 @@ local function CreateOptions(Frame)
             Name = "ModeContainer",
             Parent = ParentContainer,
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, yOffset),
-            Position = UDim2.new(0, 0, 0, 0),  -- Автоматическое позиционирование
+            Size = UDim2.new(1, 0, 0, 25),
+            Position = UDim2.new(0, 0, 0, yOffset),  -- Автоматическое позиционирование
             ZIndex = 1  -- Устанавливаем базовый ZIndex
         })
 
