@@ -40,7 +40,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader, Notifier)
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
     local AutoRedeem = loader:Get("RedeemCode"):drawModule(OtherTab, Notifier)
 
-    Notifier:Send("Base ModuleManager Build | 0x000000000172", 6)
+    Notifier:Send("Base ModuleManager Build | 0x000000000173", 6)
 end
 
 return ModuleManager

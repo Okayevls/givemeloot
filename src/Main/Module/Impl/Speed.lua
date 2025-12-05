@@ -1,13 +1,8 @@
-local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/"..
-        game:GetService("HttpService"):JSONDecode(game:HttpGet("https://api.github.com/repos/Okayevls/givemeloot/commits/main"))["sha"]..
-        "/src/Main/Module/Core/ModuleBase.lua?v="..os.time()))()
+local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/"..game:GetService("HttpService"):JSONDecode(game:HttpGet("https://api.github.com/repos/Okayevls/givemeloot/commits/main"))["sha"].."/src/Main/Module/Core/ModuleBase.lua?v="..os.time()))()
+local Speed = ModuleBase.new("Speed")
 
-local Speed = ModuleBase.new("Speed", "Acceleration of player movement")
-
-Speed.Settings = {
-    SpeedMultiplier = {Type = "Slider", Min = 10, Max = 500, Default = 145, Step = 0.1},
-    RagdollEnabled  = {Type = "SwitchB", Default = false}
-}
+Speed.RagdollEnabled = false
+Speed.SpeedMultiplier = 145
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
@@ -27,18 +22,22 @@ end
 
 function Speed:EUpdate()
     if not character then return end
-    local humanoid = character:FindFirstChild("Humanoid")
     local currentHrp = character:FindFirstChild("HumanoidRootPart")
-    if not humanoid or not currentHrp then return end
+    local humanoid = character:FindFirstChild("Humanoid")
 
+    if not currentHrp or not humanoid then return end
     hrp = currentHrp
+
     local dir = humanoid.MoveDirection
-    if dir.Magnitude == 0 then return end
 
     if self.Enabled then
-        hrp.Velocity = Vector3.new(dir.X * self.SpeedMultiplier, hrp.Velocity.Y * 0.9, dir.Z * self.SpeedMultiplier)
+        if dir.Magnitude > 0 then
+            hrp.Velocity = Vector3.new(dir.X * self.SpeedMultiplier, hrp.Velocity.Y * 0.9, dir.Z * self.SpeedMultiplier)
+        end
     elseif self.RagdollEnabled and character:GetAttribute("Ragdoll") then
-        hrp.Velocity = Vector3.new(dir.X * 100, hrp.Velocity.Y * 0.9, dir.Z * 100)
+        if dir.Magnitude > 0 then
+            hrp.Velocity = Vector3.new(dir.X * 100, hrp.Velocity.Y * 0.9, dir.Z * 100)
+        end
     end
 end
 
@@ -51,7 +50,14 @@ function Speed:Disable()
 end
 
 function Speed:drawModule(MainTab, Notifier)
-    ModuleBase.drawModule(self, MainTab, Notifier)
+    local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
+
+    Folder.SwitchAndBinding("Toggle", function(Status)
+        if Status then self:Enable() Notifier:Send("[Legacy.wip] Speed - Enable!", 6) else self:Disable() Notifier:Send("[Legacy.wip] Speed - Disable!", 6) end
+    end)
+
+    Folder.Slider("Boost Multiple", { Min = 10, Max = 500, Default = 145, Step = 0.1 }, function(value) self.SpeedMultiplier = value end)
+    Folder.Switch("Ragdoll Enabled", function(State) self.RagdollEnabled = State end)
     return self
 end
 
