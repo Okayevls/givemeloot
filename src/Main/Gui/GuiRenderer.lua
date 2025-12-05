@@ -739,11 +739,26 @@ local function CreateOptions(Frame)
             Function = Callback or function(Selected) end
         }
 
+        -- Получаем родительский контейнер и считаем количество уже существующих элементов
+        local ParentContainer = typeof(Frame) == "Instance" and Frame or Frame()
+        local existingChildren = ParentContainer:GetChildren()
+        local moduleCount = 0
+
+        for _, child in ipairs(existingChildren) do
+            if child:IsA("ImageButton") and child.Name:find("ModeContainer") then
+                moduleCount = moduleCount + 1
+            end
+        end
+
+        -- Вычисляем позицию для нового модуля
+        local yOffset = moduleCount * 30  -- 25 высота + 5 отступ
+
         local Container = Utility.new("ImageButton", {
             Name = "ModeContainer",
-            Parent = typeof(Frame) == "Instance" and Frame or Frame(),
+            Parent = ParentContainer,
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 55),
+            Size = UDim2.new(1, 0, 0, 25),
+            Position = UDim2.new(0, 0, 0, yOffset)  -- Автоматическое позиционирование
         })
 
         -- Заголовок
@@ -823,6 +838,11 @@ local function CreateOptions(Frame)
             ListContainer.Visible = DropdownOpen
         end)
 
+        -- Обновляем размер родительского контейнера, если это необходимо
+        if ParentContainer:IsA("ScrollingFrame") then
+            ParentContainer.CanvasSize = UDim2.new(0, 0, 0, (moduleCount + 1) * 30)
+        end
+
         -- Метатаблица для удобного доступа
         return setmetatable({}, {
             __index = function(_, Index)
@@ -842,8 +862,7 @@ local function CreateOptions(Frame)
             end
         })
     end
-
-
+    
     function Options.Binding(Title, Callback)
         local Properties = {
             Title = Title and tostring(Title) or "Bind",
