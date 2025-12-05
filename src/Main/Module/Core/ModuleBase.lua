@@ -36,8 +36,7 @@ end
 function ModuleBase:Enable()
     if self.Enabled then return end
     self.Enabled = true
-    self.Notifier:Send("[Legacy.wip]"..self.name.." - Enable!", 6)
-
+    --Notifier:Send("[Legacy.wip]"..self.name.." - Enable!", 6)
     self:AddConnection(RunService.RenderStepped:Connect(function(dt)
         if self.ERender then self:ERender(dt) end
     end))
@@ -61,7 +60,7 @@ end
 
 function ModuleBase:Disable()
     self.Enabled = false
-    self.Notifier:Send("[Legacy.wip]"..self.name.." - Disable!", 6)
+    --Notifier:Send("[Legacy.wip]"..self.name.." - Disable!", 6)
     self:DisconnectAll()
 end
 
@@ -77,11 +76,13 @@ function ModuleBase:BuildUI(Folder)
             Folder.Switch(name, function(state)
                 self[name] = state
             end)
-        elseif data.Type == "SwitchB" then
+        end
+        if data.Type == "SwitchB" then
             Folder.SwitchAndBinding(name, function(state)
                 self[name] = state
             end)
-        elseif data.Type == "Slider" then
+        end
+        if data.Type == "Slider" then
             Folder.Slider(name, {
                 Min = data.Min,
                 Max = data.Max,
@@ -94,25 +95,4 @@ function ModuleBase:BuildUI(Folder)
     end
 end
 
---local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
---
---Folder.SwitchAndBinding("Toggle", function(Status)
---    if Status then
---        Notifier:Send("[Legacy.wip] Speed - Enable!", 6)
---        self:Enable()
---    else
---        Notifier:Send("[Legacy.wip] Speed - Disable!", 6)
---        self:Disable()
---    end
---end)
---
---Folder.Slider("Boost Multiple", { Min = 10, Max = 500, Default = 145, Step = 0.1 }, function(value)
---    self.SpeedMultiplier = value
---end)
---
---Folder.Switch("Ragdoll Enabled", function(State)
---    self.RagdollEnabled = State
---end)
---
---return self
 return ModuleBase
