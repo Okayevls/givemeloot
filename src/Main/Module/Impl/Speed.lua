@@ -3,7 +3,6 @@ local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ok
 local Speed = ModuleBase.new("Speed", "Acceleration of player movement")
 
 Speed.Settings = {
-    Enabled  = {Type = "SwitchB", Default = false},
     SpeedMultiplier = {Type = "Slider", Min = 10, Max = 500, Default = 145, Step = 0.1},
     RagdollEnabled  = {Type = "SwitchA", Default = false}
 }
@@ -25,7 +24,6 @@ function Speed:ELocalPlayerSpawned()
 end
 
 function Speed:EUpdate()
-    print(self.Enabled)
     if not character then return end
     local currentHrp = character:FindFirstChild("HumanoidRootPart")
     local humanoid = character:FindFirstChild("Humanoid")
@@ -55,7 +53,7 @@ function Speed:Disable()
 end
 
 function Speed:drawModule(MainTab, Notifier)
-    ModuleBase.drawModule(self, MainTab)
+    ModuleBase.drawModule(MainTab, Notifier)
     return self
 end
 
