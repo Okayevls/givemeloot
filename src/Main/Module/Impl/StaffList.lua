@@ -104,13 +104,21 @@ end
 function StaffList:UpdateList()
     if not self.Enabled or not self.Gui then return end
     local staffContainer = self.StaffContainer
-    staffContainer:ClearAllChildren()
+
+    -- Удаляем все элементы кроме UIListLayout
+    for _, child in pairs(staffContainer:GetChildren()) do
+        if not child:IsA("UIListLayout") then
+            child:Destroy()
+        end
+    end
 
     local moderators = {}
 
     for _, player in pairs(Players:GetPlayers()) do
-        if player:FindFirstChild("PlayerData") and player.PlayerData:FindFirstChild("IsModerator") then
-            if player.PlayerData.IsModerator.Value then
+        local playerData = player:FindFirstChild("PlayerData") or player:WaitForChild("PlayerData", 1)
+        if playerData then
+            local isMod = playerData:FindFirstChild("IsModerator") or playerData:WaitForChild("IsModerator", 1)
+            if isMod and isMod.Value then
                 table.insert(moderators, player)
             end
         end
