@@ -27,24 +27,30 @@ function KickTarget:teleportToTargetAndBack()
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
     if not rootLocal then return end
 
-    originalPos = rootLocal.Position.Y
-    local targetHeight = math.random(25000, 27000)
+    local targetHeight = math.random(22000, 27000)
 
     rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
 
     wait(0.5)
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
-    wait(1.5)
 
-    rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
-    self.Enabled = false
-    if self._Switch then
-        self._Switch.Value = false
+    if not checkCarrying() then
+        wait(0.4)
+        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
+        self.Enabled = false
+        if self._Switch then
+            self._Switch.Value = false
+        end
     end
 end
 
 function KickTarget:Enable()
     if self.Enabled then return end
+    local localChar = Players.LocalPlayer.Character
+    if not localChar then return end
+    local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
+    if not rootLocal then return end
+    originalPos = rootLocal.Position.Y
     self.Enabled = true
     task.spawn(function()
         self:teleportToTargetAndBack()
@@ -52,11 +58,6 @@ function KickTarget:Enable()
 end
 
 function KickTarget:Disable()
-   --local localChar = Players.LocalPlayer.Character
-   --local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
-   --if not checkCarrying() then
-   --    rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
-   --end
     self.Enabled = false
 end
 
