@@ -28,7 +28,7 @@ local function teleportToTargetAndBack()
 
     local originalPos = rootLocal.Position
     local targetHeight = math.random(15000, 17000)
-    
+
     local nearestPlayer = nil
     local minDistance = math.huge
     for _, player in pairs(Players:GetPlayers()) do
@@ -71,9 +71,11 @@ local function teleportToTargetAndBack()
     end)
 
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
-    wait(0.8)
+    wait(1.5)
 
-    rootLocal.CFrame = CFrame.new(Vector3.new(originalPos.X, originalPos.Y, originalPos.Z))
+    if not checkCarrying() then
+        rootLocal.CFrame = CFrame.new(Vector3.new(originalPos.X, originalPos.Y, originalPos.Z))
+    end
     return success
 end
 
