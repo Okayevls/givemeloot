@@ -33,9 +33,9 @@ function KickTarget:teleportToTargetAndBack()
 
     wait(0.5)
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
+    wait(0.5)
 
     if not checkCarrying() then
-        wait(0.4)
         rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
         self.Enabled = false
         if self._Switch then
