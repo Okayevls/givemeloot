@@ -31,14 +31,9 @@ local function teleportToTargetAndBack()
 
     rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
     wait(0.5)
-
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
-
-    if not checkCarrying() then
-        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
-    end
-
-    return success
+    wait(0.8)
+    self.Enabled = false
 end
 
 function KickTarget:Enable()
@@ -49,6 +44,11 @@ end
 
 function KickTarget:Disable()
     if not self.Enabled then return end
+    local localChar = Players.LocalPlayer.Character
+    local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
+    if not checkCarrying() then
+        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
+    end
     self.Enabled = false
 end
 
