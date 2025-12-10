@@ -10,37 +10,55 @@ local KickTarget = ModuleBase.new("KickTarget")
 KickTarget.Enabled = false
 KickTarget.Targets = {}
 
-local function checkCarrying(targetPlayer)
-    if targetPlayer.Character and targetPlayer.Character:FindFirstChild("Chaufrei") then
-        local carrying = targetPlayer.Character.Chaufrei:FindFirstChild("Values"):FindFirstChild("Carrying")
-        if carrying and carrying:IsA("ObjectValue") then
+local function checkCarrying()
+    if Players.LocalPlayer.Character then
+        local carrying = Players.LocalPlayer.Character:FindFirstChild("Values"):FindFirstChild("Carrying")
+        if carrying then
             return carrying.Value ~= nil
         end
     end
     return false
 end
 
--- Телепорт к игроку и замер времени полета
 local function teleportToTargetAndBack(targetPlayer)
     local localChar = Players.LocalPlayer.Character
-    local targetChar = targetPlayer.Character
-    if not localChar or not targetChar then return end
-
+    if not localChar then return end
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
-    local rootTarget = targetChar:FindFirstChild("HumanoidRootPart")
-    if not rootLocal or not rootTarget then return end
+    if not rootLocal then return end
 
     local originalPos = rootLocal.Position
-    local targetPos = rootTarget.Position + Vector3.new(0, 2, 0) -- почти вплотную
+    local targetHeight = math.random(15000, 17000)
 
-    rootLocal.CFrame = CFrame.new(targetPos)
+    local nearestPlayer = nil
+    local minDistance = math.huge
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and player.Character then
+            local rootTarget = player.Character:FindFirstChild("HumanoidRootPart")
+            if rootTarget then
+                local dist = (rootTarget.Position - rootLocal.Position).Magnitude
+                if dist < minDistance then
+                    nearestPlayer = player
+                    minDistance = dist
+                end
+            end
+        end
+    end
+
+    if not nearestPlayer then return end
+    local rootTarget = nearestPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not rootTarget then return end
+
+    local targetPos = rootTarget.Position
+    targetPos = Vector3.new(targetPos.X, targetHeight, targetPos.Z)
+    local offset = (rootTarget.Position - rootLocal.Position).Unit * 5
+    rootLocal.CFrame = CFrame.new(targetPos + offset)
+
     local startTime = tick()
-
-    -- Проверяем условия полета
     local success = false
+
     local connection
     connection = RunService.Heartbeat:Connect(function()
-        if not targetPlayer or not targetPlayer.Character then
+        if not nearestPlayer or not nearestPlayer.Character then
             print("Error Kicked Target: Player left or reset")
             connection:Disconnect()
             success = false
@@ -48,15 +66,16 @@ local function teleportToTargetAndBack(targetPlayer)
             print("Error Kicked Target: Player too low")
             connection:Disconnect()
             success = false
-        elseif tick() - startTime > 5 then -- допустим, максимум 5 секунд
-            print("Successful Kicked Target: "..targetPlayer.Name.." | Flight time: "..string.format("%.2f", tick() - startTime).."s")
+        elseif tick() - startTime > 5 then
+            print("Successful Kicked Target: "..nearestPlayer.Name.." | Flight time: "..string.format("%.2f", tick() - startTime).."s")
             connection:Disconnect()
             success = true
         end
     end)
 
-    wait(0.8) -- немного держим
-    rootLocal.CFrame = CFrame.new(originalPos)
+    game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
+    wait(0.8)
+    rootLocal.CFrame = CFrame.new(Vector3.new(originalPos.X, originalPos.Y, originalPos.Z))
     return success
 end
 
@@ -68,11 +87,9 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 function KickTarget:EUpdate()
-    for _, target in pairs(Players:GetPlayers()) do
-        if target ~= Players.LocalPlayer and checkCarrying(target) then
-            KickTarget.Targets[target] = true
-            teleportToTargetAndBack(target)
-        end
+    if checkCarrying() then
+        KickTarget.Targets[target] = true
+        teleportToTargetAndBack()
     end
 end
 
