@@ -15,6 +15,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader, Notifier)
         JumpCircle = "src/Main/Module/Impl/JumpCircle.lua",
         FastInteract = "src/Main/Module/Impl/FastInteract.lua",
         StaffList = "src/Main/Module/Impl/StaffList.lua",
+        KickTarget = "src/Main/Module/Impl/KickTarget.lua",
         Speed = "src/Main/Module/Impl/Speed.lua"
     })
 

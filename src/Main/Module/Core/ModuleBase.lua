@@ -56,6 +56,12 @@ function ModuleBase:Enable()
     self:AddConnection(UserInputService.InputEnded:Connect(function(input, gp)
         if self.EKeyUnInput then self:EKeyUnInput(input, gp) end
     end))
+
+    self:AddConnection(Players.PlayerRemoving:Connect(function(player)
+        --local userId = player.UserId
+        --local username = player.Name
+        if self.EPlayerLeaveServer then self:EPlayerLeaveServer(player) end
+    end))
 end
 
 function ModuleBase:Disable()
