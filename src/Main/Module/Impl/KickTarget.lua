@@ -20,14 +20,14 @@ local function checkCarrying()
     return false
 end
 
-local function teleportToTargetAndBack()
+function KickTarget:teleportToTargetAndBack()
     local localChar = Players.LocalPlayer.Character
     if not localChar then return end
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
     if not rootLocal then return end
 
     originalPos = rootLocal.Position.Y
-    local targetHeight = math.random(15000, 17000)
+    local targetHeight = math.random(25000, 27000)
 
     rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
     wait(0.5)
@@ -39,11 +39,12 @@ end
 function KickTarget:Enable()
     if self.Enabled then return end
     self.Enabled = true
-    teleportToTargetAndBack()
+    task.spawn(function()
+        self:teleportToTargetAndBack()
+    end)
 end
 
 function KickTarget:Disable()
-    if not self.Enabled then return end
     local localChar = Players.LocalPlayer.Character
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
     if not checkCarrying() then
