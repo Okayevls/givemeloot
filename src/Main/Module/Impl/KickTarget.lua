@@ -1,6 +1,4 @@
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local Workspace = game:GetService("Workspace")
 
 local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Okayevls/givemeloot/"..
         game:GetService("HttpService"):JSONDecode(game:HttpGet("https://api.github.com/repos/Okayevls/givemeloot/commits/main"))["sha"]..
@@ -31,46 +29,11 @@ local function teleportToTargetAndBack()
     originalPos = rootLocal.Position.Y
     local targetHeight = math.random(15000, 17000)
 
-    local nearestPlayer = nil
-    local minDistance = math.huge
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= Players.LocalPlayer and player.Character then
-            local rootTarget = player.Character:FindFirstChild("HumanoidRootPart")
-            if rootTarget then
-                local dist = (rootTarget.Position - rootLocal.Position).Magnitude
-                if dist < minDistance then
-                    nearestPlayer = player
-                    minDistance = dist
-                end
-            end
-        end
-    end
-
-    if not nearestPlayer then return end
-    KickTarget.Targets[nearestPlayer] = true
-    local rootTarget = nearestPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not rootTarget then return end
-
     rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
-
-    local success = false
-
-    local connection
-    connection = RunService.Heartbeat:Connect(function()
-        if not nearestPlayer or not nearestPlayer.Character then
-            print("kicked Target: "..nearestPlayer.Name)
-            KickTarget.Targets[nearestPlayer] = nil
-            connection:Disconnect()
-            success = true
-        elseif rootTarget.Position.Y < 500 then
-            print("Error Kicked Target: "..nearestPlayer.Name)
-            KickTarget.Targets[nearestPlayer] = nil
-            connection:Disconnect()
-            success = false
-        end
-    end)
+    wait(0.5)
 
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
+
     if not checkCarrying() then
         rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
     end
@@ -78,27 +41,15 @@ local function teleportToTargetAndBack()
     return success
 end
 
-function KickTarget:EUpdate()
-    if checkCarrying() then
-        teleportToTargetAndBack()
-    end
-end
-
 function KickTarget:Enable()
     if self.Enabled then return end
     self.Enabled = true
-    self.Heartbeat = RunService.Heartbeat:Connect(function()
-        self:EUpdate()
-    end)
+    teleportToTargetAndBack()
 end
 
 function KickTarget:Disable()
     if not self.Enabled then return end
     self.Enabled = false
-    if self.Heartbeat then
-        self.Heartbeat:Disconnect()
-        self.Heartbeat = nil
-    end
 end
 
 function KickTarget:drawModule(MainTab, Notifier)
