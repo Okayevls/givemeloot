@@ -63,7 +63,7 @@ function KickTarget:Disable()
 end
 
 function KickTarget:drawModule(MainTab, Notifier)
-    local Folder = MainTab.Folder("KickTarget", "[Info]")
+    local Folder = MainTab.Folder("KickTarget", "[Info] performs manipulation and kicks the player")
     self._Switch = Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
             Notifier:Send("[Legacy.wip] KickTarget - Enable!", 4)
