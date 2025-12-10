@@ -27,7 +27,7 @@ function KickTarget:teleportToTargetAndBack()
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
     if not rootLocal then return end
 
-    local targetHeight = math.random(22000, 27000)
+    local targetHeight = math.random(52000, 57000)
 
     rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
 
