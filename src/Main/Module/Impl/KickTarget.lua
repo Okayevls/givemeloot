@@ -33,6 +33,7 @@ function KickTarget:teleportToTargetAndBack()
 
     wait(0.5)
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
+    Players.LocalPlayer.Character.Values.Carrying.Value = nil
     wait(0.5)
 
     if not checkCarrying() then
