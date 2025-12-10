@@ -7,6 +7,8 @@ local ModuleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/Ok
         "/src/Main/Module/Core/ModuleBase.lua?v="..os.time()))()
 
 local KickTarget = ModuleBase.new("KickTarget")
+local originalPos
+
 KickTarget.Enabled = false
 KickTarget.Targets = {}
 
@@ -26,7 +28,7 @@ local function teleportToTargetAndBack()
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
     if not rootLocal then return end
 
-    local originalPos = rootLocal.Position
+    originalPos = rootLocal.Position.Y
     local targetHeight = math.random(15000, 17000)
 
     local nearestPlayer = nil
@@ -49,10 +51,8 @@ local function teleportToTargetAndBack()
     local rootTarget = nearestPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not rootTarget then return end
 
-    local targetPos = rootTarget.Position
-    targetPos = Vector3.new(targetPos.X, targetHeight, targetPos.Z)
-    local offset = (rootTarget.Position - rootLocal.Position).Unit * 5
-    rootLocal.CFrame = CFrame.new(targetPos + offset)
+    rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
+
     local success = false
 
     local connection
@@ -71,11 +71,10 @@ local function teleportToTargetAndBack()
     end)
 
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
-    wait(1.5)
-
     if not checkCarrying() then
-        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos.Y, rootLocal.Position.Z))
+        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
     end
+
     return success
 end
 
