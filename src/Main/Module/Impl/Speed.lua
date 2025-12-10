@@ -9,17 +9,6 @@ local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local hrp
 
-local function setupCharacter()
-    character = player.Character or player.CharacterAdded:Wait()
-    hrp = character:WaitForChild("HumanoidRootPart")
-end
-
-setupCharacter()
-
-function Speed:ELocalPlayerSpawned()
-    setupCharacter()
-end
-
 function Speed:EUpdate()
     if not character then return end
     local currentHrp = character:FindFirstChild("HumanoidRootPart")
