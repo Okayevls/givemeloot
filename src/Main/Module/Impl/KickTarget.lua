@@ -20,7 +20,7 @@ local function checkCarrying()
     return false
 end
 
-local function teleportToTargetAndBack(targetPlayer)
+local function teleportToTargetAndBack()
     local localChar = Players.LocalPlayer.Character
     if not localChar then return end
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
@@ -28,7 +28,7 @@ local function teleportToTargetAndBack(targetPlayer)
 
     local originalPos = rootLocal.Position
     local targetHeight = math.random(15000, 17000)
-
+    
     local nearestPlayer = nil
     local minDistance = math.huge
     for _, player in pairs(Players:GetPlayers()) do
@@ -45,6 +45,7 @@ local function teleportToTargetAndBack(targetPlayer)
     end
 
     if not nearestPlayer then return end
+    KickTarget.Targets[nearestPlayer] = true
     local rootTarget = nearestPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not rootTarget then return end
 
@@ -52,43 +53,32 @@ local function teleportToTargetAndBack(targetPlayer)
     targetPos = Vector3.new(targetPos.X, targetHeight, targetPos.Z)
     local offset = (rootTarget.Position - rootLocal.Position).Unit * 5
     rootLocal.CFrame = CFrame.new(targetPos + offset)
-
-    local startTime = tick()
     local success = false
 
     local connection
     connection = RunService.Heartbeat:Connect(function()
         if not nearestPlayer or not nearestPlayer.Character then
-            print("Error Kicked Target: Player left or reset")
-            connection:Disconnect()
-            success = false
-        elseif rootTarget.Position.Y < 500 then
-            print("Error Kicked Target: Player too low")
-            connection:Disconnect()
-            success = false
-        elseif tick() - startTime > 5 then
-            print("Successful Kicked Target: "..nearestPlayer.Name.." | Flight time: "..string.format("%.2f", tick() - startTime).."s")
+            print("kicked Target: "..nearestPlayer.Name)
+            KickTarget.Targets[nearestPlayer] = nil
             connection:Disconnect()
             success = true
+        elseif rootTarget.Position.Y < 500 then
+            print("Error Kicked Target: "..nearestPlayer.Name)
+            KickTarget.Targets[nearestPlayer] = nil
+            connection:Disconnect()
+            success = false
         end
     end)
 
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
     wait(0.8)
+
     rootLocal.CFrame = CFrame.new(Vector3.new(originalPos.X, originalPos.Y, originalPos.Z))
     return success
 end
 
-Players.PlayerRemoving:Connect(function(player)
-    if KickTarget.Targets[player] then
-        print("kicked Target: "..player.Name)
-        KickTarget.Targets[player] = nil
-    end
-end)
-
 function KickTarget:EUpdate()
     if checkCarrying() then
-        KickTarget.Targets[target] = true
         teleportToTargetAndBack()
     end
 end
