@@ -31,9 +31,12 @@ function KickTarget:teleportToTargetAndBack()
     local targetHeight = math.random(25000, 27000)
 
     rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
+
     wait(0.5)
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
-    wait(0.8)
+    wait(1.5)
+
+    rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
     self.Enabled = false
     if self._Switch then
         self._Switch.Value = false
@@ -49,11 +52,11 @@ function KickTarget:Enable()
 end
 
 function KickTarget:Disable()
-    local localChar = Players.LocalPlayer.Character
-    local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
-    if not checkCarrying() then
-        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
-    end
+   --local localChar = Players.LocalPlayer.Character
+   --local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
+   --if not checkCarrying() then
+   --    rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
+   --end
     self.Enabled = false
 end
 
