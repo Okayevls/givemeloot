@@ -8,6 +8,7 @@ local KickTarget = ModuleBase.new("KickTarget")
 local originalPos
 
 KickTarget.Enabled = false
+KickTarget._Switch = nil
 KickTarget.Targets = {}
 
 local function checkCarrying()
@@ -34,6 +35,9 @@ function KickTarget:teleportToTargetAndBack()
     game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
     wait(0.8)
     self.Enabled = false
+    if self._Switch then
+        self._Switch.Value = false
+    end
 end
 
 function KickTarget:Enable()
@@ -55,7 +59,7 @@ end
 
 function KickTarget:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("KickTarget", "[Info]")
-    Folder.SwitchAndBinding("Toggle", function(Status)
+    self._Switch = Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then
             Notifier:Send("[Legacy.wip] KickTarget - Enable!", 4)
             self:Enable()
