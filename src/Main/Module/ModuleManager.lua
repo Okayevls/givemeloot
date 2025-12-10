@@ -39,6 +39,7 @@ function ModuleManager:drawCategory(Window, ModuleLoader, Notifier)
     local FastInteract = loader:Get("FastInteract"):drawModule(PlayerTab, Notifier)
 
     local ChatSpy = loader:Get("ChatSpy"):drawModule(OtherTab, Notifier)
+    local KickTarget = loader:Get("KickTarget"):drawModule(OtherTab, Notifier)
     local AutoRedeem = loader:Get("RedeemCode"):drawModule(OtherTab, Notifier)
 
     Notifier:Send("Base ModuleManager Build | 0x000000000173", 6)
