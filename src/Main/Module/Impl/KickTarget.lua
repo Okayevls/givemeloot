@@ -74,7 +74,7 @@ local function teleportToTargetAndBack()
     wait(1.5)
 
     if not checkCarrying() then
-        rootLocal.CFrame = CFrame.new(Vector3.new(originalPos.X, originalPos.Y, originalPos.Z))
+        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos.Y, rootLocal.Position.Z))
     end
     return success
 end
