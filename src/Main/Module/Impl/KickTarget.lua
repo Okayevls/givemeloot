@@ -24,6 +24,7 @@ desync_setback.Transparency = 1
 local desync = {
     enabled = false,
     teleportPosition = Vector3.new(0, 0, 0),
+    old_positionY = nil,
     old_position = nil
 }
 
@@ -51,13 +52,17 @@ function KickTarget:EUpdate()
         local rootPart = Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         if rootPart then
             desync.old_position = rootPart.CFrame
+            desync.old_positionY = rootPart.CFrame
+
             local targetHeight = math.random(KickTarget.min, KickTarget.max)
             desync.teleportPosition = Vector3.new(rootPart.Position.X, targetHeight, rootPart.Position.Z)
             rootPart.CFrame = CFrame.new(desync.teleportPosition)
             workspace.CurrentCamera.CameraSubject = desync_setback
+
             RunService.RenderStepped:Wait()
+
             desync_setback.CFrame = desync.old_position * CFrame.new(0, rootPart.Size.Y / 2 + 0.5, 0)
-            rootPart.CFrame = desync.old_position
+            rootPart.CFrame = CFrame.new(rootPart.Position.X, desync.old_positionY, rootPart.Position.Z)
         end
     end
 end
@@ -96,6 +101,7 @@ function KickTarget:Enable()
     if not localChar then return end
     local rootLocal = localChar:FindFirstChild("HumanoidRootPart")
     if not rootLocal then return end
+    desync.old_positionY = rootLocal.Position.Y
     originalPos = rootLocal.Position.Y
     self.Enabled = true
     task.spawn(function()
