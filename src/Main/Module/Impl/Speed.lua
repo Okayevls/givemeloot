@@ -7,25 +7,22 @@ Speed.SpeedMultiplier = 145
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local hrp
 
 function Speed:EUpdate()
     if not character then return end
     local currentHrp = character:FindFirstChild("HumanoidRootPart")
     local humanoid = character:FindFirstChild("Humanoid")
-
     if not currentHrp or not humanoid then return end
-    hrp = currentHrp
 
     local dir = humanoid.MoveDirection
 
     if self.Enabled then
         if dir.Magnitude > 0 then
-            hrp.Velocity = Vector3.new(dir.X * self.SpeedMultiplier, hrp.Velocity.Y * 0.9, dir.Z * self.SpeedMultiplier)
+            currentHrp.Velocity = Vector3.new(dir.X * self.SpeedMultiplier, currentHrp.Velocity.Y * 0.9, dir.Z * self.SpeedMultiplier)
         end
     elseif self.RagdollEnabled and character:GetAttribute("Ragdoll") then
         if dir.Magnitude > 0 then
-            hrp.Velocity = Vector3.new(dir.X * 100, hrp.Velocity.Y * 0.9, dir.Z * 100)
+            currentHrp.Velocity = Vector3.new(dir.X * 100, currentHrp.Velocity.Y * 0.9, dir.Z * 100)
         end
     end
 end

@@ -1,2 +1,23 @@
-[main 1eba52a] Auto-commit 14.12.2025 20:29:21,13
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[main d92a676] Auto-commit 16.01.2026  0:57:45,29
+ 23 files changed, 100 insertions(+), 307 deletions(-)
+ delete mode 100644 library/Newtonsoft.Json.dll
+ delete mode 100644 library/Xeno.dll
+ delete mode 100644 library/concrt140.dll
+ delete mode 100644 library/gson-2.10.1.jar
+ delete mode 100644 library/jna-5.14.0.jar
+ delete mode 100644 library/jna-platform-5.14.0.jar
+ delete mode 100644 library/libcrypto-3-x64.dll
+ delete mode 100644 library/libssl-3-x64.dll
+ delete mode 100644 library/msvcp140.dll
+ delete mode 100644 library/msvcp140_1.dll
+ delete mode 100644 library/msvcrt.dll
+ delete mode 100644 library/ntdll.dll
+ delete mode 100644 library/ucrtbase.dll
+ delete mode 100644 library/vcruntime140.dll
+ delete mode 100644 library/vcruntime140_1.dll
+ create mode 100644 src/BloxStrike/ESP
+ delete mode 100644 src/Main/TEMPLATE/Test
+ delete mode 100644 src/MainLoader/CoreBinary.java
+ delete mode 100644 src/MainLoader/CoreInitilizator.java
+ delete mode 100644 src/MainLoader/CoreLibrary.java
+ delete mode 100644 src/Start.java
