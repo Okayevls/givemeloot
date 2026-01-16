@@ -8,11 +8,9 @@ local KickTarget = ModuleBase.new("KickTarget")
 local originalPos
 
 KickTarget.Enabled = false
-KickTarget.HealthArg = false
 KickTarget._Switch = nil
 KickTarget.max = 57000
 KickTarget.min = 50000
-KickTarget.healthCheck = 26
 KickTarget.Targets = {}
 
 local function checkCarrying()
@@ -33,24 +31,19 @@ function KickTarget:teleportToTargetAndBack()
 
     local targetHeight = math.random(KickTarget.min, KickTarget.max)
 
-    if self.HealthArg then
-        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
+    rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, targetHeight, rootLocal.Position.Z))
 
-        wait(0.5)
-        game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
-        Players.LocalPlayer.Character.Values.Carrying.Value = nil
-        wait(0.5)
+    wait(0.5)
+    game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvents"):WaitForChild("Carry"):FireServer(false)
+    Players.LocalPlayer.Character.Values.Carrying.Value = nil
+    wait(0.5)
 
-        if not checkCarrying() then
-            rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
-            self.Enabled = false
-            self.HealthArg = false
-            if self._Switch then
-                self._Switch.Value = false
-            end
+    if not checkCarrying() then
+        rootLocal.CFrame = CFrame.new(Vector3.new(rootLocal.Position.X, originalPos, rootLocal.Position.Z))
+        self.Enabled = false
+        if self._Switch then
+            self._Switch.Value = false
         end
-    else
-        self.HealthArg = localChar:WaitForChild("Humanoid").Health >= self.healthCheck
     end
 end
 
@@ -81,10 +74,6 @@ function KickTarget:drawModule(MainTab, Notifier)
             Notifier:Send("[Legacy.wip] KickTarget - Disable!", 4)
             self:Disable()
         end
-    end)
-
-    Folder.Slider("Check health", { Min = 0, Max = 30, Default = 26, Step = 0.1 }, function(value)
-        self.healthCheck = value
     end)
 
     Folder.Slider("MaxY", { Min = 25000, Max = 99000000, Default = 50000, Step = 5000 }, function(value)
