@@ -58,8 +58,7 @@ function ModuleBase:Enable()
     end))
 
     self:AddConnection(Players.PlayerRemoving:Connect(function(player)
-        --local userId = player.UserId
-        --local username = player.Name
+        --local userId = player.UserId --local username = player.Name
         if self.EPlayerLeaveServer then self:EPlayerLeaveServer(player) end
     end))
 end

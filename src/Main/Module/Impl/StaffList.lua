@@ -10,7 +10,6 @@ StaffList.Gui = nil
 
 function StaffList:CreateGui()
     if self.Gui then return end
-
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "StaffListGUI"
     screenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -30,7 +29,6 @@ function StaffList:CreateGui()
     uiCorner.CornerRadius = UDim.new(0, 15)
     uiCorner.Parent = mainFrame
 
-    -- Заголовок
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 40)
     title.Position = UDim2.new(0, 0, 0, 0)
@@ -42,7 +40,6 @@ function StaffList:CreateGui()
     title.Parent = mainFrame
     self.Title = title
 
-    -- Разделитель
     local separator = Instance.new("Frame")
     separator.Size = UDim2.new(1, -20, 0, 2)
     separator.Position = UDim2.new(0, 10, 0, 45)
@@ -51,7 +48,6 @@ function StaffList:CreateGui()
     separator.Parent = mainFrame
     self.Separator = separator
 
-    -- Контейнер для списка
     local staffContainer = Instance.new("Frame")
     staffContainer.Size = UDim2.new(1, 0, 0, 0)
     staffContainer.Position = UDim2.new(0, 0, 0, 50)
@@ -66,7 +62,6 @@ function StaffList:CreateGui()
     uiListLayout.Parent = staffContainer
     self.ListLayout = uiListLayout
 
-    -- Движение окна мышкой
     local dragging = false
     local dragInput, dragStart, startPos
 
@@ -105,7 +100,6 @@ function StaffList:UpdateList()
     if not self.Enabled or not self.Gui then return end
     local staffContainer = self.StaffContainer
 
-    -- Удаляем все элементы кроме UIListLayout
     for _, child in pairs(staffContainer:GetChildren()) do
         if not child:IsA("UIListLayout") then
             child:Destroy()

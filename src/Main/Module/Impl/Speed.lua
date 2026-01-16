@@ -5,13 +5,11 @@ Speed.RagdollEnabled = false
 Speed.SpeedMultiplier = 145
 
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
 
 function Speed:EUpdate()
-    if not character then return end
-    local currentHrp = character:FindFirstChild("HumanoidRootPart")
-    local humanoid = character:FindFirstChild("Humanoid")
+    if not Players.LocalPlayer.Character then return end
+    local currentHrp = Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local humanoid = Players.LocalPlayer.Character:FindFirstChild("Humanoid")
     if not currentHrp or not humanoid then return end
 
     local dir = humanoid.MoveDirection
@@ -20,7 +18,7 @@ function Speed:EUpdate()
         if dir.Magnitude > 0 then
             currentHrp.Velocity = Vector3.new(dir.X * self.SpeedMultiplier, currentHrp.Velocity.Y * 0.9, dir.Z * self.SpeedMultiplier)
         end
-    elseif self.RagdollEnabled and character:GetAttribute("Ragdoll") then
+    elseif self.RagdollEnabled and Players.LocalPlayer.Character:GetAttribute("Ragdoll") then
         if dir.Magnitude > 0 then
             currentHrp.Velocity = Vector3.new(dir.X * 100, currentHrp.Velocity.Y * 0.9, dir.Z * 100)
         end
@@ -38,18 +36,6 @@ end
 function Speed:drawModule(MainTab, Notifier)
     local Folder = MainTab.Folder("Speed", "[Info] Acceleration of player movement")
 
-    --Folder.ModeSetting("Speed Mode", {"Normal", "Fast", "Ultra"}, function(selected)
-    --    print("Выбран режим: " .. selected)
---
-    --    if selected == "Normal" then
-    --        Speed.SpeedMultiplier = 100
-    --    elseif selected == "Fast" then
-    --        Speed.SpeedMultiplier = 200
-    --    elseif selected == "Ultra" then
-    --        Speed.SpeedMultiplier = 500
-    --    end
-    --end)
-
     Folder.SwitchAndBinding("Toggle", function(Status)
         if Status then self:Enable() Notifier:Send("[Legacy.wip] Speed - Enable!", 6) else self:Disable() Notifier:Send("[Legacy.wip] Speed - Disable!", 6) end
     end)
@@ -60,3 +46,16 @@ function Speed:drawModule(MainTab, Notifier)
 end
 
 return Speed
+
+
+--Folder.ModeSetting("Speed Mode", {"Normal", "Fast", "Ultra"}, function(selected)
+--    print("Выбран режим: " .. selected)
+--
+--    if selected == "Normal" then
+--        Speed.SpeedMultiplier = 100
+--    elseif selected == "Fast" then
+--        Speed.SpeedMultiplier = 200
+--    elseif selected == "Ultra" then
+--        Speed.SpeedMultiplier = 500
+--    end
+--end)
